@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+ENV/
+.venv/
+db.sqlite3
+*.db
+*.bak
+
+# Django specific
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.log
+media/
+staticfiles/
+local_settings.py
+.env
