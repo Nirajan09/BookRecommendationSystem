@@ -1,10 +1,10 @@
-/* Global Reset */
+/* Global Reset
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
 }
 
-/* Base Styles */
+/* Base Styles
 body {
   font-family: "Work Sans", sans-serif;
   color: #0d141c;
@@ -12,7 +12,7 @@ body {
   line-height: 1.6;
 }
 
-/* Container */
+/* Container 
 .book-detail {
   display: flex;
   flex-direction: column;
@@ -21,7 +21,7 @@ body {
   justify-content: flex-start;
 }
 
-/* Header */
+/* Header 
 .header {
   display: flex;
   justify-content: space-between;
@@ -111,7 +111,7 @@ body {
   object-fit: cover;
 }
 
-/* Breadcrumbs */
+/* Breadcrumbs
 .breadcrumb {
   display: flex;
   align-items: center;
@@ -128,7 +128,7 @@ body {
   color: #5c738a;
 }
 
-/* Book Header */
+/* Book Header
 .book-header {
   padding: 0 40px 24px;
   max-width: 960px;
@@ -144,7 +144,7 @@ body {
   color: #5c738a;
 }
 
-/* Main Section: Cover & Details */
+/* Main Section: Cover & Details 
 .book-main {
   display: flex;
   gap: 40px;
@@ -180,7 +180,7 @@ body {
   color: #5c738a;
 }
 
-/* About Section */
+/* About Section
 .about {
   padding: 0 40px 40px;
   max-width: 760px;
@@ -197,7 +197,6 @@ body {
   color: #4a739c;
 }
 
-/* Reviews Summary */
 .reviews-summary {
   padding: 0 40px 40px;
   max-width: 960px;
@@ -235,7 +234,7 @@ body {
   color: #5c738a;
 }
 
-/* Individual Reviews */
+/* Individual Reviews 
 .reviews-list {
   padding: 0 40px 40px;
   max-width: 960px;
@@ -285,7 +284,7 @@ body {
   margin-right: 12px;
 }
 
-/* Similar Books */
+/* Similar Books 
 .similar-books {
   padding: 0 40px 40px;
   max-width: 960px;
@@ -318,4 +317,4 @@ body {
 .similar-item p {
   font-size: 0.875rem;
   color: #5c738a;
-}
+} */

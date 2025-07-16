@@ -1,9 +1,9 @@
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
-import {  toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./Auth.css";
 import { loginSchema } from '../../utils/ValidationSchema/ValidationSchema';
 import { useAuth } from '../../utils/AuthContext/AuthContext';
@@ -22,7 +22,7 @@ export default function Login() {
   });
 
   const onSubmit = async (data) => {
-     setLoading(true);
+    setLoading(true);
     try {
       const res = await axios.post('http://localhost:8000/accounts/login/', data);
       toast.success('Login successful!', {
@@ -37,14 +37,14 @@ export default function Login() {
       }, 2200);
     } catch {
       toast.error('Invalid credentials.');
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
-      <h2>Login</h2>
+      <h2>Welcome Back</h2>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <input
           {...register('username')}
@@ -60,6 +60,14 @@ export default function Login() {
         />
         {errors.password && <div className="error">{errors.password.message}</div>}
         <button type="submit">{isSubmitting || loading ? "Logging In..." : "Login"}</button>
+        <div className="account-info">
+          Don't have an account? <Link to="/register" className="register-link">Register</Link>
+        </div>
+        <div className="back-home">
+          <Link to="/" className="home-link">
+            Back to Home
+          </Link>
+        </div>
       </form>
     </div>
   );

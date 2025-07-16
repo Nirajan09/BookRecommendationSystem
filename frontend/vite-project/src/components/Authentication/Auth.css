@@ -4,11 +4,12 @@
   padding: 36px 32px 28px 32px;
   background: #fff;
   border-radius: 18px;
-  box-shadow: 0 6px 32px rgba(33, 147, 176, 0.12), 0 1.5px 6px rgba(109, 213, 237, 0.10);
+  box-shadow: 0 6px 32px rgba(33, 147, 176, 0.12),
+    0 1.5px 6px rgba(109, 213, 237, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
-  animation: fadeInAuth 0.7s cubic-bezier(.39,.575,.565,1) both;
+  animation: fadeInAuth 0.7s cubic-bezier(0.39, 0.575, 0.565, 1) both;
 }
 
 .auth-container h2 {
@@ -72,6 +73,34 @@
   letter-spacing: 0.2px;
   animation: fadeInError 0.3s;
 }
+.account-info {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.register-link {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.back-home {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.home-link {
+  color: #6b7280;
+  font-size: 12px;
+  text-decoration: none;
+  transition: text-decoration 0.2s;
+}
+
+.home-link:hover {
+  text-decoration: underline;
+}
 
 @keyframes fadeInAuth {
   0% {
@@ -84,8 +113,12 @@
   }
 }
 @keyframes fadeInError {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Responsive design */

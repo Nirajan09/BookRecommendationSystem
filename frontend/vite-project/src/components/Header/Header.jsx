@@ -27,6 +27,11 @@ export default function Header() {
           Home
         </Link>
 
+        {
+          token && <Link to="/dashboard" className="nav-link">Dashboard
+          </Link>
+        }
+
         {!token && (
           <>
             <Link to="/register" className="nav-link" onClick={handleLinkClick}>

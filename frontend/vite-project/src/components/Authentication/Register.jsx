@@ -1,9 +1,10 @@
+
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./Auth.css";
 import { registerSchema } from '../../utils/ValidationSchema/ValidationSchema';
 import { useState } from 'react';
@@ -36,7 +37,7 @@ export default function Register() {
 
   return (
     <div className="auth-container">
-      <h2>Register</h2>
+      <h2>Create an Account</h2>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <input
           {...register('username')}
@@ -59,6 +60,14 @@ export default function Register() {
         />
         {errors.password && <div className="error">{errors.password.message}</div>}
         <button type="submit">{isSubmitting || loading ? "Registering In..." : "Register"}</button>
+         <div className="account-info">
+          Already have an account? <Link to="/login" className="register-link">Login</Link>
+        </div>
+        <div className="back-home">
+          <Link to="/" className="home-link">
+            Back to Home
+          </Link>
+        </div>
       </form>
     </div>
   );
