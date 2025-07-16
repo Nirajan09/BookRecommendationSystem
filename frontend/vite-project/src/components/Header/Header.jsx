@@ -9,7 +9,6 @@ export default function Header() {
 
   const handleLinkClick = () => setMenuOpen(false);
 
- 
 
   return (
     <nav className="navbar">
