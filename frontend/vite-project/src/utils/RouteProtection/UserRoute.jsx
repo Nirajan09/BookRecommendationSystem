@@ -1,14 +1,11 @@
-// src/components/ProtectedRoute.js
-import { Navigate } from "react-router-dom";
 import { useAuth } from "../AuthContext/AuthContext";
+import { Navigate } from "react-router-dom";
 
 export default function UserRoute({ children }) {
-  const { token } = useAuth();
-
-  // If not authenticated, redirect to login
-  if (!token) {
+  const { token, user } = useAuth();
+  // Only allow if user is authenticated AND NOT is_staff
+  if (!token || !user || user.is_staff) {
     return <Navigate to="/login" replace />;
   }
-  // If authenticated, render the protected content
   return children;
 }

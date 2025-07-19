@@ -9,7 +9,7 @@ import { useAuth } from '../../utils/AuthContext/AuthContext';
 import { useState } from 'react';
 
 export default function Login() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const {
@@ -23,18 +23,24 @@ export default function Login() {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
+      // Login and get token
       const res = await axios.post('http://localhost:8000/accounts/login/', data);
       toast.success('Login successful!', {
         position: "top-right",
         autoClose: 2000,
         closeButton: false,
       });
-      login(res.data.token);
+      // Call context login (also fetches user info)
+      await login(res.data.token);
 
       setTimeout(() => {
-        navigate('/dashboard');
-      }, 2200);
-      
+        const profile = JSON.parse(localStorage.getItem("user"));
+        if (profile && profile.is_staff) {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
+      }, 1000);
     } catch {
       toast.error('Invalid credentials.');
     } finally {
