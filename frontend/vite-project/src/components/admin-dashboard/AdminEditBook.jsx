@@ -54,7 +54,7 @@ export default function AdminEditBook() {
   };
 
   return (
-    <div className="flex flex-col items-center px-2 py-8 bg-gray-100 min-h-screen">
+    <div className="flex flex-col items-center px-2 py-8 bg-gray-100 min-h-[90vh]">
       <form
         className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm flex flex-col"
         onSubmit={handleSubmit(onSubmit)}

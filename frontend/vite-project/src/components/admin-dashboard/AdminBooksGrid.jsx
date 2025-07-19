@@ -8,6 +8,10 @@ export default function AdminBooksGrid() {
   const { token } = useAuth();
   const navigate = useNavigate();
 
+  // Modal state for confirming delete
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null); // The book to delete
+
   useEffect(() => {
     axios
       .get("http://localhost:8000/books/admin/books/", {
@@ -16,20 +20,38 @@ export default function AdminBooksGrid() {
       .then(res => setBooks(res.data))
       .catch(err => {
         if (err.response?.status === 403) {
-          alert("Admin access only.");
+          // You can use toast here too!
           navigate("/login");
         }
       });
   }, [token, navigate]);
 
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this book?")) {
-      axios.delete(`http://localhost:8000/books/admin/books/${id}/`, {
+  // When the user clicks Delete, open modal for confirmation
+  const confirmDelete = (book) => {
+    setSelectedBook(book);
+    setShowDeleteModal(true);
+  };
+
+  // If user confirms, perform delete
+  const handleDeleteConfirmed = async () => {
+    if (!selectedBook) return;
+    try {
+      await axios.delete(`http://localhost:8000/books/admin/books/${selectedBook.id}/`, {
         headers: { Authorization: `Token ${token}` }
-      })
-        .then(() => setBooks(books.filter(book => book.id !== id)))
-        .catch(() => alert("Delete failed."));
+      });
+      setBooks(books.filter(book => book.id !== selectedBook.id));
+      setShowDeleteModal(false);
+      setSelectedBook(null);
+    } catch {
+      // You can use toast.error() here!
+      setShowDeleteModal(false);
+      setSelectedBook(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteModal(false);
+    setSelectedBook(null);
   };
 
   return (
@@ -55,7 +77,6 @@ export default function AdminBooksGrid() {
                   alt={book.title}
                   className="w-full h-60 object-contain rounded mb-2"
                 />
-
               ) : (
                 <div className="w-full h-40 bg-gray-100 flex items-center justify-center rounded mb-2 text-gray-400 text-4xl">
                   <span role="img" aria-label="no cover">📕</span>
@@ -78,7 +99,7 @@ export default function AdminBooksGrid() {
                   className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded w-full text-center"
                 >Edit</Link>
                 <button
-                  onClick={() => handleDelete(book.id)}
+                  onClick={() => confirmDelete(book)}
                   className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded w-full text-center"
                 >Delete</button>
               </div>
@@ -86,6 +107,32 @@ export default function AdminBooksGrid() {
           ))}
         </div>
       </section>
+      {/* Delete Confirm Modal */}
+      {showDeleteModal && (
+  <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
+      <p className="text-lg font-semibold text-gray-800 mb-4">Delete Book</p>
+      <p className="text-gray-600 mb-6 text-center">
+        Are you sure you want to delete <b>{selectedBook?.title}</b>?
+      </p>
+      <div className="flex space-x-4">
+        <button
+          onClick={handleDeleteConfirmed}
+          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold"
+        >
+          Yes, Delete
+        </button>
+        <button
+          onClick={handleCancelDelete}
+          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded font-semibold"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   );
 }
