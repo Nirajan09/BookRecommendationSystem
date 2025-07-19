@@ -4,7 +4,7 @@ import { useAuth } from '../../utils/AuthContext/AuthContext';
 const AdminHeader = () => {
     const { user,logout  } = useAuth();
   return (
-    <header className="bg-white shadow-md flex flex-col sm:flex-row items-center justify-between p-4">
+    <header className="bg-white h-[10vh] shadow-md flex flex-col sm:flex-row items-center justify-between p-4">
         <div className="flex items-center space-x-2">
           <span className="text-2xl font-bold text-indigo-600">Admin Dashboard</span>
         </div>

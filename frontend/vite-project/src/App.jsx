@@ -8,6 +8,10 @@ import GuestRoute from './utils/RouteProtection/GuestRoute'
 import UserDashboard from "./components/user-dashboard/UserDashboard"
 import AdminDashboard from "./components/admin-dashboard/AdminDashboard"
 import AdminRoute from './utils/RouteProtection/AdminRoute'
+import AdminBooksGrid from "./components/admin-dashboard/AdminBooksGrid";
+import AdminAddBook from "./components/admin-dashboard/AdminAddBook";
+import AdminEditBook from "./components/admin-dashboard/AdminEditBook";
+import BookDetail from './components/admin-dashboard/BookDetail'
 
 function App() {
 
@@ -37,9 +41,48 @@ function App() {
         {/* Admin Dashboard: only admins */}
         <Route path="/admin/*" element={
           <AdminRoute>
-            <AdminDashboard/>
+            <AdminDashboard />
           </AdminRoute>
         } />
+
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/books"
+          element={
+            <AdminRoute>
+              <AdminBooksGrid />
+            </AdminRoute>
+          }
+        />
+        <Route path="/admin/books/:id" element={
+          <AdminRoute>
+            <BookDetail />
+          </AdminRoute>
+        }
+        />
+        <Route
+          path="/admin/books/add"
+          element={
+            <AdminRoute>
+              <AdminAddBook />
+            </AdminRoute>
+          }
+        />
+        <Route
+          path="/admin/books/:id/edit"
+          element={
+            <AdminRoute>
+              <AdminEditBook />
+            </AdminRoute>
+          }
+        />
       </Routes>
     </>
   )
