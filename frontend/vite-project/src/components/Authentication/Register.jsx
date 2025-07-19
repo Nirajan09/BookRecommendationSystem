@@ -15,7 +15,7 @@ export default function Register() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting}
+    formState: { errors, isSubmitting }
   } = useForm({
     resolver: yupResolver(registerSchema)
   });
@@ -30,7 +30,7 @@ export default function Register() {
       }, 2200);
     } catch {
       toast.error('Registration failed.');
-    }finally {
+    } finally {
       setLoading(false);
     }
   };
@@ -60,7 +60,7 @@ export default function Register() {
         />
         {errors.password && <div className="error">{errors.password.message}</div>}
         <button type="submit">{isSubmitting || loading ? "Registering In..." : "Register"}</button>
-         <div className="account-info">
+        <div className="account-info">
           Already have an account? <Link to="/login" className="register-link">Login</Link>
         </div>
         <div className="back-home">
