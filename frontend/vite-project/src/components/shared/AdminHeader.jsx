@@ -4,11 +4,11 @@ import { useAuth } from '../../utils/AuthContext/AuthContext';
 const AdminHeader = () => {
     const { user,logout  } = useAuth();
   return (
-    <header className="bg-white h-[10vh] shadow-md flex flex-col sm:flex-row items-center justify-between p-4">
+    <header className="bg-white h-[13vh] sm:h-[10vh] shadow-md flex flex-col sm:flex-row  items-center justify-between p-4">
         <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-indigo-600">Admin Dashboard</span>
+          <span className="text-xl sm:text-2xl font-bold text-indigo-600">Admin Dashboard</span>
         </div>
-        <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 mt-2 sm:mt-0">
+        <div className="flex items-center space-y-2 space-x-4 mt-2 ">
           <span className="text-sm text-gray-500">
             {user && `Logged in as: ${user.username}`}
           </span>

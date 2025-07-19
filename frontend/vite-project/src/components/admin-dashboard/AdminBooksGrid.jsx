@@ -59,10 +59,17 @@ export default function AdminBooksGrid() {
       <section className="w-full max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-4">
           <h2 className="text-2xl font-bold text-indigo-700">Manage Books</h2>
+          <div className="flex gap-6">
+
           <Link
-            to="/admin/books/add"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
-          >Add Book</Link>
+          to="/admin/"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
+        >Continue to Dashboard</Link>
+        <Link
+          to="/admin/books/add"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
+        >Add Book</Link>
+          </div>
         </div>
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {books.map(book => (

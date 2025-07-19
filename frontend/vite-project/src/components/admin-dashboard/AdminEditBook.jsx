@@ -122,10 +122,10 @@ export default function AdminEditBook() {
         </button>
         <button
           type="button"
-          onClick={() => navigate(`/admin/books/${id}`)}
+          onClick={() => navigate(`/admin/books`)}
           className="w-full mt-2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-medium transition"
         >
-          Back to Details
+          Back to Books Grid
         </button>
       </form>
     </div>
