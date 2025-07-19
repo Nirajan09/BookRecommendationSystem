@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "./Header.css";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 
 export default function Header() {

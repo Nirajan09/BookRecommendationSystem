@@ -2,7 +2,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../AuthContext/AuthContext";
 
-export default function ProtectedRoute({ children }) {
+export default function UserRoute({ children }) {
   const { token } = useAuth();
 
   // If not authenticated, redirect to login

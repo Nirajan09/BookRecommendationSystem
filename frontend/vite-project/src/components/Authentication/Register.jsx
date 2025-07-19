@@ -5,7 +5,6 @@ import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
-import "./Auth.css";
 import { registerSchema } from '../../utils/ValidationSchema/ValidationSchema';
 import { useState } from 'react';
 

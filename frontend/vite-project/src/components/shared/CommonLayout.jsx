@@ -1,5 +1,4 @@
-import Header from "../Header/Header";
-
+import Header from "./Header";
 
 const CommonLayout = ({ children }) => {
   return (

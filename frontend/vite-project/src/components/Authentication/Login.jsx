@@ -4,7 +4,6 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link, useNavigate } from 'react-router-dom';
-import "./Auth.css";
 import { loginSchema } from '../../utils/ValidationSchema/ValidationSchema';
 import { useAuth } from '../../utils/AuthContext/AuthContext';
 import { useState } from 'react';
@@ -35,6 +34,7 @@ export default function Login() {
       setTimeout(() => {
         navigate('/dashboard');
       }, 2200);
+      
     } catch {
       toast.error('Invalid credentials.');
     } finally {
