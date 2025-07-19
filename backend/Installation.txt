@@ -3,3 +3,10 @@ python -m venv .venv
 
 
 pip install djangorestframework djangorestframework-simplejwt django-cors-headers
+# Books app
+python manage.py startapp books
+python manage.py makemigrations books
+python manage.py migrate
+
+
+python manage.py createsuperuser
