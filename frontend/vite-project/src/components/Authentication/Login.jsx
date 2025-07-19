@@ -29,16 +29,14 @@ export default function Login() {
         autoClose: 2000,
         closeButton: false,
       });
-      await login(res.data.token);
-
-      setTimeout(() => {
-        const profile = JSON.parse(localStorage.getItem("user"));
-        if (profile && profile.is_staff) {
-          navigate('/admin');
-        } else {
-          navigate('/dashboard');
-        }
-      }, 1000);
+      // Await login, which returns user profile info!
+      const profile = await login(res.data.token);
+      // Now profile is guaranteed to have is_staff
+      if (profile && profile.is_staff) {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch {
       toast.error('Invalid credentials.');
     } finally {
@@ -83,5 +81,3 @@ export default function Login() {
     </div>
   );
 }
-
-

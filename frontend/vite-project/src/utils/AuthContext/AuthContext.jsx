@@ -1,38 +1,38 @@
-// utils/AuthContext/AuthContext.jsx
+// src/utils/AuthContext/AuthContext.jsx
 import { createContext, useContext, useState } from "react";
 import axios from "axios";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(() => {
-    const stored = localStorage.getItem('user');
+    const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
 
-const login = async (tokenValue) => {
-  setToken(tokenValue);
-  localStorage.setItem('token', tokenValue);
+  // login returns profile for reliable navigation
+  const login = async (tokenValue) => {
+    setToken(tokenValue);
+    localStorage.setItem("token", tokenValue);
 
-  // Fetch user info immediately after login
-  const res = await axios.get('http://localhost:8000/accounts/user/', {
-    headers: { Authorization: `Token ${tokenValue}` },
-  });
-  setUser(res.data);
-  localStorage.setItem('user', JSON.stringify(res.data));
-};
-
+    const res = await axios.get("http://localhost:8000/accounts/user/", {
+      headers: { Authorization: `Token ${tokenValue}` },
+    });
+    setUser(res.data);
+    localStorage.setItem("user", JSON.stringify(res.data));
+    return res.data; // RETURN user info for immediate role-based redirect
+  };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   return (
-    <AuthContext.Provider value={{ token, setToken, login, logout, user }}>
+    <AuthContext.Provider value={{ token, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
