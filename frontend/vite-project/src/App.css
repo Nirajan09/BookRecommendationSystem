@@ -1,0 +1,13 @@
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeInAuth 0.7s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+  }
+}
+@keyframes fadeInAuth {
+  0% { opacity: 0; transform: translateY(30px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes fadeInError {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
