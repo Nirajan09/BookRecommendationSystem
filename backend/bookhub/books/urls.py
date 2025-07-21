@@ -13,7 +13,6 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r'admin/books', AdminBookViewSet, basename='admin-books')
-router = DefaultRouter()
 router.register('cart', CartItemViewSet, basename='cart')
 router.register('wishlist', WishlistItemViewSet, basename='wishlist')
 
@@ -25,6 +24,6 @@ urlpatterns = [
     path('top-rated/', TopRatedView.as_view(), name='book-top-rated'),
     path('personalized/', PersonalizedPicksView.as_view(), name='book-personalized'),
 
-    # Admin endpoints (CRUD, protected, /books/admin/books/)
+    # All router endpoints: /admin/books/, /cart/, /wishlist/
     path('', include(router.urls)),
 ]

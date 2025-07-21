@@ -49,7 +49,6 @@ class TopRatedView(APIView):
 # Personalized (customize this logic as you wish)
 class PersonalizedPicksView(APIView):
     permission_classes = [permissions.IsAuthenticated]
-    permission_classes = [permissions.IsAuthenticated]
     def get(self, request):
         # For demo: just return 12 random books or most recent
         books = Book.objects.all().order_by('?')[:12]
