@@ -73,3 +73,12 @@ class WishlistItemViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class BookViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Provides /books/books/ [list] and /books/books/<id>/ [retrieve] for regular users.
+    Ensure BookSerializer exists and is safe to expose publicly or to authenticated users!
+    """
+    queryset = Book.objects.all()  # filter as needed for public visibility
+    serializer_class = BookSerializer
+    permission_classes = [permissions.AllowAny]  # or customize for only logged-in, etc.

@@ -8,11 +8,13 @@ from .views import (
     TopRatedView,
     PersonalizedPicksView,
     CartItemViewSet,
-    WishlistItemViewSet
+    WishlistItemViewSet,
+    BookViewSet
 )
 
 router = DefaultRouter()
 router.register(r'admin/books', AdminBookViewSet, basename='admin-books')
+router.register(r'', BookViewSet, basename='books') 
 router.register('cart', CartItemViewSet, basename='cart')
 router.register('wishlist', WishlistItemViewSet, basename='wishlist')
 
