@@ -10,3 +10,9 @@ python manage.py migrate
 
 
 python manage.py createsuperuser
+
+python manage.py startapp userprofile
+
+python manage.py makemigrations userprofile
+python manage.py migrate
+
