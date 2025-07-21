@@ -13,6 +13,8 @@ import AdminEditBook from "./components/admin-dashboard/AdminEditBook";
 import BookDetail from './components/admin-dashboard/BookDetail'
 import UserHome from './components/user-dashboard/UserHome'
 import UserDashboard from './components/user-dashboard/UserDashboard'
+import UserBookDetail from './components/user-dashboard/UserBookDetail'
+import CartPage from './components/user-dashboard/CartPage'
 
 function App() {
 
@@ -38,6 +40,19 @@ function App() {
             <UserHome />
           </UserRoute>
         } />
+
+        <Route path="/books/cart" element={
+          <UserRoute>
+            <CartPage />
+          </UserRoute>
+      } />
+
+         <Route path="/books/:id" element={
+           <UserRoute>
+          <UserBookDetail />
+          </UserRoute>
+          } />
+
         <Route path="/dashboard/*" element={
           <UserRoute>
             <UserDashboard />
