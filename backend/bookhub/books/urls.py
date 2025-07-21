@@ -7,10 +7,15 @@ from .views import (
     BestSellersView,
     TopRatedView,
     PersonalizedPicksView,
+    CartItemViewSet,
+    WishlistItemViewSet
 )
 
 router = DefaultRouter()
 router.register(r'admin/books', AdminBookViewSet, basename='admin-books')
+router = DefaultRouter()
+router.register('cart', CartItemViewSet, basename='cart')
+router.register('wishlist', WishlistItemViewSet, basename='wishlist')
 
 urlpatterns = [
     # Public/explore endpoints

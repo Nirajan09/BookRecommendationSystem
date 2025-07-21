@@ -38,3 +38,18 @@ class BookRating(models.Model):
         return f"{self.user} - {self.book.title}: {self.rating}"
 
 # This structure means: if a user hasn't rated a book, there is NO BookRating row.
+
+class CartItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart_items')
+    book = models.ForeignKey('Book', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('user', 'book')  # Each book appears once per user in the cart
+
+class WishlistItem(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist_items')
+    book = models.ForeignKey('Book', on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('user', 'book')  # Each book appears once per user in the wishlist

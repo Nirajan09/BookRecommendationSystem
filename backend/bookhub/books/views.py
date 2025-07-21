@@ -2,7 +2,11 @@ from rest_framework import viewsets, generics, filters, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Book
+from .models import CartItem
+from .models import WishlistItem
 from .serializers import BookSerializer
+from .serializers import WishlistItemSerializer
+from .serializers import CartItemSerializer
 
 # -------- ADMIN BOOK MANAGEMENT -------
 class AdminBookViewSet(viewsets.ModelViewSet):
@@ -50,3 +54,23 @@ class PersonalizedPicksView(APIView):
         # For demo: just return 12 random books or most recent
         books = Book.objects.all().order_by('?')[:12]
         return Response(BookSerializer(books, many=True).data)
+
+class CartItemViewSet(viewsets.ModelViewSet):
+    serializer_class = CartItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return CartItem.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+class WishlistItemViewSet(viewsets.ModelViewSet):
+    serializer_class = WishlistItemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return WishlistItem.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
