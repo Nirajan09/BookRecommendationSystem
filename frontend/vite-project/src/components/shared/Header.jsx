@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
+import UserProfileSnapshot from "../user-dashboard/UserProfileSnapshot";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -49,12 +50,7 @@ export default function Header() {
           </>
         )}
         {token && (
-          <button
-            className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
-            onClick={logout}
-          >
-            Logout
-          </button>
+          <UserProfileSnapshot/>
         )}
       </div>
 

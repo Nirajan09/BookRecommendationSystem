@@ -5,13 +5,14 @@ import Register from './components/Authentication/Register'
 import Home from './components/shared/Home'
 import UserRoute from './utils/RouteProtection/UserRoute'
 import GuestRoute from './utils/RouteProtection/GuestRoute'
-import UserDashboard from "./components/user-dashboard/UserDashboard"
 import AdminDashboard from "./components/admin-dashboard/AdminDashboard"
 import AdminRoute from './utils/RouteProtection/AdminRoute'
 import AdminBooksGrid from "./components/admin-dashboard/AdminBooksGrid";
 import AdminAddBook from "./components/admin-dashboard/AdminAddBook";
 import AdminEditBook from "./components/admin-dashboard/AdminEditBook";
 import BookDetail from './components/admin-dashboard/BookDetail'
+import UserHome from './components/user-dashboard/UserHome'
+import UserDashboard from './components/user-dashboard/UserDashboard'
 
 function App() {
 
@@ -32,6 +33,11 @@ function App() {
         } />
 
         {/* User Dashboard: only logged-in users (non-admin) */}
+        <Route path="/user-home/*" element={
+          <UserRoute>
+            <UserHome />
+          </UserRoute>
+        } />
         <Route path="/dashboard/*" element={
           <UserRoute>
             <UserDashboard />

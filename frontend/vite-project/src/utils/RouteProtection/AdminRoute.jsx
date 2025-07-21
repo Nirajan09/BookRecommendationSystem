@@ -7,6 +7,6 @@ console.log("AdminRoute:", { token, user });
   if (!token) return <Navigate to="/login" replace />;
   if (user === null) return <div>Loading...</div>; // Wait for user to load
 
-  if (!user.is_staff) return <Navigate to="/dashboard" replace />;
+  if (!user.is_staff) return <Navigate to="/user-home" replace />;
   return children;
 }

@@ -17,7 +17,7 @@ export default function Home() {
           </p>
           <div className="mt-2">
             <Link
-              to={token ? "/dashboard" : "/login"}
+              to={token ? "/user-home" : "/login"}
               className="inline-block bg-gradient-to-r from-blue-700 to-cyan-400 hover:from-blue-800 hover:to-cyan-600 text-white px-8 py-3 rounded-lg font-semibold text-base shadow hover:-translate-y-1 hover:scale-105 transition-all"
             >
               Get Started
