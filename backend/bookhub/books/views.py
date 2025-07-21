@@ -2,11 +2,16 @@ from rest_framework import viewsets, generics, filters, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Book
+from .models import BookRating
 from .models import CartItem
 from .models import WishlistItem
 from .serializers import BookSerializer
 from .serializers import WishlistItemSerializer
 from .serializers import CartItemSerializer
+from rest_framework.decorators import action
+from rest_framework import status
+from django.db.models import Avg
+
 
 # -------- ADMIN BOOK MANAGEMENT -------
 class AdminBookViewSet(viewsets.ModelViewSet):
@@ -57,20 +62,16 @@ class PersonalizedPicksView(APIView):
 class CartItemViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-
     def get_queryset(self):
         return CartItem.objects.filter(user=self.request.user)
-
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 class WishlistItemViewSet(viewsets.ModelViewSet):
     serializer_class = WishlistItemSerializer
     permission_classes = [permissions.IsAuthenticated]
-
     def get_queryset(self):
         return WishlistItem.objects.filter(user=self.request.user)
-
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
@@ -82,3 +83,27 @@ class BookViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Book.objects.all()  # filter as needed for public visibility
     serializer_class = BookSerializer
     permission_classes = [permissions.AllowAny]  # or customize for only logged-in, etc.
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    def rate(self, request, pk=None):
+        book = self.get_object()
+        rating_value = request.data.get('rating')
+        comment = request.data.get('comment', "")
+
+        # Validate rating
+        try:
+            rating_value = int(rating_value)
+        except (TypeError, ValueError):
+            return Response({'detail': 'Invalid rating.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not (1 <= rating_value <= 5):
+            return Response({'detail': 'Rating must be 1-5.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Create or update rating
+        rating_obj, created = BookRating.objects.update_or_create(
+            user=request.user, book=book,
+            defaults={'rating': rating_value, 'comment': comment}
+        )
+        avg = book.ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+        book.average_rating = round(avg, 2)
+        book.save(update_fields=['average_rating'])
+
+        return Response({'detail': 'Review submitted!'}, status=status.HTTP_201_CREATED)
