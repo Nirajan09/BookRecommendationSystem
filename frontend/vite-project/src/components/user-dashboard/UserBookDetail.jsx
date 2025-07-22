@@ -63,10 +63,11 @@ export default function UserBookDetail() {
       setShowCartModal(false);
       navigate("/cart");
     } catch (err) {
-      setCartMsg("Could not add to cart.");
-    } finally {
-      setAddingCart(false);
-    }
+  if (err.response?.data?.quantity) {
+    toast.error(err.response.data.quantity);
+  } else {
+    toast.error("Could not add to cart.");
+  }}
   };
 
   // Existing add to wishlist and review handlers remain as is...
