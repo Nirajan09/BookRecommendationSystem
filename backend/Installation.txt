@@ -16,3 +16,11 @@ python manage.py startapp userprofile
 python manage.py makemigrations userprofile
 python manage.py migrate
 
+To ensure every user in your database has an associated Profile and to prevent RelatedObjectDoesNotExist errors, you need to execute a small script in the Django shell. This process only needs to be done once, and it does not require placing the code into your source files.
+
+from django.contrib.auth.models import User
+from userprofile.models import Profile
+
+for user in User.objects.all():
+    Profile.objects.get_or_create(user=user)
+

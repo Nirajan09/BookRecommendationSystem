@@ -4,8 +4,6 @@ from .models import CartItem
 from .models import WishlistItem
 from .models import BookRating
 
-
-
 class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CartItem
