@@ -19,11 +19,14 @@ export default function AdminAddBook() {
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
+
       formData.append("title", data.title);
       formData.append("author", data.author);
       formData.append("isbn", data.isbn);
       formData.append("price", data.price);
       formData.append("description", data.description || "");
+      formData.append("quantity", data.quantity);  // <-- append quantity here
+
       if (data.cover_image?.[0]) {
         formData.append("cover_image", data.cover_image[0]);
       }
@@ -55,14 +58,18 @@ export default function AdminAddBook() {
           placeholder="Title"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.title && <span className="text-red-500 text-xs mb-1">Title is required</span>}
+        {errors.title && (
+          <span className="text-red-500 text-xs mb-1">Title is required</span>
+        )}
 
         <input
           {...register("author", { required: true })}
           placeholder="Author"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.author && <span className="text-red-500 text-xs mb-1">Author is required</span>}
+        {errors.author && (
+          <span className="text-red-500 text-xs mb-1">Author is required</span>
+        )}
 
         <input
           {...register("isbn", {
@@ -73,12 +80,16 @@ export default function AdminAddBook() {
           maxLength={13}
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.isbn && <span className="text-red-500 text-xs mb-1">ISBN is required and must be at most 13 characters</span>}
+        {errors.isbn && (
+          <span className="text-red-500 text-xs mb-1">
+            ISBN is required and must be at most 13 characters
+          </span>
+        )}
 
         <input
           {...register("price", {
             required: true,
-            pattern: /^\d+(\.\d{1,2})?$/,
+            pattern: /^\d+(\.\d{1,2})?$/
           })}
           placeholder="Price"
           type="number"
@@ -86,7 +97,29 @@ export default function AdminAddBook() {
           min="0"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.price && <span className="text-red-500 text-xs mb-1">Price is required and must be a valid number with up to 2 decimals</span>}
+        {errors.price && (
+          <span className="text-red-500 text-xs mb-1">
+            Price is required and must be a valid number with up to 2 decimals
+          </span>
+        )}
+
+        {/* New Quantity input */}
+        <input
+          {...register("quantity", {
+            required: true,
+            min: 0,
+            valueAsNumber: true,
+          })}
+          placeholder="Quantity"
+          type="number"
+          min="0"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.quantity && (
+          <span className="text-red-500 text-xs mb-1">
+            Quantity is required and must be 0 or more
+          </span>
+        )}
 
         <textarea
           {...register("description")}
