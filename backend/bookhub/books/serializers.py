@@ -25,8 +25,11 @@ class BookSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class CartItemSerializer(serializers.ModelSerializer):
-    book = BookSerializer(read_only=True)
+    book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all(), write_only=True)
+    book_detail = BookSerializer(source='book', read_only=True)
+
     class Meta:
         model = CartItem
-        fields = ['id', 'user', 'book', 'quantity', 'added_at']
-        read_only_fields = ['id', 'user', 'added_at']  # <-- add 'user' here
+        fields = ['id', 'user', 'book', 'book_detail', 'quantity', 'added_at']
+        read_only_fields = ['id', 'user', 'added_at', 'book_detail']
+

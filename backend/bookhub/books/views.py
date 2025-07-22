@@ -84,7 +84,15 @@ class CartItemViewSet(viewsets.ModelViewSet):
         user = request.user
         book_id = request.data.get('book')
         quantity = int(request.data.get('quantity', 1))
+        try:
+            quantity = int(request.data.get('quantity', 1))
+        except (TypeError, ValueError):
+            return Response({'detail': 'Quantity must be an integer.'}, status=status.HTTP_400_BAD_REQUEST)
+        if quantity < 1:
+            return Response({'detail': 'Quantity must be at least 1.'}, status=status.HTTP_400_BAD_REQUEST)
 
+        if not book_id:
+            return Response({"detail": "Book ID is required."}, status=status.HTTP_400_BAD_REQUEST)
         if not book_id:
             return Response({"detail": "Book ID is required."}, status=status.HTTP_400_BAD_REQUEST)
 
