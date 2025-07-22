@@ -21,7 +21,6 @@ db.sqlite3
 *.pyd
 *.sqlite3
 *.log
-media/
 staticfiles/
 local_settings.py
 .env
