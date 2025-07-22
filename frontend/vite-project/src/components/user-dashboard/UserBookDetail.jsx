@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
+import { toast } from "react-toastify";
 
 const BASE_URL = "http://localhost:8000";
 
 export default function UserBookDetail() {
   const { id } = useParams();
   const { token } = useAuth();
+  const navigate = useNavigate();
 
   const [book, setBook] = useState(null);
   const [error, setError] = useState(null);
@@ -23,6 +25,10 @@ export default function UserBookDetail() {
   const [reviewText, setReviewText] = useState("");
   const [reviewMsg, setReviewMsg] = useState("");
 
+  // Modal & quantity for Add to Cart
+  const [showCartModal, setShowCartModal] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+
   useEffect(() => {
     axios
       .get(`${BASE_URL}/books/${id}/`, {
@@ -31,31 +37,39 @@ export default function UserBookDetail() {
       .then((res) => setBook(res.data))
       .catch((e) => {
         setError(
-          e?.response?.status === 404
-            ? "Book not found."
-            : "Failed to load book."
+          e?.response?.status === 404 ? "Book not found." : "Failed to load book."
         );
       });
   }, [id, token]);
 
-  // ADD TO CART
-  const handleAddToCart = async () => {
+  // Show modal and reset quantity to 1
+  const openCartModal = () => {
+    setQuantity(1);
+    setShowCartModal(true);
+  };
+  const closeCartModal = () => setShowCartModal(false);
+
+  // Add to cart API call inside modal
+  const handleAddToCartFromModal = async () => {
     setAddingCart(true);
     setCartMsg("");
     try {
       await axios.post(
         `${BASE_URL}/books/cart/`,
-        { book: book.id, quantity: 1 },
+        { book: book.id, quantity },
         { headers: { Authorization: `Token ${token}` } }
       );
-      setCartMsg("Added to cart!");
+      toast.success(`Book added to cart!`);
+      setShowCartModal(false);
+      navigate("/cart");
     } catch (err) {
-  setCartMsg("Could not add to cart.");
-  console.error("Cart error:", err?.response?.data || err.message || err);
-} finally {
+      setCartMsg("Could not add to cart.");
+    } finally {
       setAddingCart(false);
     }
   };
+
+  // Existing add to wishlist and review handlers remain as is...
 
   // ADD TO WISHLIST
   const handleAddToWishlist = async () => {
@@ -69,36 +83,33 @@ export default function UserBookDetail() {
       );
       setWishlistMsg("Added to wishlist!");
     } catch (err) {
-  setWishlistMsg("Could not add to wishlist.");
-  console.error("Wishlist error:", err?.response?.data || err.message || err);
-}finally {
+      setWishlistMsg("Could not add to wishlist.");
+    } finally {
       setAddingWishlist(false);
     }
   };
 
   // SUBMIT REVIEW
   const handleReviewSubmit = async (e) => {
-  e.preventDefault();
-  setReviewMsg("");
-  try {
-    await axios.post(
-      `${BASE_URL}/books/${book.id}/rate/`,
-      { rating: Number(ratingValue), comment: reviewText },
-      { headers: { Authorization: `Token ${token}` } }
-    );
-    setReviewMsg("Review submitted!");
-    setRatingValue("");
-    setReviewText("");
-    // Re-fetch book details to update average_rating in UI
-    const res = await axios.get(
-      `${BASE_URL}/books/${book.id}/`,
-      { headers: { Authorization: `Token ${token}` } }
-    );
-    setBook(res.data);
-  } catch {
-    setReviewMsg("Could not submit review.");
-  }
-};
+    e.preventDefault();
+    setReviewMsg("");
+    try {
+      await axios.post(
+        `${BASE_URL}/books/${book.id}/rate/`,
+        { rating: Number(ratingValue), comment: reviewText },
+        { headers: { Authorization: `Token ${token}` } }
+      );
+      setReviewMsg("Review submitted!");
+      setRatingValue("");
+      setReviewText("");
+      const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      setBook(res.data);
+    } catch {
+      setReviewMsg("Could not submit review.");
+    }
+  };
 
   if (error)
     return (
@@ -117,58 +128,59 @@ export default function UserBookDetail() {
     );
 
   return (
-    <div className="flex flex-col items-center min-h-[90vh] justify-center">
-      <div className="bg-white rounded shadow-lg p-6 w-full max-w-sm flex flex-col">
-        {book.cover_image && (
-          <div className="flex items-center justify-center w-full h-44 rounded mb-3">
-            <img
-              src={
-                book.cover_image.startsWith("http")
-                  ? book.cover_image
-                  : `${BASE_URL}${book.cover_image}`
-              }
-              alt={book.title}
-              className="max-h-full max-w-full object-contain"
-            />
+    <>
+      <div className="flex flex-col items-center min-h-[90vh] justify-center">
+        <div className="bg-white rounded shadow-lg p-6 w-full max-w-sm flex flex-col">
+          {book.cover_image && (
+            <div className="flex items-center justify-center w-full h-44 rounded mb-3">
+              <img
+                src={
+                  book.cover_image.startsWith("http")
+                    ? book.cover_image
+                    : `${BASE_URL}${book.cover_image}`
+                }
+                alt={book.title}
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+          )}
+          <h2 className="text-2xl font-bold mb-2">{book.title}</h2>
+          <p className="mb-1">
+            <b>Author:</b> {book.author}
+          </p>
+          <p className="mb-1">
+            <b>ISBN:</b> {book.isbn}
+          </p>
+          <p className="mb-1">
+            <b>Price:</b> ${book.price}
+          </p>
+          <p className="mb-4 text-gray-600">
+            <b>Description:</b> {book.description}
+          </p>
+
+          {/* Actions: Cart, Wishlist */}
+          <div className="flex space-x-2 my-2">
+            <button
+              onClick={openCartModal}
+              className="bg-indigo-500 text-white px-4 py-2 rounded disabled:opacity-70"
+              disabled={addingCart}
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={handleAddToWishlist}
+              className="bg-pink-100 text-pink-600 px-4 py-2 rounded disabled:opacity-70"
+              disabled={addingWishlist}
+            >
+              {addingWishlist ? "Adding..." : "Wishlist"}
+            </button>
           </div>
-        )}
-        <h2 className="text-2xl font-bold mb-2">{book.title}</h2>
-        <p className="mb-1">
-          <b>Author:</b> {book.author}
-        </p>
-        <p className="mb-1">
-          <b>ISBN:</b> {book.isbn}
-        </p>
-        <p className="mb-1">
-          <b>Price:</b> ${book.price}
-        </p>
-        <p className="mb-4 text-gray-600">
-          <b>Description:</b> {book.description}
-        </p>
-
-        {/* Actions: Cart, Wishlist */}
-        <div className="flex space-x-2 my-2">
-          <button
-            onClick={handleAddToCart}
-            className="bg-indigo-500 text-white px-4 py-2 rounded disabled:opacity-70"
-            disabled={addingCart}
-          >
-            {addingCart ? "Adding..." : "Add to Cart"}
-          </button>
-          <button
-            onClick={handleAddToWishlist}
-            className="bg-pink-100 text-pink-600 px-4 py-2 rounded disabled:opacity-70"
-            disabled={addingWishlist}
-          >
-            {addingWishlist ? "Adding..." : "Wishlist"}
-          </button>
-        </div>
-        {cartMsg && <div className="text-green-700 text-sm">{cartMsg}</div>}
-        {wishlistMsg && (
-          <div className="text-pink-700 text-sm">{wishlistMsg}</div>
-        )}
-
-        {/* Rating and Reviews */}
+          {cartMsg && <div className="text-green-700 text-sm">{cartMsg}</div>}
+          {wishlistMsg && (
+            <div className="text-pink-700 text-sm">{wishlistMsg}</div>
+          )}
+          
+          {/* Rating and Reviews */}
         <div className="mt-4 mb-2">
           <b>Average Rating:</b>{" "}
           {book.average_rating
@@ -176,6 +188,7 @@ export default function UserBookDetail() {
             : <span className="text-gray-400">No rating yet</span>
           }
         </div>
+
 
         {/* Reviews (optional, if provided by backend) */}
         <div className="mb-4">
@@ -200,6 +213,7 @@ export default function UserBookDetail() {
             <div className="text-gray-400 text-sm">No reviews yet.</div>
           )}
         </div>
+
 
         {/* Leave a Review */}
         <div className="border-t pt-4 mt-4 mb-2">
@@ -234,7 +248,7 @@ export default function UserBookDetail() {
           </form>
           {reviewMsg && <div className="text-green-700 text-xs mt-1">{reviewMsg}</div>}
         </div>
-        
+       
         <div className="flex space-x-2 mt-2">
           <Link
             to="/user-home"
@@ -243,7 +257,73 @@ export default function UserBookDetail() {
             Back to Home
           </Link>
         </div>
+        </div>
       </div>
+
+      {/* Modal for Add to Cart */}
+      {showCartModal && (
+  <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-lg">
+      {/* Book cover image */}
+      {book.cover_image && (
+        <div className="flex items-center justify-center w-full h-36 rounded mb-4">
+          <img
+            src={
+              book.cover_image.startsWith("http")
+                ? book.cover_image
+                : `${BASE_URL}${book.cover_image}`
+            }
+            alt={book.title}
+            className="max-h-full max-w-full object-contain"
+          />
+        </div>
+      )}
+
+      <h3 className="text-xl font-semibold mb-4">{book.title}</h3>
+      <p><b>Author:</b> {book.author}</p>
+      <p><b>Price:</b> ${book.price}</p>
+      <p className="mb-4"><b>Available Quantity:</b> {book.quantity}</p>
+
+      {/* Quantity selector */}
+      <div className="flex items-center mb-4 space-x-4">
+        <button
+          onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
+          -
+        </button>
+        <span className="font-semibold">{quantity}</span>
+        <button
+          onClick={() => setQuantity((q) => (q < book.quantity ? q + 1 : q))}
+          className={`px-3 py-1 rounded text-white ${
+            quantity >= book.quantity ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+          }`}
+          disabled={quantity >= book.quantity}
+        >
+          +
+        </button>
+      </div>
+
+      <button
+        onClick={handleAddToCartFromModal}
+        disabled={addingCart}
+        className={`w-full py-2 rounded text-white font-semibold ${
+          addingCart ? "bg-gray-400" : "bg-indigo-600 hover:bg-indigo-700"
+        }`}
+      >
+        {addingCart ? "Adding..." : "Add to Cart"}
+      </button>
+
+      <button
+        onClick={closeCartModal}
+        className="w-full mt-2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-medium transition"
+      >
+        Cancel
+      </button>
     </div>
+  </div>
+)}
+
+    </>
   );
 }

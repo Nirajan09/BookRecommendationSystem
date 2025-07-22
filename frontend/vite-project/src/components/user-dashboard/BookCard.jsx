@@ -16,7 +16,6 @@ export default function BookCard({ book }) {
       <span className="text-blue-700 font-bold mb-2">${book.price}</span>
       <div className="flex space-x-2">
         <Link to={`/books/${book.id}`} className="text-blue-500 underline text-xs">View</Link>
-        <button className="bg-indigo-500 text-white px-2 py-1 rounded text-xs">Add to Cart</button>
         <button className="bg-pink-100 text-pink-600 px-2 py-1 rounded text-xs">Wishlist</button>
       </div>
     </div>
