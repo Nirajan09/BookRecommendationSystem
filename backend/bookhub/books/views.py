@@ -12,6 +12,7 @@ from rest_framework.decorators import action
 from rest_framework import status
 from django.db.models import Avg
 from .serializers import BookRatingSerializer
+from rest_framework.exceptions import ValidationError
 
 # -------- ADMIN BOOK MANAGEMENT -------
 class AdminBookViewSet(viewsets.ModelViewSet):
@@ -79,6 +80,42 @@ class CartItemViewSet(viewsets.ModelViewSet):
         return CartItem.objects.filter(user=self.request.user)
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+    def create(self, request, *args, **kwargs):
+        user = request.user
+        book_id = request.data.get('book')
+        quantity = int(request.data.get('quantity', 1))
+
+        if not book_id:
+            return Response({"detail": "Book ID is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Get related book
+        try:
+            book = Book.objects.get(pk=book_id)
+        except Book.DoesNotExist:
+            return Response({"detail": "Book not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Calculate existing quantity in cart if any
+        existing_item = CartItem.objects.filter(user=user, book=book).first()
+        current_qty = existing_item.quantity if existing_item else 0
+        new_qty = current_qty + quantity
+
+        # Check if new quantity exceeds available stock
+        if new_qty > book.quantity:
+            msg = f"Only {book.quantity - current_qty} item(s) left in stock."
+            raise ValidationError({"quantity": msg})
+
+        # If existing cart item, update quantity
+        if existing_item:
+            existing_item.quantity = new_qty
+            existing_item.save()
+            serializer = self.get_serializer(existing_item)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        # Else create new cart item
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class WishlistItemViewSet(viewsets.ModelViewSet):
     serializer_class = WishlistItemSerializer
