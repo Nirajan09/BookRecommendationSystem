@@ -15,7 +15,7 @@ export default function UserProfileSnapshot() {
   const [showMenu, setShowMenu] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
-const modalRef = useRef(null);
+  const modalRef = useRef(null);
   const avatarRef = useRef(null);
 
 
@@ -37,15 +37,15 @@ const modalRef = useRef(null);
 
   // Menu close on click outside
   useEffect(() => {
-  if (!showModal) return;
-  const handler = (event) => {
-    if (modalRef.current && !modalRef.current.contains(event.target)) {
-      setShowModal(false);
-    }
-  };
-  document.addEventListener("mousedown", handler);
-  return () => document.removeEventListener("mousedown", handler);
-}, [showModal]);
+    if (!showModal) return;
+    const handler = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setShowModal(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [showModal]);
 
 
   // Handle form field changes
@@ -65,10 +65,10 @@ const modalRef = useRef(null);
     data.append("first_name", form.first_name);
     data.append("last_name", form.last_name);
     data.append("email", form.email);
-    if (form.avatar) data.append("profile.avatar", form.avatar);
+if (form.avatar) data.append("profile.avatar", form.avatar);
     try {
       const res = await axios.patch(
-        "http://localhost:8000/api/userprofile/me/",
+        "http://localhost:8000/userprofile/profile/",
         data,
         { headers: { Authorization: `Token ${token}`, "Content-Type": "multipart/form-data" } }
       );
@@ -86,7 +86,13 @@ const modalRef = useRef(null);
   return (
     <div ref={avatarRef} className="relative ml-3">
       <img
-        src={profile.profile?.avatar || "/DefaultAvatar.png"}
+        src={
+          profile.profile?.avatar
+            ? profile.profile.avatar.startsWith("http")
+              ? profile.profile.avatar
+              : `http://localhost:8000${profile.profile.avatar}`
+            : "/DefaultAvatar.png"
+        }
         alt="Avatar"
         onClick={() => setShowMenu(v => !v)}
         className="w-10 h-10 rounded-full object-cover border border-blue-300 shadow-sm cursor-pointer transition hover:ring-2 hover:ring-blue-200"
