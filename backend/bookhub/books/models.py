@@ -11,7 +11,7 @@ class Book(models.Model):
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     cover_image = models.ImageField(upload_to='covers/', null=True, blank=True)
-
+    quantity = models.PositiveIntegerField(default=0)
     def __str__(self):
         return self.title
 
