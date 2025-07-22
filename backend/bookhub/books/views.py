@@ -11,13 +11,26 @@ from .serializers import CartItemSerializer
 from rest_framework.decorators import action
 from rest_framework import status
 from django.db.models import Avg
-
+from .serializers import BookRatingSerializer
 
 # -------- ADMIN BOOK MANAGEMENT -------
 class AdminBookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAdminUser]
+
+class BookRatingViewSet(viewsets.ModelViewSet):
+    queryset = BookRating.objects.all()
+    serializer_class = BookRatingSerializer
+    permission_classes = [permissions.IsAdminUser]  # Only admins can delete reviews
+
+    def perform_destroy(self, instance):
+        book = instance.book
+        instance.delete()
+        # Recalculate average rating after deletion
+        avg = book.ratings.aggregate(avg=Avg('rating'))['avg'] or 0
+        book.average_rating = round(avg, 2)
+        book.save(update_fields=['average_rating'])
 
 # -------- PUBLIC CURATED SHELVES -------
 

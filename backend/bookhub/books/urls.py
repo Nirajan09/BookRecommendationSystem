@@ -9,13 +9,15 @@ from .views import (
     PersonalizedPicksView,
     CartItemViewSet,
     WishlistItemViewSet,
-    BookViewSet
+    BookViewSet,
+    BookRatingViewSet
 )
 
 router = DefaultRouter()
 router.register(r'admin/books', AdminBookViewSet, basename='admin-books')
 router.register('cart', CartItemViewSet, basename='cart')
 router.register('wishlist', WishlistItemViewSet, basename='wishlist')
+router.register(r'reviews', BookRatingViewSet, basename='reviews')  # Add 
 router.register(r'', BookViewSet, basename='books')  # NOTE: move this last!
 
 urlpatterns = [
