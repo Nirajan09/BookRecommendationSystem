@@ -212,7 +212,7 @@ export default function CartPage() {
       </div>
 
       {/* Checkout button */}
-      <div className="mt-auto mt-6 flex justify-end">
+      <div className="mt-6 flex justify-end">
         <button
           disabled={selectedItems.size === 0}
           onClick={handleCheckout}
