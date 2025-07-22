@@ -10,7 +10,12 @@ export default function AdminEditBook() {
   const { token } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
-  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
   // Fetch current book data on mount
   useEffect(() => {
@@ -24,11 +29,12 @@ export default function AdminEditBook() {
       setValue("isbn", book.isbn);
       setValue("price", book.price);
       setValue("description", book.description);
+      setValue("quantity", book.quantity); // Set quantity here
     })
     .catch(() => navigate("/admin/books"));
   }, [id, setValue, token, navigate]);
 
-  // Submit updated book info (with optional new cover image)
+  // Submit updated book info (with optional cover image & quantity)
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("title", data.title);
@@ -36,7 +42,8 @@ export default function AdminEditBook() {
     formData.append("isbn", data.isbn);
     formData.append("price", data.price);
     formData.append("description", data.description || "");
-    if (data.cover_image?.[0]) {
+    formData.append("quantity", data.quantity);  // Append quantity to formData
+    if(data.cover_image?.[0]) {
       formData.append("cover_image", data.cover_image[0]);
     }
     try {
@@ -77,26 +84,40 @@ export default function AdminEditBook() {
         {errors.author && <span className="text-red-500 text-xs mb-1">Author required</span>}
 
         <input
-  {...register("isbn", { required: true, maxLength: 13 })}
-  placeholder="ISBN"
-  maxLength={13}
-  className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-/>
-{errors.isbn && <span className="text-red-500 text-xs mb-1">ISBN must be at most 13 characters</span>}
+          {...register("isbn", { required: true, maxLength: 13 })}
+          placeholder="ISBN"
+          maxLength={13}
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.isbn && <span className="text-red-500 text-xs mb-1">ISBN must be at most 13 characters</span>}
 
-<input
-  {...register("price", {
-      required: true,
-      pattern: /^\d+(\.\d{1,2})?$/,
-      validate: v => (v && v.toString().split(".")[1]?.length <= 2) || "Max 2 decimals"
-    })}
-  placeholder="Price"
-  type="number"
-  step="0.01"
-  min="0"
-  className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-/>
-{errors.price && <span className="text-red-500 text-xs mb-1">Price must have at most 2 decimal places</span>}
+        <input
+          {...register("price", {
+            required: true,
+            pattern: /^\d+(\.\d{1,2})?$/,
+            validate: v => (v && v.toString().split(".")[1]?.length <= 2) || "Max 2 decimals"
+          })}
+          placeholder="Price"
+          type="number"
+          step="0.01"
+          min="0"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.price && <span className="text-red-500 text-xs mb-1">Price must have at most 2 decimal places</span>}
+
+        {/* Add quantity input */}
+        <input
+          {...register("quantity", {
+            required: true,
+            min: 0,
+            valueAsNumber: true
+          })}
+          placeholder="Quantity"
+          type="number"
+          min="0"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.quantity && <span className="text-red-500 text-xs mb-1">Quantity is required (0+)</span>}
 
         <textarea
           {...register("description")}
