@@ -41,7 +41,7 @@ function App() {
           </UserRoute>
         } />
 
-        <Route path="/books/cart" element={
+        <Route path="/cart" element={
           <UserRoute>
             <CartPage />
           </UserRoute>
