@@ -115,8 +115,9 @@ class BookViewSet(viewsets.ReadOnlyModelViewSet):
             user=request.user, book=book,
             defaults={'rating': rating_value, 'comment': comment}
         )
-        avg = book.ratings.aggregate(avg=Avg('rating'))['avg'] or 0
-        book.average_rating = round(avg, 2)
+        avg = book.ratings.aggregate(avg=Avg('rating'))['avg']
+        book.average_rating = round(avg if avg is not None else 0, 2)
         book.save(update_fields=['average_rating'])
+
 
         return Response({'detail': 'Review submitted!'}, status=status.HTTP_201_CREATED)
