@@ -19,6 +19,7 @@ class BookRatingSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'book', 'rated_at']
 
 class BookSerializer(serializers.ModelSerializer):
+    price = serializers.FloatField()
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
     class Meta:
         model = Book
