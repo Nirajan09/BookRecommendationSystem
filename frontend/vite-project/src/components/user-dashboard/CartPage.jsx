@@ -92,10 +92,19 @@ export default function CartPage() {
   // Handle checkout click
   const handleCheckout = () => {
     if (selectedItems.size === 0) return;
-
     toast.success(`Proceeding to checkout ${selectedItems.size} item(s)`);
     navigate("/checkout", { state: { items: Array.from(selectedItems) } });
   };
+
+  // Calculate subtotal for selected items
+  const selectedSubtotal = cartItems
+    .filter((item) => selectedItems.has(item.id))
+    .reduce(
+      (sum, item) =>
+        sum +
+        Number(item.book_detail?.price) * item.quantity,
+      0
+    );
 
   if (loading) {
     return <div className="p-6 text-center">Loading cart...</div>;
@@ -168,9 +177,15 @@ export default function CartPage() {
 
             <div className="flex-1 flex flex-col">
               <h2 className="font-semibold">{book_detail?.title || "Unknown Title"}</h2>
-              <p className="text-sm text-gray-600">Author: {book_detail?.author || "Unknown"}</p>
-              <p className="text-indigo-600 font-semibold mt-1">${book_detail?.price ?? "0.00"}</p>
-              <p className="text-sm mt-1">Available: {book_detail?.quantity ?? 0}</p>
+              <p className="text-sm text-gray-600">
+                Author: {book_detail?.author || "Unknown"}
+              </p>
+              <p className="text-indigo-600 font-semibold mt-1">
+                ${Number(book_detail?.price).toFixed(2)}
+              </p>
+              <p className="text-sm mt-1">
+                Available: {book_detail?.quantity ?? 0}
+              </p>
             </div>
 
             {/* Quantity selector */}
@@ -207,8 +222,23 @@ export default function CartPage() {
                 +
               </button>
             </div>
+
+            {/* Total price for this item */}
+            <div className="ml-6 text-right min-w-[90px]">
+              <p className="font-semibold text-lg">
+                ${(Number(book_detail?.price) * quantity).toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-400">Total</p>
+            </div>
           </div>
         ))}
+      </div>
+
+      {/* Cart Subtotal (for selected items) */}
+      <div className="mt-6 flex justify-end items-center space-x-3">
+        <span className="font-semibold text-xl">
+          Subtotal: ${selectedSubtotal.toFixed(2)}
+        </span>
       </div>
 
       {/* Checkout button */}
