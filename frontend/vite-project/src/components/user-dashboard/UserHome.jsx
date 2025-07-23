@@ -3,9 +3,8 @@ import axios from "axios";
 import BookSearchBar from "./BookSearchBar";
 import BookShelf from "./BookShelf";
 import BookCard from "./BookCard";
+import { useAuth } from "../../utils/AuthContext/AuthContext";
 
-// Replace with your own auth/token solution if needed
-const TOKEN = "a2adee84e6dd67de874402964761925c913c03d1"; // <-- Set this with your actual user's token
 
 export default function UserHome() {
   const [query, setQuery] = useState("");
@@ -16,15 +15,16 @@ export default function UserHome() {
   const [topRated, setTopRated] = useState([]);
   const [personalized, setPersonalized] = useState([]);
 
+  const {token}=useAuth();
   // Shelves
   useEffect(() => {
-    axios.get("http://localhost:8000/books/new-releases/", { headers: { Authorization: `Token ${TOKEN}` } })
+    axios.get("http://localhost:8000/books/new-releases/", { headers: { Authorization: `Token ${token}` } })
       .then(res => setNewReleases(res.data || []));
-    axios.get("http://localhost:8000/books/best-sellers/", { headers: { Authorization: `Token ${TOKEN}` } })
+    axios.get("http://localhost:8000/books/best-sellers/", { headers: { Authorization: `Token ${token}` } })
       .then(res => setBestSellers(res.data || []));
-    axios.get("http://localhost:8000/books/top-rated/", { headers: { Authorization: `Token ${TOKEN}` } })
+    axios.get("http://localhost:8000/books/top-rated/", { headers: { Authorization: `Token ${token}` } })
       .then(res => setTopRated(res.data || []));
-    axios.get("http://localhost:8000/books/personalized/", { headers: { Authorization: `Token ${TOKEN}` } })
+    axios.get("http://localhost:8000/books/personalized/", { headers: { Authorization: `Token ${token}` } })
       .then(res => setPersonalized(res.data || []));
   }, []);
 
@@ -35,7 +35,7 @@ useEffect(() => {
     return;
   }
   axios.get(`http://localhost:8000/books/all/?search=${encodeURIComponent(searchTerm)}`, {
-    headers: { Authorization: `Token ${TOKEN}` }
+    headers: { Authorization: `Token ${token}` }
   }).then(res => {
     console.log("Search result:", res.data);
     // Defensive assignment:
