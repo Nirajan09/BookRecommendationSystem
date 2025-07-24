@@ -4,6 +4,7 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AiOutlineDelete } from "react-icons/ai";
+import { IoCartOutline } from "react-icons/io5";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -140,17 +141,27 @@ export default function CartPage() {
     return <div className="p-6 text-center">Loading cart...</div>;
 
   if (cartItems.length === 0)
-    return (
-      <div className="p-6 text-center">
-        <p>Your cart is empty.</p>
-        <button
-          onClick={() => navigate("/books")}
-          className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded"
-        >
-          Browse Books
-        </button>
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[70vh] text-center">
+      <div className="flex items-center justify-center w-32 h-32 rounded-full bg-indigo-50 mb-4 shadow-sm">
+        <IoCartOutline size={72} className="text-indigo-400" />
       </div>
-    );
+      <div className="text-2xl font-bold text-gray-700 mb-2">Your cart is empty!</div>
+      <div className="text-gray-500 mb-6">
+        Looks like you haven&apos;t added anything yet.<br />
+        Browse our collection and get started!
+      </div>
+      <button
+        onClick={() => navigate("/books")}
+        className="px-6 py-2 bg-indigo-600 rounded text-white text-lg font-semibold shadow hover:bg-indigo-700 transition"
+      >
+        <span className="inline-flex items-center gap-2">
+          <IoCartOutline size={22} />
+          Browse Books
+        </span>
+      </button>
+    </div>
+  );
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col min-h-[80vh]">
