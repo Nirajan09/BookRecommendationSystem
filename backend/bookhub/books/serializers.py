@@ -5,11 +5,7 @@ from .models import WishlistItem
 from .models import BookRating
 
 
-class WishlistItemSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WishlistItem
-        fields = ['id', 'user', 'book', 'added_at']
-        read_only_fields = ['id', 'user', 'added_at']  # <-- add 'user' here
+
 
 class BookRatingSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()  # Shows username (or __str__ on your User model)
@@ -34,3 +30,10 @@ class CartItemSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'book', 'book_detail', 'quantity', 'added_at']
         read_only_fields = ['id', 'user', 'added_at', 'book_detail']
 
+class WishlistItemSerializer(serializers.ModelSerializer):
+    book_detail = BookSerializer(source='book', read_only=True)
+
+    class Meta:
+        model = WishlistItem
+        fields = ['id', 'user', 'book', 'added_at', 'book_detail']
+        read_only_fields = ['id', 'user', 'added_at']
