@@ -4,9 +4,14 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import UserProfileSnapshot from "../user-dashboard/UserProfileSnapshot";
 import { IoCartOutline } from "react-icons/io5";
 import { MdFavoriteBorder } from "react-icons/md";
+import axios from "axios";
+
+const BASE_URL = "http://localhost:8000";
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, logout } = useAuth();
+  const [cartCount, setCartCount] = useState(0);
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -17,6 +22,26 @@ export default function Header() {
     }
     return () => (document.body.style.overflow = "");
   }, [menuOpen]);
+
+  // Fetch cart count when token changes
+  useEffect(() => {
+    if (!token) {
+      setCartCount(0);
+      return;
+    }
+    axios
+      .get(`${BASE_URL}/books/cart/`, {
+        headers: { Authorization: `Token ${token}` },
+      })
+      .then((res) => {
+        const totalItems = res.data.reduce(
+          (acc, item) => acc + (item.quantity || 1),
+          0
+        );
+        setCartCount(totalItems);
+      })
+      .catch(() => setCartCount(0));
+  }, [token]);
 
   const handleLinkClick = () => setMenuOpen(false);
 
@@ -30,39 +55,57 @@ export default function Header() {
       {/* Desktop Links */}
       <div className="hidden md:flex items-center gap-5">
         <Link
-          to={`${token?"/user-home":"/"}`}
+          to={`${token ? "/user-home" : "/"}`}
           className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
         >
           Home
         </Link>
         {token && (
-          <Link to="/cart" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+          <Link
+            to="/cart"
+            className="relative text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+          >
             <IoCartOutline size={30} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
+                {cartCount}
+              </span>
+            )}
           </Link>
         )}
         {token && (
-          <Link to="/wishlist" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+          <Link
+            to="/wishlist"
+            className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+          >
             <MdFavoriteBorder size={30} />
           </Link>
         )}
         {token && (
-          <Link to="/dashboard" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+          <Link
+            to="/dashboard"
+            className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+          >
             Dashboard
           </Link>
         )}
         {!token && (
           <>
-            <Link to="/register" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+            <Link
+              to="/register"
+              className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+            >
               Register
             </Link>
-            <Link to="/login" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+            <Link
+              to="/login"
+              className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+            >
               Login
             </Link>
           </>
         )}
-        {token && (
-          <UserProfileSnapshot/>
-        )}
+        {token && <UserProfileSnapshot />}
       </div>
 
       {/* Hamburger (mobile) */}
@@ -87,7 +130,8 @@ export default function Header() {
       </button>
 
       {/* Mobile Slide-in Menu */}
-      <div className={`fixed top-0 right-0 h-screen bg-white shadow-xl z-[100] w-4/5 max-w-xs transform transition-transform duration-300
+      <div
+        className={`fixed top-0 right-0 h-screen bg-white shadow-xl z-[100] w-4/5 max-w-xs transform transition-transform duration-300
         ${menuOpen ? "translate-x-0" : "translate-x-full"}
         flex flex-col p-8 pt-20 gap-1`}
       >
@@ -98,6 +142,35 @@ export default function Header() {
         >
           Home
         </Link>
+        {token && (
+          <Link
+            to="/cart"
+            className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition relative"
+            onClick={handleLinkClick}
+          >
+            <span className="inline-flex items-center">
+              <IoCartOutline size={26} />
+              <span className="ml-2">Cart</span>
+              {cartCount > 0 && (
+                <span className="ml-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
+                  {cartCount}
+                </span>
+              )}
+            </span>
+          </Link>
+        )}
+        {token && (
+          <Link
+            to="/wishlist"
+            className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition"
+            onClick={handleLinkClick}
+          >
+            <span className="inline-flex items-center">
+              <MdFavoriteBorder size={26} />
+              <span className="ml-2">Wishlist</span>
+            </span>
+          </Link>
+        )}
         {token && (
           <Link
             to="/dashboard"
@@ -148,3 +221,4 @@ export default function Header() {
     </nav>
   );
 }
+
