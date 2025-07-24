@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { AiOutlineDelete } from "react-icons/ai";
 
 const BASE_URL = "http://localhost:8000";
 
@@ -15,6 +16,11 @@ export default function CartPage() {
   const [selectAll, setSelectAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [updatingItemId, setUpdatingItemId] = useState(null);
+  const [deletingItemId, setDeletingItemId] = useState(null);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [itemPendingDelete, setItemPendingDelete] = useState(null);
 
   // Fetch cart items on mount and token change
   const fetchCartItems = async () => {
@@ -34,6 +40,7 @@ export default function CartPage() {
 
   useEffect(() => {
     fetchCartItems();
+    // eslint-disable-next-line
   }, [token]);
 
   // Toggle single cart item checkbox
@@ -42,7 +49,9 @@ export default function CartPage() {
     if (newSelected.has(id)) newSelected.delete(id);
     else newSelected.add(id);
     setSelectedItems(newSelected);
-    setSelectAll(newSelected.size === cartItems.length && cartItems.length > 0);
+    setSelectAll(
+      newSelected.size === cartItems.length && cartItems.length > 0
+    );
   };
 
   // Toggle all checkboxes
@@ -67,7 +76,6 @@ export default function CartPage() {
     }
 
     setUpdatingItemId(cartItem.id);
-    // Optimistic UI update first:
     setCartItems((prev) =>
       prev.map((item) =>
         item.id === cartItem.id ? { ...item, quantity: newQuantity } : item
@@ -82,11 +90,35 @@ export default function CartPage() {
       );
     } catch (error) {
       toast.error("Failed to update quantity.");
-      // Revert by refetching cart
       fetchCartItems();
     } finally {
       setUpdatingItemId(null);
     }
+  };
+
+  // Delete handler (after confirmation)
+  const handleDeleteItem = async (cartItemId) => {
+    if (deletingItemId) return;
+    setDeletingItemId(cartItemId);
+    try {
+      await axios.delete(`${BASE_URL}/books/cart/${cartItemId}/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      toast.success("Item removed from cart.");
+      fetchCartItems();
+      setModalOpen(false);
+      setItemPendingDelete(null);
+    } catch (error) {
+      toast.error("Failed to remove item from cart.");
+    } finally {
+      setDeletingItemId(null);
+    }
+  };
+
+  // Show modal on delete icon click
+  const confirmDelete = (cartItemId) => {
+    setItemPendingDelete(cartItemId);
+    setModalOpen(true);
   };
 
   // Handle checkout click
@@ -100,17 +132,14 @@ export default function CartPage() {
   const selectedSubtotal = cartItems
     .filter((item) => selectedItems.has(item.id))
     .reduce(
-      (sum, item) =>
-        sum +
-        Number(item.book_detail?.price) * item.quantity,
+      (sum, item) => sum + Number(item.book_detail?.price) * item.quantity,
       0
     );
 
-  if (loading) {
+  if (loading)
     return <div className="p-6 text-center">Loading cart...</div>;
-  }
 
-  if (cartItems.length === 0) {
+  if (cartItems.length === 0)
     return (
       <div className="p-6 text-center">
         <p>Your cart is empty.</p>
@@ -122,7 +151,6 @@ export default function CartPage() {
         </button>
       </div>
     );
-  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 flex flex-col min-h-[80vh]">
@@ -145,7 +173,7 @@ export default function CartPage() {
         </label>
       </div>
 
-      {/* Cart items vertical list */}
+      {/* Cart item list */}
       <div className="flex flex-col space-y-4">
         {cartItems.map(({ id, book_detail, quantity }) => (
           <div
@@ -191,14 +219,12 @@ export default function CartPage() {
             {/* Quantity selector */}
             <div className="flex items-center space-x-2">
               <button
-                disabled={
-                  quantity <= 1 || updatingItemId === id
-                }
+                disabled={quantity <= 1 }
                 onClick={() =>
                   updateQuantity({ id, book_detail, quantity }, quantity - 1)
                 }
                 className={`px-3 py-1 rounded border ${
-                  quantity <= 1 || updatingItemId === id
+                  quantity <= 1
                     ? "opacity-50 cursor-not-allowed"
                     : "hover:bg-gray-200"
                 }`}
@@ -208,13 +234,13 @@ export default function CartPage() {
               <span className="w-8 text-center">{quantity}</span>
               <button
                 disabled={
-                  quantity >= (book_detail?.quantity ?? 1) || updatingItemId === id
+                  quantity >= (book_detail?.quantity ?? 1)
                 }
                 onClick={() =>
                   updateQuantity({ id, book_detail, quantity }, quantity + 1)
                 }
                 className={`px-3 py-1 rounded text-white ${
-                  quantity >= (book_detail?.quantity ?? 1) || updatingItemId === id
+                  quantity >= (book_detail?.quantity ?? 1) 
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-indigo-600 hover:bg-indigo-700"
                 }`}
@@ -223,7 +249,20 @@ export default function CartPage() {
               </button>
             </div>
 
-            {/* Total price for this item */}
+            {/* Delete button */}
+            <button
+              onClick={() => confirmDelete(id)}
+              disabled={deletingItemId === id}
+              className={`ml-4 p-1 rounded hover:bg-red-100 focus:outline-none ${
+                deletingItemId === id ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              aria-label="Delete item from cart"
+              title="Delete item"
+            >
+              <AiOutlineDelete size={24} className="text-red-600" />
+            </button>
+
+            {/* Total price */}
             <div className="ml-6 text-right min-w-[90px]">
               <p className="font-semibold text-lg">
                 ${(Number(book_detail?.price) * quantity).toFixed(2)}
@@ -234,7 +273,7 @@ export default function CartPage() {
         ))}
       </div>
 
-      {/* Cart Subtotal (for selected items) */}
+      {/* Cart Subtotal */}
       <div className="mt-6 flex justify-end items-center space-x-3">
         <span className="font-semibold text-xl">
           Subtotal: ${selectedSubtotal.toFixed(2)}
@@ -255,6 +294,39 @@ export default function CartPage() {
           Checkout ({selectedItems.size})
         </button>
       </div>
+
+      {/* CONFIRMATION MODAL */}
+      {modalOpen && (
+        <div
+          className="fixed inset-0 flex justify-center items-center z-50 bg-black bg-opacity-30"
+          onClick={() => setModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 shadow-lg min-w-[320px] flex flex-col items-center"
+            onClick={e => e.stopPropagation()}
+          >
+            <p className="text-lg font-semibold mb-4 text-gray-800">
+              Are you sure you want to delete this item from the cart?
+            </p>
+            <div className="flex gap-4 mt-2">
+              <button
+                className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded font-medium"
+                onClick={() => handleDeleteItem(itemPendingDelete)}
+                disabled={deletingItemId === itemPendingDelete}
+              >
+                {deletingItemId === itemPendingDelete ? "Deleting..." : "Yes"}
+              </button>
+              <button
+                className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-2 rounded font-medium"
+                onClick={() => setModalOpen(false)}
+                disabled={deletingItemId === itemPendingDelete}
+              >
+                No
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
