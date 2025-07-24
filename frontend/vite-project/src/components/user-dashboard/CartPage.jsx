@@ -294,6 +294,7 @@ export default function CartPage() {
           Checkout ({selectedItems.size})
         </button>
       </div>
+      
 
       {/* CONFIRMATION MODAL */}
       {modalOpen && (

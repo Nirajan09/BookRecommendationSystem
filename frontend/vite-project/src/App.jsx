@@ -15,6 +15,7 @@ import UserHome from './components/user-dashboard/UserHome'
 import UserDashboard from './components/user-dashboard/UserDashboard'
 import UserBookDetail from './components/user-dashboard/UserBookDetail'
 import CartPage from './components/user-dashboard/CartPage'
+import Wishlist from './components/user-dashboard/Wishlist'
 
 function App() {
 
@@ -52,6 +53,12 @@ function App() {
           <UserBookDetail />
           </UserRoute>
           } />
+
+        <Route path="/wishlist" element={
+          <UserRoute>
+            <Wishlist />
+          </UserRoute>
+        } />
 
         <Route path="/dashboard/*" element={
           <UserRoute>
