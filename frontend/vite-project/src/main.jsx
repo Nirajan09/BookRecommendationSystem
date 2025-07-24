@@ -13,7 +13,11 @@ createRoot(document.getElementById('root')).render(
 
     <App />
   </CommonLayout>
-  <ToastContainer closeButton={false} />
+  <ToastContainer
+        closeButton={true}        // Explicitly show close button (default is true)
+        autoClose={2000}          // Auto close after 5 seconds (5000ms)
+        pauseOnHover={true}       // Pause timer on hover
+        draggable={false}  />
    </AuthProvider>
   </BrowserRouter>
 )

@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { MdFavorite, MdFavoriteBorder, MdAutorenew } from "react-icons/md";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
-import AddToCartModal from "../../utils/Models/AddToCartModal";
+import AddToCartModal from "../../utils/Models/AddToCartModal"; // Update path if needed
 
 const BASE_URL = "http://localhost:8000";
 
@@ -29,7 +29,6 @@ export default function UserBookDetail() {
   const [ratingValue, setRatingValue] = useState(0);
   const [hoverValue, setHoverValue] = useState(0);
   const [reviewText, setReviewText] = useState("");
-  const [reviewMsg, setReviewMsg] = useState("");
 
   // Modal & quantity for Add to Cart
   const [showCartModal, setShowCartModal] = useState(false);
@@ -37,7 +36,6 @@ export default function UserBookDetail() {
 
   useEffect(() => {
     if (!token) return;
-
     // Fetch book details
     axios
       .get(`${BASE_URL}/books/${id}/`, {
@@ -56,7 +54,6 @@ export default function UserBookDetail() {
         headers: { Authorization: `Token ${token}` },
       })
       .then((res) => {
-        // Assuming wishlist items have a 'book' field containing book id
         const wishlistBooks = res.data.map((item) => item.book);
         setIsInWishlist(wishlistBooks.includes(Number(id)));
       })
@@ -128,24 +125,21 @@ export default function UserBookDetail() {
       }
     } catch (err) {
       toast.error("Could not update wishlist.");
-
     } finally {
       setAddingWishlist(false);
     }
   };
 
-
   // SUBMIT REVIEW
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    setReviewMsg("");
     try {
       await axios.post(
         `${BASE_URL}/books/${book.id}/rate/`,
         { rating: Number(ratingValue), comment: reviewText },
         { headers: { Authorization: `Token ${token}` } }
       );
-      setReviewMsg("Review submitted!");
+      toast.success("Review submitted!");
       setRatingValue("");
       setReviewText("");
       const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
@@ -153,7 +147,7 @@ export default function UserBookDetail() {
       });
       setBook(res.data);
     } catch {
-      setReviewMsg("Could not submit review.");
+      toast.error("Could not submit review.");
     }
   };
 
@@ -232,10 +226,7 @@ export default function UserBookDetail() {
           </div>
           {cartMsg && <div className="text-green-700 text-sm">{cartMsg}</div>}
           {wishlistMsg && (
-            <div
-              className={`${isInWishlist ? "text-red-700" : "text-pink-700"
-                } text-sm`}
-            >
+            <div className={`${isInWishlist ? "text-red-700" : "text-pink-700"} text-sm`}>
               {wishlistMsg}
             </div>
           )}
@@ -263,7 +254,7 @@ export default function UserBookDetail() {
                     </div>
                     {review.rating && (
                       <span className="flex items-center text-yellow-400 text-xs mt-0.5">
-                        {[1, 2, 3, 4, 5].map(num =>
+                        {[1, 2, 3, 4, 5].map((num) =>
                           num <= review.rating ? (
                             <AiFillStar key={num} size={20} />
                           ) : (
@@ -280,6 +271,7 @@ export default function UserBookDetail() {
             )}
           </div>
 
+          {/* Leave a Review */}
           <div className="border-t pt-4 mt-4 mb-2">
             <b>Leave a Review:</b>
             <form
@@ -293,7 +285,6 @@ export default function UserBookDetail() {
                     className="cursor-pointer"
                     onClick={() => setRatingValue(star)}
                     onMouseEnter={() => {
-                      // Only allow hover highlight on stars BEFORE the selected rating
                       if (!ratingValue || star <= ratingValue) {
                         setHoverValue(star);
                       }
@@ -324,9 +315,7 @@ export default function UserBookDetail() {
                 Submit
               </button>
             </form>
-            {reviewMsg && (
-              <div className="text-green-700 text-xs mt-1">{reviewMsg}</div>
-            )}
+            {/* No reviewMsg inline toast, all is via toast */}
           </div>
 
           <div className="flex space-x-2 mt-2">
@@ -342,14 +331,14 @@ export default function UserBookDetail() {
 
       {/* Modal for Add to Cart */}
       <AddToCartModal
-  open={showCartModal}
-  book={book}
-  quantity={quantity}
-  onQuantityChange={setQuantity}
-  onAddToCart={handleAddToCartFromModal}
-  adding={addingCart}
-  onClose={closeCartModal}
-/>
+        open={showCartModal}
+        book={book}
+        quantity={quantity}
+        onQuantityChange={setQuantity}
+        onAddToCart={handleAddToCartFromModal}
+        adding={addingCart}
+        onClose={closeCartModal}
+      />
     </>
   );
 }
