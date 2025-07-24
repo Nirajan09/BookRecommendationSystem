@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import UserProfileSnapshot from "../user-dashboard/UserProfileSnapshot";
-
+import { IoCartOutline } from "react-icons/io5";
+import { MdFavoriteBorder } from "react-icons/md";
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, logout } = useAuth();
@@ -29,11 +30,21 @@ export default function Header() {
       {/* Desktop Links */}
       <div className="hidden md:flex items-center gap-5">
         <Link
-          to="/"
+          to="/user-home"
           className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
         >
           Home
         </Link>
+        {token && (
+          <Link to="/cart" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+            <IoCartOutline size={30} />
+          </Link>
+        )}
+        {token && (
+          <Link to="/wishlist" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
+            <MdFavoriteBorder size={30} />
+          </Link>
+        )}
         {token && (
           <Link to="/dashboard" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition">
             Dashboard
