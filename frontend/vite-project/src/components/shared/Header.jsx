@@ -30,7 +30,7 @@ export default function Header() {
       {/* Desktop Links */}
       <div className="hidden md:flex items-center gap-5">
         <Link
-          to="/user-home"
+          to={`${token?"/user-home":"/"}`}
           className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
         >
           Home

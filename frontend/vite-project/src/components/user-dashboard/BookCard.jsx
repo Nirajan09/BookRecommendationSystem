@@ -15,8 +15,7 @@ export default function BookCard({ book }) {
       <p className="text-xs text-gray-500 mb-1">{book.author}</p>
       <span className="text-blue-700 font-bold mb-2">${book.price}</span>
       <div className="flex space-x-2">
-        <Link to={`/books/${book.id}`} className="text-blue-500 underline text-xs">View</Link>
-        <button className="bg-pink-100 text-pink-600 px-2 py-1 rounded text-xs">Wishlist</button>
+        <Link to={`/books/${book.id}`} className="bg-blue-500 w-40 p-5  underline text-xs">View</Link>
       </div>
     </div>
   );
