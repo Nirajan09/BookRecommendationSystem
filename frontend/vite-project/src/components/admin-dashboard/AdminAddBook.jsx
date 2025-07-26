@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
@@ -10,33 +10,14 @@ export default function AdminAddBook() {
   const { token } = useAuth();
   const navigate = useNavigate();
 
-  // Add state for genres
-  const [genres, setGenres] = useState([]);
-  const [genreLoading, setGenreLoading] = useState(true);
-
-  // Fetch genres on mount
-  useEffect(() => {
-    async function fetchGenres() {
-      try {
-        // Change this URL as per your API config!
-        const res = await axios.get("http://localhost:8000/books/genres/", {
-          headers: { Authorization: `Token ${token}` }
-        });
-        setGenres(res.data);
-      } catch (e) {
-        toast.error("Failed to load genres!");
-      } finally {
-        setGenreLoading(false);
-      }
-    }
-    fetchGenres();
-  }, [token]);
-
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting }
   } = useForm();
+
+  // State for genre input
+  const [genreInput, setGenreInput] = useState("");
 
   const onSubmit = async (data) => {
     try {
@@ -48,13 +29,19 @@ export default function AdminAddBook() {
       formData.append("description", data.description || "");
       formData.append("quantity", data.quantity);
 
-      // Add selected genres (array of ids)
-      if (data.genres && data.genres.length > 0) {
-        // Because FormData treats duplicate keys as array members,
-        // we must append for each selected id!
-        for (const genreId of data.genres) {
-          formData.append("genres", genreId);
-        }
+      // Parse genres: comma separated, trimmed, not empty
+      const genreList = genreInput
+        .split(",")
+        .map((g) => g.trim())
+        .filter(Boolean);
+
+      if (genreList.length === 0) {
+        toast.error("At least one genre is required!");
+        return;
+      }
+
+      for (const genre of genreList) {
+        formData.append("genres", genre);
       }
 
       if (data.cover_image?.[0]) {
@@ -83,34 +70,23 @@ export default function AdminAddBook() {
       >
         <h2 className="text-xl font-bold text-indigo-700 mb-4">Add New Book</h2>
 
-        {/* ...other fields as before... */}
-
-        {/* GENRES DROPDOWN */}
-        <label className="mb-2 text-sm text-gray-600">Genres:</label>
-        {genreLoading ? (
-          <span className="mb-2 text-gray-500">Loading genres…</span>
-        ) : (
-          <select
-            {...register("genres", { required: true })}
-            multiple
-            className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-            style={{ minHeight: "80px" }}
-          >
-            {genres.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-        )}
-        {errors.genres && (
+        {/* Genre input */}
+        <label className="mb-2 text-sm text-gray-600">Genres (comma-separated):</label>
+        <input
+          value={genreInput}
+          onChange={e => setGenreInput(e.target.value)}
+          placeholder="e.g. Fantasy, Romance, Adventure"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          required
+        />
+        {/* Optionally: Validate */}
+        {genreInput.trim() === "" &&
           <span className="text-red-500 text-xs mb-1">
-            At least one genre must be selected
+            At least one genre is required
           </span>
-        )}
+        }
 
-        {/* ...rest of your fields, cover_image, buttons, etc... */}
-        {/* DO NOT REMOVE YOUR OTHER INPUTS! */}
+        {/* ...rest of your form fields as before... */}
         <input
           {...register("title", { required: true })}
           placeholder="Title"
@@ -161,12 +137,11 @@ export default function AdminAddBook() {
           </span>
         )}
 
-        {/* New Quantity input */}
         <input
           {...register("quantity", {
             required: true,
             min: 0,
-            valueAsNumber: true,
+            valueAsNumber: true
           })}
           placeholder="Quantity"
           type="number"

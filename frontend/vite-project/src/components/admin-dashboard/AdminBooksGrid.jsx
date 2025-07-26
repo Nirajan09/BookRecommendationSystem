@@ -61,14 +61,14 @@ export default function AdminBooksGrid() {
           <h2 className="text-2xl font-bold text-indigo-700">Manage Books</h2>
           <div className="flex gap-6">
 
-          <Link
-          to="/admin/"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
-        >Continue to Dashboard</Link>
-        <Link
-          to="/admin/books/add"
-          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
-        >Add Book</Link>
+            <Link
+              to="/admin/"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
+            >Continue to Dashboard</Link>
+            <Link
+              to="/admin/books/add"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
+            >Add Book</Link>
           </div>
         </div>
         <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -94,7 +94,19 @@ export default function AdminBooksGrid() {
               <h3 className="font-semibold text-lg text-center mb-1">{book.title}</h3>
               <p className="text-gray-700 text-center mb-1"><b>Author:</b> {book.author}</p>
               <p className="text-indigo-700 font-semibold text-center mb-2"><b>Price:</b> ${book.price}</p>
-
+              {/* Genres */}
+              {book.genres_detail && book.genres_detail.length > 0 && (
+                <div className="flex flex-wrap justify-center gap-2 mb-2">
+                  {book.genres_detail.map((genre) => (
+                    <span
+                      key={genre.name}
+                      className="text-xs px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full font-medium"
+                    >
+                      {genre.name}
+                    </span>
+                  ))}
+                </div>
+              )}
               {/* Action Buttons */}
               <div className="flex w-full space-x-2 mt-auto">
                 <Link
@@ -116,29 +128,29 @@ export default function AdminBooksGrid() {
       </section>
       {/* Delete Confirm Modal */}
       {showDeleteModal && (
-  <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
-    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
-      <p className="text-lg font-semibold text-gray-800 mb-4">Delete Book</p>
-      <p className="text-gray-600 mb-6 text-center">
-        Are you sure you want to delete <b>{selectedBook?.title}</b>?
-      </p>
-      <div className="flex space-x-4">
-        <button
-          onClick={handleDeleteConfirmed}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold"
-        >
-          Yes, Delete
-        </button>
-        <button
-          onClick={handleCancelDelete}
-          className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded font-semibold"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
+            <p className="text-lg font-semibold text-gray-800 mb-4">Delete Book</p>
+            <p className="text-gray-600 mb-6 text-center">
+              Are you sure you want to delete <b>{selectedBook?.title}</b>?
+            </p>
+            <div className="flex space-x-4">
+              <button
+                onClick={handleDeleteConfirmed}
+                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded font-semibold"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={handleCancelDelete}
+                className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded font-semibold"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
