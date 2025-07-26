@@ -20,10 +20,31 @@ class BookRatingSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     price = serializers.FloatField()
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
-    genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)
+    genres = serializers.ListField(child=serializers.CharField(), write_only=True)
+    genres_detail = GenreSerializer(source='genres', many=True, read_only=True)
     class Meta:
         model = Book
         fields = "__all__"
+    def create(self, validated_data):
+        genre_names = validated_data.pop('genres', [])
+        book = super().create(validated_data)
+        genres = []
+        for name in genre_names:
+            genre, _ = Genre.objects.get_or_create(name=name)
+            genres.append(genre)
+        book.genres.set(genres)
+        return book
+
+    def update(self, instance, validated_data):
+        genre_names = validated_data.pop('genres', None)
+        book = super().update(instance, validated_data)
+        if genre_names is not None:
+            genres = []
+            for name in genre_names:
+                genre, _ = Genre.objects.get_or_create(name=name)
+                genres.append(genre)
+            book.genres.set(genres)
+        return book
 
 class CartItemSerializer(serializers.ModelSerializer):
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all(), write_only=True)

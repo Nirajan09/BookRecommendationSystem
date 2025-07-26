@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
@@ -10,6 +10,28 @@ export default function AdminAddBook() {
   const { token } = useAuth();
   const navigate = useNavigate();
 
+  // Add state for genres
+  const [genres, setGenres] = useState([]);
+  const [genreLoading, setGenreLoading] = useState(true);
+
+  // Fetch genres on mount
+  useEffect(() => {
+    async function fetchGenres() {
+      try {
+        // Change this URL as per your API config!
+        const res = await axios.get("http://localhost:8000/books/genres/", {
+          headers: { Authorization: `Token ${token}` }
+        });
+        setGenres(res.data);
+      } catch (e) {
+        toast.error("Failed to load genres!");
+      } finally {
+        setGenreLoading(false);
+      }
+    }
+    fetchGenres();
+  }, [token]);
+
   const {
     register,
     handleSubmit,
@@ -19,13 +41,21 @@ export default function AdminAddBook() {
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
-
       formData.append("title", data.title);
       formData.append("author", data.author);
       formData.append("isbn", data.isbn);
       formData.append("price", data.price);
       formData.append("description", data.description || "");
-      formData.append("quantity", data.quantity);  // <-- append quantity here
+      formData.append("quantity", data.quantity);
+
+      // Add selected genres (array of ids)
+      if (data.genres && data.genres.length > 0) {
+        // Because FormData treats duplicate keys as array members,
+        // we must append for each selected id!
+        for (const genreId of data.genres) {
+          formData.append("genres", genreId);
+        }
+      }
 
       if (data.cover_image?.[0]) {
         formData.append("cover_image", data.cover_image[0]);
@@ -39,7 +69,7 @@ export default function AdminAddBook() {
       });
       toast.success("Book added successfully!");
       navigate("/admin/books");
-    } catch {
+    } catch (err) {
       toast.error("Failed to add book.");
     }
   };
@@ -53,6 +83,34 @@ export default function AdminAddBook() {
       >
         <h2 className="text-xl font-bold text-indigo-700 mb-4">Add New Book</h2>
 
+        {/* ...other fields as before... */}
+
+        {/* GENRES DROPDOWN */}
+        <label className="mb-2 text-sm text-gray-600">Genres:</label>
+        {genreLoading ? (
+          <span className="mb-2 text-gray-500">Loading genres…</span>
+        ) : (
+          <select
+            {...register("genres", { required: true })}
+            multiple
+            className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+            style={{ minHeight: "80px" }}
+          >
+            {genres.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+        )}
+        {errors.genres && (
+          <span className="text-red-500 text-xs mb-1">
+            At least one genre must be selected
+          </span>
+        )}
+
+        {/* ...rest of your fields, cover_image, buttons, etc... */}
+        {/* DO NOT REMOVE YOUR OTHER INPUTS! */}
         <input
           {...register("title", { required: true })}
           placeholder="Title"
@@ -136,7 +194,9 @@ export default function AdminAddBook() {
           className="mb-3"
         />
         {errors.cover_image && (
-          <span className="text-red-500 text-xs mb-1">Cover image is required</span>
+          <span className="text-red-500 text-xs mb-1">
+            Cover image is required
+          </span>
         )}
 
         <button
