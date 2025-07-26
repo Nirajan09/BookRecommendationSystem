@@ -4,6 +4,7 @@ import BookSearchBar from "./BookSearchBar";
 import BookShelf from "./BookShelf";
 import BookCard from "./BookCard";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
+import HeroSection from "./HeroSection"; // Adjust path if needed
 
 
 export default function UserHome() {
@@ -51,11 +52,14 @@ useEffect(() => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      
       <BookSearchBar
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onSearch={() => setSearchTerm(query)}
       />
+      {/* Hero Section */}
+      <HeroSection />
 
       {searchTerm ? (
         <div>
