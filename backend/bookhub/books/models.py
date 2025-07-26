@@ -1,6 +1,14 @@
 from django.conf import settings
 from django.db import models
 
+# models.py
+
+class Genre(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
 class Book(models.Model):
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
@@ -12,6 +20,7 @@ class Book(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     cover_image = models.ImageField(upload_to='covers/', null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
+    genres = models.ManyToManyField(Genre, related_name="books", blank=True)
     def __str__(self):
         return self.title
 

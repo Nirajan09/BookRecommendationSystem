@@ -13,6 +13,8 @@ from rest_framework import status
 from django.db.models import Avg
 from .serializers import BookRatingSerializer
 from rest_framework.exceptions import ValidationError
+from .models import Genre
+from .serializers import GenreSerializer
 
 # -------- ADMIN BOOK MANAGEMENT -------
 class AdminBookViewSet(viewsets.ModelViewSet):
@@ -40,7 +42,7 @@ class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'author']  # Remove 'genre' if not in model
+    search_fields = ["title", "author", "isbn", "genres__name"]
     ordering_fields = ['created_at', 'title']  # Add fields you have in Book model
     permission_classes = [permissions.IsAuthenticated]
 
@@ -166,3 +168,9 @@ class BookViewSet(viewsets.ReadOnlyModelViewSet):
 
 
         return Response({'detail': 'Review submitted!'}, status=status.HTTP_201_CREATED)
+    
+
+class GenreViewSet(viewsets.ModelViewSet):
+    queryset = Genre.objects.all()
+    serializer_class = GenreSerializer
+    permission_classes = [permissions.IsAdminUser]  # Only admin can access

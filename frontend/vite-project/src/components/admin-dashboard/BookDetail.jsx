@@ -83,6 +83,19 @@ export default function BookDetail() {
           <b>Price:</b> ${book.price}
         </p>
 
+        {/* Genres */}
+        {book.genres_detail && book.genres_detail.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-2">
+            {book.genres_detail.map((genre) => (
+              <span
+                key={genre.name}
+                className="text-xs px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full font-medium"
+              >
+                {genre.name}
+              </span>
+            ))}
+          </div>
+        )}
         {/* Average Rating */}
         <p className="mb-1">
           <b>Average Rating:</b>{" "}
