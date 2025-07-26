@@ -56,10 +56,10 @@ export default function BookDetail() {
   if (!book) return <div className="text-center py-16">Loading...</div>;
 
   return (
-    <div className="flex flex-col items-center min-h-[90vh] justify-center">
-      <div className="bg-white rounded shadow-lg p-4 w-full max-w-sm flex flex-col">
+    <div className="bg-gradient-to-br from-blue-50 to-blue-100 flex flex-col items-center justify-center py-6 px-4 min-h-[90vh]">
+      <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-sm flex flex-col">
         {book.cover_image && (
-          <div className="flex items-center justify-center w-full h-44 rounded mb-3">
+          <div className="max-w-2xl bg-white roundes-4xl p-8 shadow-xl flex items-center justify-center  rounded mb-5">
             <img
               src={
                 book.cover_image.startsWith("http")
@@ -179,3 +179,5 @@ export default function BookDetail() {
     </div>
   );
 }
+
+
