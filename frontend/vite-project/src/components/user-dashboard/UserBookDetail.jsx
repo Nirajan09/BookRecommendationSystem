@@ -170,8 +170,10 @@ export default function UserBookDetail() {
 
   return (
     <>
-      <div className="flex flex-col items-center min-h-[90vh] justify-center">
-        <div className="bg-white rounded shadow-lg p-6 w-full max-w-sm flex flex-col">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Book Cover */}
+         <div className="flex-shrink-0 flex flex-col items-center"></div>
+        <div className="bg-blue-50 rounded shadow-lg p-6 w-full max-w-4xl flex flex-col">
           {book.cover_image && (
             <div className="flex items-center justify-center w-full h-44 rounded mb-3">
               <img
