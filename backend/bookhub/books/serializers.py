@@ -3,9 +3,12 @@ from .models import Book
 from .models import CartItem
 from .models import WishlistItem
 from .models import BookRating
+from .models import Genre
 
-
-
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['id', 'name']
 
 class BookRatingSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()  # Shows username (or __str__ on your User model)
@@ -17,6 +20,7 @@ class BookRatingSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     price = serializers.FloatField()
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
+    genres = serializers.PrimaryKeyRelatedField(queryset=Genre.objects.all(), many=True)
     class Meta:
         model = Book
         fields = "__all__"
