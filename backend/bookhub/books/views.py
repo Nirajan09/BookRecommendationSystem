@@ -42,7 +42,7 @@ class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['title', 'author']  # Remove 'genre' if not in model
+    search_fields = ["title", "author", "isbn", "genres__name"]
     ordering_fields = ['created_at', 'title']  # Add fields you have in Book model
     permission_classes = [permissions.IsAuthenticated]
 
