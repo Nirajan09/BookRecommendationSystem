@@ -172,7 +172,7 @@ export default function UserBookDetail() {
     <>
       <div className="flex flex-col md:flex-row gap-8">
         {/* Book Cover */}
-         <div className="flex-shrink-0 flex flex-col items-center"></div>
+        <div className="flex-shrink-0 flex flex-col items-center"></div>
         <div className="bg-blue-50 rounded shadow-lg p-6 w-full max-w-4xl flex flex-col">
           {book.cover_image && (
             <div className="flex items-center justify-center w-full h-44 rounded mb-3">
@@ -201,6 +201,19 @@ export default function UserBookDetail() {
             <b>Description:</b> {book.description}
           </p>
 
+          {book.genres_detail && book.genres_detail.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {book.genres_detail.map((genre) => (
+                <span
+                  key={genre.name}
+                  className="text-xs px-2 py-1 bg-indigo-100 text-indigo-800 rounded-full font-medium"
+                >
+                  {genre.name}
+                </span>
+              ))}
+            </div>
+          )}
+          
           {/* Actions: Cart, Wishlist */}
           <div className="flex space-x-2 my-2">
             <button

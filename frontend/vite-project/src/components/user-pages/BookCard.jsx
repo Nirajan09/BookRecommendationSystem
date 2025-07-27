@@ -56,22 +56,29 @@ export default function BookCard({ book }) {
       <p className="text-xs text-gray-500 mb-1">{book.author}</p>
       <div className="flex items-center justify-center mb-2">
   {book.average_rating ? (
-    <>
-      {/* <span className="text-yellow-400 mr-1">
-        {Array(Math.round(book.average_rating))
-          .fill(0)
-          .map((_, i) => (
-            <svg key={i} className="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z" />
-            </svg>
-          ))}
-      </span>
-      <span className="text-gray-700 text-sm ml-1">{book.average_rating} / 5</span> */}
-        <StarRating rating={book.average_rating} />
-        <span className="text-gray-700 text-sm ml-1">{book.average_rating}</span>
-        <span className="text-gray-700 text-sm ml-1">500</span> {/*total user ratings need to be added*/}
+    <div className="flex items-center gap-x-2">
+  <span className="text-gray-700 text-sm">{book.average_rating}</span>
+  <StarRating rating={book.average_rating} />
+  <span className="text-gray-700 text-sm">{book.ratings_count ?? 500}</span>
+</div>
+
+    // <div>
+    //   {/* <span className="text-yellow-400 mr-1">
+    //     {Array(Math.round(book.average_rating))
+    //       .fill(0)
+    //       .map((_, i) => (
+    //         <svg key={i} className="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
+    //           <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z" />
+    //         </svg>
+    //       ))}
+    //   </span>
+    //   <span className="text-gray-700 text-sm ml-1">{book.average_rating} / 5</span> */}
+
+    //     <span className="text-gray-700 text-sm ml-1">{book.average_rating}</span>
+    //     <StarRating rating={book.average_rating} />
+    //     <span className="text-gray-700 text-sm ml-1">500</span> {/*total user ratings need to be added*/}
       
-    </>
+    // </div>
   ) : (
     <span className="text-gray-400 text-xs">No ratings yet</span>
   )}
