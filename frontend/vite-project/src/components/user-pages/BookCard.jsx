@@ -43,7 +43,6 @@ const StarRating = ({ rating }) => {
 };
 
 export default function BookCard({ book }) {
-  console.log("BookCard received book:", book);
   return (
      <Link to={`/books/${book.id}`} className="no-underline">
     <div className="bg-white rounded-2xl shadow-lg p-5 w-64 h-100 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-xl">

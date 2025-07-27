@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import BookSearchBar from "./BookSearchBar";
+import BookSearchBar from "../search-box/BookSearchBar";
 import BookShelf from "./BookShelf";
 import BookCard from "./BookCard";
 import { useAuth } from "../../utils/AuthContext/AuthContext";

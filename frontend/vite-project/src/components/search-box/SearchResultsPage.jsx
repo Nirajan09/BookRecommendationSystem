@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
-import BookCard from "./BookCard";
+import BookCard from "../user-pages/BookCard";
 
 export default function SearchResultsPage() {
   const { token } = useAuth();

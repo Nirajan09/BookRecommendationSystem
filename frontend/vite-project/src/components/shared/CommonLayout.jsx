@@ -1,14 +1,14 @@
 import { useAuth } from "../../utils/AuthContext/AuthContext";
-import AdminHeader from "./AdminHeader";
-import Header from "./Header";
+import UserHeader from "../header-section/UserHeader";
+import AdminHeader from "../header-section/AdminHeader";
 
 const CommonLayout = ({ children }) => {
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   return (
     <div>
       {/* Header Component */}
       {
-        user?.is_staff?<AdminHeader/>:<Header />
+        user?.is_staff?<AdminHeader/>:<UserHeader />
       }
       
       

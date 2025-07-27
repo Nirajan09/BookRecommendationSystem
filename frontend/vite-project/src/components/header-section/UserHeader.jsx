@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
-import UserProfileSnapshot from "../user-dashboard/UserProfileSnapshot";
+import UserProfileSnapshot from "../profile-section/UserProfileSnapshot";
 import { IoCartOutline } from "react-icons/io5";
 import { MdFavoriteBorder } from "react-icons/md";
 import axios from "axios";
-import BookSearchBar from "../user-dashboard/BookSearchBar";
+import BookSearchBar from "../search-box/BookSearchBar";
 const BASE_URL = "http://localhost:8000";
 
-export default function Header() {
+export default function UserHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);

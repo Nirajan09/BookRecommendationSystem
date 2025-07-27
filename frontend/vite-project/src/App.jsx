@@ -7,16 +7,16 @@ import UserRoute from './utils/RouteProtection/UserRoute'
 import GuestRoute from './utils/RouteProtection/GuestRoute'
 import AdminDashboard from "./components/admin-dashboard/AdminDashboard"
 import AdminRoute from './utils/RouteProtection/AdminRoute'
-import AdminBooksGrid from "./components/admin-dashboard/AdminBooksGrid";
-import AdminAddBook from "./components/admin-dashboard/AdminAddBook";
-import AdminEditBook from "./components/admin-dashboard/AdminEditBook";
-import BookDetail from './components/admin-dashboard/BookDetail'
-import UserHome from './components/user-dashboard/UserHome'
+import AdminBooksGrid from "./components/admin-pages/AdminBooksGrid";
+import AdminAddBook from "./components/admin-pages/AdminAddBook";
+import AdminEditBook from "./components/admin-pages/AdminEditBook";
+import BookDetail from './components/admin-pages/BookDetail'
+import UserHome from './components/user-pages/UserHome'
 import UserDashboard from './components/user-dashboard/UserDashboard'
-import UserBookDetail from './components/user-dashboard/UserBookDetail'
-import CartPage from './components/user-dashboard/CartPage'
-import Wishlist from './components/user-dashboard/Wishlist'
-import SearchResultsPage from './components/user-dashboard/SearchResultsPage'
+import UserBookDetail from './components/user-pages/UserBookDetail'
+import CartPage from './components/cart-page/CartPage'
+import Wishlist from './components/wishlist-page/Wishlist'
+import SearchResultsPage from './components/search-box/SearchResultsPage'
 
 function App() {
 
