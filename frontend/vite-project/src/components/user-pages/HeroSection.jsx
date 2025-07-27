@@ -11,7 +11,7 @@ export default function HeroSection() {
       <img
         src={heroBg}
         alt="Hero background"
-        className="absolute inset-0 w-full h-full w-[120%] object-cover pointer-events-none "
+        className="absolute inset-0 w-full h-full object-cover pointer-events-none"
         draggable={false}
         style={{ objectPosition: "center -250px" }}
       />
@@ -22,11 +22,14 @@ export default function HeroSection() {
         <div className="pt-12 md:pt-0 max-w-xl">
           <h1 className="text-4xl md:text-6xl font-black text-black mb-4 leading-tight">
             <span className="font-extrabold">Discover</span>{" "}
-            <span className="font-normal">your</span><br />
+            <span className="font-normal">your</span>
+            <br />
             <span className="font-normal">favorite</span>{" "}
             <span className="text-orange-400 font-extrabold">books</span>
           </h1>
-          <p className="text-lg md:text-xl text-black/80 mt-2">Explore the book</p>
+          <p className="text-lg md:text-xl text-black/80 mt-2">
+            Explore the book
+          </p>
         </div>
 
         {/* Right: Book covers */}
@@ -35,21 +38,21 @@ export default function HeroSection() {
           <img
             src={book1}
             alt="Book 1"
-            className="w-44 md:w-64 mx-6 h-auto rounded shadow-lg"
+            className="w-36 md:w-60 h-auto rounded shadow-lg transition-transform duration-300 hover:-translate-y-2"
             style={{ zIndex: 2 }}
           />
           {/* Side books */}
-          <div className="flex flex-col gap-4 ml-[-30px]">
+          <div className="flex flex-col gap-4 ml-[-20px] md:ml-[-32px]">
             <img
               src={book2}
               alt="Book 2"
-              className="w-24 md:w-28 h-auto rounded shadow-lg "
+              className="w-20 md:w-28 h-auto rounded shadow-lg transition-transform duration-300 hover:-translate-y-1"
               style={{ zIndex: 1 }}
             />
             <img
               src={book3}
               alt="Book 3"
-              className="w-24 md:w-28 h-auto rounded shadow-lg "
+              className="w-20 md:w-28 h-auto rounded shadow-lg transition-transform duration-300 hover:translate-y-1"
               style={{ zIndex: 1 }}
             />
           </div>

@@ -12,7 +12,7 @@ import AdminAddBook from "./components/admin-pages/AdminAddBook";
 import AdminEditBook from "./components/admin-pages/AdminEditBook";
 import BookDetail from './components/admin-pages/BookDetail'
 import UserHome from './components/user-pages/UserHome'
-import UserDashboard from './components/user-dashboard/UserDashboard'
+import UserDashboard from './components/user-dashboards/UserDashboard'
 import UserBookDetail from './components/user-pages/UserBookDetail'
 import CartPage from './components/cart-page/CartPage'
 import Wishlist from './components/wishlist-page/Wishlist'
