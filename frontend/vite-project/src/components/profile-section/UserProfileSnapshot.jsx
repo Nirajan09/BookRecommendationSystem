@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { toast } from "react-toastify";
+import AvatarSkeleton from "../../Skeleton/AvatarSkeleton";
 
 export default function UserProfileSnapshot() {
   const { token, logout } = useAuth();
@@ -81,7 +82,7 @@ if (form.avatar) data.append("profile.avatar", form.avatar);
   };
 
 
-  if (!profile) return <div className="p-4">Loading profile...</div>;
+  if (!profile) return <AvatarSkeleton/>
 
   return (
     <div ref={avatarRef} className="relative ml-3">
