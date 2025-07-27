@@ -7,10 +7,10 @@ import UserRoute from './utils/RouteProtection/UserRoute'
 import GuestRoute from './utils/RouteProtection/GuestRoute'
 import AdminDashboard from "./components/admin-dashboard/AdminDashboard"
 import AdminRoute from './utils/RouteProtection/AdminRoute'
-import AdminBooksGrid from "./components/admin-pages/AdminBooksGrid";
-import AdminAddBook from "./components/admin-pages/AdminAddBook";
-import AdminEditBook from "./components/admin-pages/AdminEditBook";
-import BookDetail from './components/admin-pages/BookDetail'
+import AdminBooksGrid from "./components/adminbook-pages/AdminBooksGrid";
+import AdminAddBook from "./components/adminbook-pages/AdminAddBook";
+import AdminEditBook from "./components/adminbook-pages/AdminEditBook";
+import BookDetail from './components/adminbook-pages/BookDetail'
 import UserHome from './components/user-pages/UserHome'
 import UserDashboard from './components/user-dashboard/UserDashboard'
 import UserBookDetail from './components/user-pages/UserBookDetail'
