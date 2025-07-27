@@ -8,7 +8,6 @@ export default function BookShelf({ title, books }) {
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
-
   useEffect(() => {
     const checkScroll = () => {
       if (!scrollRef.current) return;
