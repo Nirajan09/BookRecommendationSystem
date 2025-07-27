@@ -16,6 +16,7 @@ import UserDashboard from './components/user-dashboard/UserDashboard'
 import UserBookDetail from './components/user-dashboard/UserBookDetail'
 import CartPage from './components/user-dashboard/CartPage'
 import Wishlist from './components/user-dashboard/Wishlist'
+import SearchResultsPage from './components/user-dashboard/SearchResultsPage'
 
 function App() {
 
@@ -41,6 +42,13 @@ function App() {
             <UserHome />
           </UserRoute>
         } />
+
+        <Route path="/search" element={
+          <UserRoute>
+            <SearchResultsPage />
+          </UserRoute>
+      } 
+      />
 
         <Route path="/cart" element={
           <UserRoute>

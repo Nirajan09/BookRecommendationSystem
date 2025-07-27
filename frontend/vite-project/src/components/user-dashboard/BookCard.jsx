@@ -1,13 +1,13 @@
-// BookCard.jsx
-import React from "react";
+
 import { Link } from "react-router-dom";
 
 export default function BookCard({ book }) {
+  console.log("BookCard received book:", book);
   return (
      <Link to={`/books/${book.id}`} className="no-underline">
     <div className="bg-white rounded-2xl shadow-lg p-5 w-64 h-100 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-xl">
       <img
-        src={`http://localhost:8000${book.cover_image}`}
+        src={book.cover_image?.startsWith('http') ? book.cover_image : `http://localhost:8000${book.cover_image}`}
         alt={book.title}
         className="h-56 w-auto object-contain rounded-xl mb-4 border border-gray-200 bg-gray-100"
         style={{ maxWidth: 150 }}

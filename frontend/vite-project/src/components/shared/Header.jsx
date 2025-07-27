@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import UserProfileSnapshot from "../user-dashboard/UserProfileSnapshot";
 import { IoCartOutline } from "react-icons/io5";
 import { MdFavoriteBorder } from "react-icons/md";
 import axios from "axios";
-
+import BookSearchBar from "../user-dashboard/BookSearchBar";
 const BASE_URL = "http://localhost:8000";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { token, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
+
+  // Search bar:
+  const [query, setQuery] = useState("");
+  const navigate = useNavigate();
 
   // Prevent background scroll when mobile menu is open
   useEffect(() => {
@@ -46,179 +50,89 @@ export default function Header() {
   const handleLinkClick = () => setMenuOpen(false);
 
   return (
-    <nav className="bg-white shadow-md flex items-center justify-between px-8 h-16 relative z-50">
-      {/* Logo */}
-      <div className="text-2xl font-bold text-blue-700 tracking-wide select-none">
-        BookStore
-      </div>
+    <nav className="bg-white shadow-md h-16 flex items-center px-4 md:px-8 relative z-50 justify-between">
+  {/* Left: Logo */}
+  <Link
+    to={token ? "/user-home" : "/"}
+    className="text-2xl font-bold text-blue-700 tracking-wide select-none whitespace-nowrap mr-6"
+    onClick={handleLinkClick}
+  >
+    BookStore
+  </Link>
 
-      {/* Desktop Links */}
-      <div className="hidden md:flex items-center gap-5">
+  {token && (
+    <div className="flex-1 flex justify-center items-center mt-8 h-[4vh]">
+      <div className="w-full max-w-md">
+        <BookSearchBar
+          value={query}
+          onChange={e => setQuery(e.target.value)}
+          onSearch={() => {
+            if (query.trim()) {
+              navigate(`/search?q=${encodeURIComponent(query)}`);
+              setMenuOpen(false);
+            }
+          }}
+        />
+      </div>
+    </div>
+  )}
+
+
+  {/* Right: Nav/action links */}
+  <div className="flex items-center gap-4 ml-6">
+    <Link
+      to={token ? "/user-home" : "/"}
+      className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+    >
+      Home
+    </Link>
+    {token && (
+      <Link
+        to="/cart"
+        className="relative text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition flex items-center"
+      >
+        <IoCartOutline size={26} />
+        {cartCount > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
+            {cartCount}
+          </span>
+        )}
+      </Link>
+    )}
+    {token && (
+      <Link
+        to="/wishlist"
+        className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition flex items-center"
+      >
+        <MdFavoriteBorder size={26} />
+      </Link>
+    )}
+    {token && (
+      <Link
+        to="/dashboard"
+        className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
+      >
+        Dashboard
+      </Link>
+    )}
+    {!token && (
+      <>
         <Link
-          to={`${token ? "/user-home" : "/"}`}
+          to="/register"
           className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
         >
-          Home
+          Register
         </Link>
-        {token && (
-          <Link
-            to="/cart"
-            className="relative text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
-          >
-            <IoCartOutline size={30} />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
-                {cartCount}
-              </span>
-            )}
-          </Link>
-        )}
-        {token && (
-          <Link
-            to="/wishlist"
-            className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
-          >
-            <MdFavoriteBorder size={30} />
-          </Link>
-        )}
-        {token && (
-          <Link
-            to="/dashboard"
-            className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
-          >
-            Dashboard
-          </Link>
-        )}
-        {!token && (
-          <>
-            <Link
-              to="/register"
-              className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
-            >
-              Register
-            </Link>
-            <Link
-              to="/login"
-              className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
-            >
-              Login
-            </Link>
-          </>
-        )}
-        {token && <UserProfileSnapshot />}
-      </div>
-
-      {/* Hamburger (mobile) */}
-      <button
-        className={`md:hidden flex flex-col justify-center items-center w-11 h-11 rounded focus:outline-none z-[101] relative group`}
-        aria-label="Toggle navigation"
-        onClick={() => setMenuOpen((prev) => !prev)}
-      >
-        {/* Hamburger lines */}
-        <span
-          className={`block h-[3px] w-7 rounded-sm bg-blue-700 my-[3px] transition-all duration-300
-            ${menuOpen ? "translate-y-2 rotate-45" : ""}`}
-        />
-        <span
-          className={`block h-[3px] w-7 rounded-sm bg-blue-700 my-[3px] transition-all duration-300
-            ${menuOpen ? "opacity-0" : ""}`}
-        />
-        <span
-          className={`block h-[3px] w-7 rounded-sm bg-blue-700 my-[3px] transition-all duration-300
-            ${menuOpen ? "-translate-y-2 -rotate-45" : ""}`}
-        />
-      </button>
-
-      {/* Mobile Slide-in Menu */}
-      <div
-        className={`fixed top-0 right-0 h-screen bg-white shadow-xl z-[100] w-4/5 max-w-xs transform transition-transform duration-300
-        ${menuOpen ? "translate-x-0" : "translate-x-full"}
-        flex flex-col p-8 pt-20 gap-1`}
-      >
         <Link
-          to="/"
-          className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition"
-          onClick={handleLinkClick}
+          to="/login"
+          className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 hover:text-blue-800 transition"
         >
-          Home
+          Login
         </Link>
-        {token && (
-          <Link
-            to="/cart"
-            className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition relative"
-            onClick={handleLinkClick}
-          >
-            <span className="inline-flex items-center">
-              <IoCartOutline size={26} />
-              <span className="ml-2">Cart</span>
-              {cartCount > 0 && (
-                <span className="ml-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
-                  {cartCount}
-                </span>
-              )}
-            </span>
-          </Link>
-        )}
-        {token && (
-          <Link
-            to="/wishlist"
-            className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition"
-            onClick={handleLinkClick}
-          >
-            <span className="inline-flex items-center">
-              <MdFavoriteBorder size={26} />
-              <span className="ml-2">Wishlist</span>
-            </span>
-          </Link>
-        )}
-        {token && (
-          <Link
-            to="/dashboard"
-            className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition"
-            onClick={handleLinkClick}
-          >
-            Dashboard
-          </Link>
-        )}
-        {!token && (
-          <>
-            <Link
-              to="/register"
-              className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition"
-              onClick={handleLinkClick}
-            >
-              Register
-            </Link>
-            <Link
-              to="/login"
-              className="block text-blue-700 font-medium py-3 text-lg hover:bg-blue-50 hover:text-blue-800 rounded transition"
-              onClick={handleLinkClick}
-            >
-              Login
-            </Link>
-          </>
-        )}
-        {token && (
-          <button
-            className="block text-blue-700 font-medium py-3 text-lg text-left w-full hover:bg-blue-50 hover:text-blue-800 rounded transition"
-            onClick={() => {
-              logout();
-              handleLinkClick();
-            }}
-          >
-            Logout
-          </button>
-        )}
-      </div>
-
-      {/* Mobile overlay */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 bg-blue-300/10 z-50 transition-opacity duration-300 md:hidden"
-          onClick={() => setMenuOpen(false)}
-        ></div>
-      )}
-    </nav>
+      </>
+    )}
+    {token && <UserProfileSnapshot />}
+  </div>
+</nav>
   );
 }
-
