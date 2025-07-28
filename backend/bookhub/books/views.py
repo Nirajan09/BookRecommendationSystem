@@ -25,7 +25,7 @@ class AdminBookViewSet(viewsets.ModelViewSet):
 class BookRatingViewSet(viewsets.ModelViewSet):
     queryset = BookRating.objects.all()
     serializer_class = BookRatingSerializer
-    permission_classes = [permissions.IsAdminUser]  # Only admins can delete reviews
+    permission_classes = [permissions.IsAuthenticated]  # Only admins can delete reviews
 
     def perform_destroy(self, instance):
         book = instance.book
