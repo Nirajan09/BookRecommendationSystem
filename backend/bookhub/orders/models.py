@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from books.models import Book  # Assuming a Book model exists in the books app
+import uuid
 
 class Order(models.Model):
     SHIPPING_CHOICES = [
@@ -13,12 +14,13 @@ class Order(models.Model):
         ('esewa', 'E-Sewa'),
         ('cash_on_delivery', 'Cash on Delivery'),
     ]
+
     STATUS_CHOICES = [
-    ('pending', 'Pending'),
-    ('processing', 'Processing'),
-    ('shipped', 'Shipped'),
-    ('delivered', 'Delivered'),
-    ('cancelled', 'Cancelled'),
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('shipped', 'Shipped'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
@@ -28,6 +30,9 @@ class Order(models.Model):
     shipping_method = models.CharField(max_length=20, choices=SHIPPING_CHOICES, default='standard')  # new field
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cash_on_delivery')  # new field
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # new field
+
+    # Add the reference field here:
+    reference = models.CharField(max_length=24, unique=True, editable=False, blank=True, null=True)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -40,6 +45,10 @@ class Order(models.Model):
     class Meta:
         ordering = ['-created']
 
+    def save(self, *args, **kwargs):
+        if not self.reference:
+            self.reference = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        super().save(*args, **kwargs)
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')

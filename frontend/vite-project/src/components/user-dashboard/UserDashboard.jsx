@@ -143,7 +143,7 @@ export default function UserDashboard() {
                   ) : (
                     orders.map((order) => (
                       <tr key={order.id} className="border-t hover:bg-gray-50">
-                        <td className="py-3 px-4">#{order.id}</td>
+                        <td className="py-3 px-4">#{order.reference}</td>
                         <td className="py-3 px-4 text-blue-500">
                           {new Date(order.created).toLocaleDateString()}
                         </td>
