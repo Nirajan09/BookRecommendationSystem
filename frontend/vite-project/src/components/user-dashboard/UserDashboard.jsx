@@ -1,4 +1,6 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useAuth } from "../../utils/AuthContext/AuthContext";
+import axios from "axios";
 
 export default function UserDashboard() {
   // Section refs for scrolling
@@ -46,52 +48,36 @@ export default function UserDashboard() {
     ref.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  const [user, setUser] = useState(null);
+  const { token } = useAuth();
+
+ useEffect(() => {
+  async function fetchUser() {
+    try {
+      const res = await axios.get("http://localhost:8000/userprofile/profile/", {
+        headers: { Authorization: `Token ${token}` }
+      });
+      setUser(res.data);
+    } catch (err) {
+      console.error("User profile fetch error:", err); // <-- Add this!
+    }
+  }
+  fetchUser();
+}, [token]);
+
+
+  if (!user) return <div>Loading...</div>;
+
+  // Parse date
+  const joined = new Date(user.date_joined).toLocaleDateString("en-US", {
+     day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+
   return (
     <div className="bg-gray-50 min-h-screen">
       <div className="flex flex-col md:flex-row max-w-5xl mx-auto py-8">
-        {/* Sidebar */}
-        <aside className="w-full md:w-64 mb-8 md:mb-0 md:mr-8">
-          <div className="flex flex-col items-center md:items-start">
-            <img
-              src="https://randomuser.me/api/portraits/women/43.jpg"
-              alt="User"
-              className="w-14 h-14 rounded-full mb-2"
-            />
-            <span className="font-semibold text-lg">Sophia Clark</span>
-          </div>
-          <nav className="mt-8 flex md:block flex-row justify-between md:justify-start">
-            <button
-              className="flex items-center w-full px-4 py-2 mb-2 rounded-lg hover:bg-gray-200 text-left"
-              onClick={() => handleNav(overviewRef)}
-            >
-              <span className="mr-3">👤</span> Overview
-            </button>
-            <button
-              className="flex items-center w-full px-4 py-2 mb-2 rounded-lg hover:bg-gray-200 text-left"
-              onClick={() => handleNav(ordersRef)}
-            >
-              <span className="mr-3">📦</span> Orders
-            </button>
-            <button
-              className="flex items-center w-full px-4 py-2 mb-2 rounded-lg hover:bg-gray-200 text-left"
-              onClick={() => handleNav(settingsRef)}
-            >
-              <span className="mr-3">⚙️</span> Settings
-            </button>
-            <button
-              className="flex items-center w-full px-4 py-2 mb-2 rounded-lg hover:bg-gray-200 text-left"
-              onClick={() => handleNav(reviewsRef)}
-            >
-              <span className="mr-3">⭐</span> Reviews
-            </button>
-            <button
-              className="flex items-center w-full px-4 py-2 mb-2 rounded-lg hover:bg-gray-200 text-left"
-              onClick={() => handleNav(returnsRef)}
-            >
-              <span className="mr-3">↩️</span> Returns
-            </button>
-          </nav>
-        </aside>
 
         {/* Main Content */}
         <main className="flex-1 px-4 md:px-8">
@@ -100,13 +86,17 @@ export default function UserDashboard() {
             <h1 className="text-3xl font-bold mb-4">My Account</h1>
             <div className="flex items-center mb-6">
               <img
-                src="https://randomuser.me/api/portraits/women/43.jpg"
-                alt="Sophia Clark"
+                 src={
+            user.image?.startsWith("http")
+              ? user.image
+              : `http://localhost:8000${user.profile.avatar}`
+          }
+                alt={user.name || "User"}
                 className="w-20 h-20 rounded-full mr-4"
               />
               <div>
-                <div className="font-semibold text-xl">Sophia Clark</div>
-                <div className="text-blue-500">Member since 2021</div>
+                <div className="font-semibold text-xl">{user.first_name + " "+ user.last_name}</div>
+                <div className="text-blue-500">Member since {joined}</div>
               </div>
             </div>
           </section>
