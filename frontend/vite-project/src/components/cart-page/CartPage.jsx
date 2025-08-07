@@ -124,10 +124,15 @@ export default function CartPage() {
 
   // Handle checkout click
   const handleCheckout = () => {
-    if (selectedItems.size === 0) return;
-    toast.success(`Proceeding to checkout ${selectedItems.size} item(s)`);
-    navigate("/checkout", { state: { items: Array.from(selectedItems) } });
-  };
+  if (selectedItems.size === 0) return;
+
+  // Get full cart items that the user selected
+  const selectedCartItems = cartItems.filter(item => selectedItems.has(item.id));
+
+  toast.success(`Proceeding to checkout ${selectedCartItems.length} item(s)`);
+  navigate("/checkout", { state: { items: selectedCartItems } });
+};
+
 
   // Calculate subtotal for selected items
   const selectedSubtotal = cartItems

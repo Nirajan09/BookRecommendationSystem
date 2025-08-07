@@ -17,7 +17,7 @@ import UserBookDetail from './components/user-pages/UserBookDetail'
 import CartPage from './components/cart-page/CartPage'
 import Wishlist from './components/wishlist-page/Wishlist'
 import SearchResultsPage from './components/search-box/SearchResultsPage'
-
+import Checkout from './components/checkout-page/CheckOutPage'
 function App() {
 
   return (
@@ -67,6 +67,13 @@ function App() {
             <Wishlist />
           </UserRoute>
         } />
+
+        <Route path="/checkout" element={
+          <UserRoute>
+            <Checkout />
+          </UserRoute>
+      } 
+        />
 
         <Route path="/dashboard/*" element={
           <UserRoute>
