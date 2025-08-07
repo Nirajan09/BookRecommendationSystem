@@ -3,28 +3,35 @@ from django.conf import settings
 from books.models import Book  # Assuming a Book model exists in the books app
 
 class Order(models.Model):
-    STATUS_PENDING = 'pending'
-    STATUS_PAID = 'paid'
-    STATUS_PROCESSING = 'processing'
-    STATUS_SHIPPED = 'shipped'
-    STATUS_DELIVERED = 'delivered'
-    STATUS_CANCELLED = 'cancelled'
+    SHIPPING_CHOICES = [
+        ('standard', 'Standard Delivery'),
+        ('express', 'Express Delivery'),
+        ('pickup', 'Store Pickup'),
+    ]
 
+    PAYMENT_CHOICES = [
+        ('esewa', 'E-Sewa'),
+        ('cash_on_delivery', 'Cash on Delivery'),
+    ]
     STATUS_CHOICES = [
-        (STATUS_PENDING, 'Pending'),
-        (STATUS_PAID, 'Paid'),
-        (STATUS_PROCESSING, 'Processing'),
-        (STATUS_SHIPPED, 'Shipped'),
-        (STATUS_DELIVERED, 'Delivered'),
-        (STATUS_CANCELLED, 'Cancelled'),
+    ('pending', 'Pending'),
+    ('processing', 'Processing'),
+    ('shipped', 'Shipped'),
+    ('delivered', 'Delivered'),
+    ('cancelled', 'Cancelled'),
     ]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     address = models.CharField(max_length=255)
     phone = models.CharField(max_length=20)
+    email = models.EmailField(null=True, blank=True)  # new field
+    shipping_method = models.CharField(max_length=20, choices=SHIPPING_CHOICES, default='standard')  # new field
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cash_on_delivery')  # new field
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # new field
+
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     total = models.DecimalField(decimal_places=2, max_digits=10)
 
     def __str__(self):
