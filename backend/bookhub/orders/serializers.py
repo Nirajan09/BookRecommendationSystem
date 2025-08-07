@@ -4,10 +4,20 @@ from .models import Order, OrderItem
 
 class OrderItemSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title', read_only=True)
-    
+    book_cover = serializers.SerializerMethodField()
+
     class Meta:
         model = OrderItem
-        fields = ['id', 'book', 'book_title', 'quantity', 'price']
+        fields = ['id', 'book', 'book_title', 'book_cover', 'price', 'quantity']
+
+    def get_book_cover(self, obj):
+        request = self.context.get('request')
+        if obj.book.cover_image:
+            url = obj.book.cover_image.url
+            if request is not None:
+                return request.build_absolute_uri(url)
+            return url
+        return None
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
