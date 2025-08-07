@@ -100,7 +100,7 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
       });
 
       toast.success("Order placed successfully!");
-      navigate("/order-success", { state: { order: response.data } });
+      navigate("/cart");
       console.log(response.data)
     } catch (err) {
       setError(
