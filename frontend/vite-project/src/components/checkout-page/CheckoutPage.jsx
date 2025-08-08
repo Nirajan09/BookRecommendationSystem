@@ -14,7 +14,7 @@ const SHIPPING_OPTIONS = [
 
 const PAYMENT_METHODS = [
   { id: "esewa", label: "E-Sewa" },
-  { id: "CashonDelivery", label: "Cash on Delivery" },
+  { id: "cash_on_delivery", label: "Cash on Delivery" },
 ];
 
 export default function CheckoutPage() {
@@ -28,7 +28,7 @@ export default function CheckoutPage() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [shippingMethod, setShippingMethod] = useState("standard");
-  const [paymentMethod, setPaymentMethod] = useState("card");
+  const [paymentMethod, setPaymentMethod] = useState("esewa");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -62,7 +62,7 @@ export default function CheckoutPage() {
   const isEmailValid = emailRegex.test(email);
 
   const canSubmit = isAddressValid && isPhoneValid && isEmailValid;
-const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
+  const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
 
@@ -103,13 +103,25 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
       navigate("/cart");
       console.log(response.data)
     } catch (err) {
-      setError(
-        err.response?.data?.detail ||
-          err.response?.data?.non_field_errors?.[0] ||
-          "Failed to place order. Please try again."
-      );
-      toast.error(error || "Failed to place order.");
-    } finally {
+      console.error("Order submit error:", err.response?.data);
+      const messages = [];
+      if (err.response && err.response.data) {
+        const data = err.response.data;
+        // Collect errors from fields or non_field_errors
+        for (const key in data) {
+          if (Array.isArray(data[key])) {
+            messages.push(`${key}: ${data[key].join(", ")}`);
+          } else {
+            messages.push(`${key}: ${data[key]}`);
+          }
+        }
+      }
+      const message = messages.join(" ") || "Failed to place order. Please try again.";
+      setError(message);
+      toast.error(message);
+    }
+
+    finally {
       setLoading(false);
     }
   };
@@ -134,9 +146,8 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className={`input input-bordered w-full mb-4 ${
-            email.length > 0 && !isEmailValid ? "border-red-500" : ""
-          }`}
+          className={`input input-bordered w-full mb-4 ${email.length > 0 && !isEmailValid ? "border-red-500" : ""
+            }`}
         />
         {email.length > 0 && !isEmailValid && (
           <p className="text-red-500 text-sm mb-4">Please enter a valid email.</p>
@@ -153,9 +164,8 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           required
-          className={`input input-bordered w-full mb-4 ${
-            address.length > 0 && !isAddressValid ? "border-red-500" : ""
-          }`}
+          className={`input input-bordered w-full mb-4 ${address.length > 0 && !isAddressValid ? "border-red-500" : ""
+            }`}
         />
         {address.length > 0 && !isAddressValid && (
           <p className="text-red-500 text-sm mb-4">Address is too short.</p>
@@ -172,9 +182,8 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
-          className={`input input-bordered w-full mb-6 ${
-            phone.length > 0 && !isPhoneValid ? "border-red-500" : ""
-          }`}
+          className={`input input-bordered w-full mb-6 ${phone.length > 0 && !isPhoneValid ? "border-red-500" : ""
+            }`}
         />
         {phone.length > 0 && !isPhoneValid && (
           <p className="text-red-500 text-sm mb-6">
@@ -183,29 +192,29 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
         )}
 
         {/* Shipping Method */}
-      <fieldset className="mb-3">
-        <legend className="text-lg font-semibold mb-2">Shipping Method</legend>
-        <div className="space-y-2">
-          {SHIPPING_OPTIONS.map(({ id, label, cost, eta }) => (
-            <label key={id} className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="radio"
-                name="shipping"
-                value={id}
-                checked={shippingMethod === id}
-                onChange={() => setShippingMethod(id)}
-                className="cursor-pointer"
-              />
-              <div>
-                <div className="font-semibold">{label}</div>
-                <div className="text-sm text-gray-600">
-                  {eta} — {cost === 0 ? "Free" : `$${cost}`}
+        <fieldset className="mb-3">
+          <legend className="text-lg font-semibold mb-2">Shipping Method</legend>
+          <div className="space-y-2">
+            {SHIPPING_OPTIONS.map(({ id, label, cost, eta }) => (
+              <label key={id} className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="radio"
+                  name="shipping"
+                  value={id}
+                  checked={shippingMethod === id}
+                  onChange={() => setShippingMethod(id)}
+                  className="cursor-pointer"
+                />
+                <div>
+                  <div className="font-semibold">{label}</div>
+                  <div className="text-sm text-gray-600">
+                    {eta} — {cost === 0 ? "Free" : `$${cost}`}
+                  </div>
                 </div>
-              </div>
-            </label>
-          ))}
-        </div>
-      </fieldset>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         {/* Payment Method */}
         <fieldset className="mb-6">
@@ -262,26 +271,25 @@ const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
         </div>
 
         {/* Dynamic Cost Summary */}
-      <div className="flex flex-col items-end mb-6 mt-2">
-        <div className="text-sm">
-          <span className="mr-8">Shipping:</span>
-          <span className="font-semibold text-indigo-700">${shippingCost.toFixed(2)}</span>
+        <div className="flex flex-col items-end mb-6 mt-2">
+          <div className="text-sm">
+            <span className="mr-8">Shipping:</span>
+            <span className="font-semibold text-indigo-700">${shippingCost.toFixed(2)}</span>
+          </div>
+          <div className="text-sm">
+            <span className="mr-9">Items:</span>
+            <span className="font-semibold">${itemsSubtotal.toFixed(2)}</span>
+          </div>
+          <div className="text-lg font-bold mt-1">
+            Total Cost: <span className="text-indigo-700">${totalCost}</span>
+          </div>
         </div>
-        <div className="text-sm">
-          <span className="mr-9">Items:</span>
-          <span className="font-semibold">${itemsSubtotal.toFixed(2)}</span>
-        </div>
-        <div className="text-lg font-bold mt-1">
-          Total Cost: <span className="text-indigo-700">${totalCost}</span>
-        </div>
-      </div>
 
         <button
           disabled={loading}
           type="submit"
-          className={`btn btn-primary bg-amber-500 cursor-pointer w-full flex items-center justify-center gap-2 ${
-            loading ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`btn btn-primary bg-amber-500 cursor-pointer w-full flex items-center justify-center gap-2 ${loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
         >
           {loading ? (
             <>
