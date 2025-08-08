@@ -37,7 +37,7 @@ export default function UserBookDetail() {
   // Add to cart modal
   const [showCartModal, setShowCartModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
-
+  const isOutOfStock = book?.quantity === 0;
   // Fetch book, wishlist, and set userReview if exists
   useEffect(() => {
     if (!token) return;
@@ -91,8 +91,9 @@ export default function UserBookDetail() {
 
   // Cart modal
   const openCartModal = () => {
-    setQuantity(1);
-    setShowCartModal(true);
+     if (isOutOfStock) return; // Do nothing or show a toast
+  setQuantity(1);
+  setShowCartModal(true);
   };
   const closeCartModal = () => setShowCartModal(false);
 
@@ -198,8 +199,6 @@ export default function UserBookDetail() {
     }
   };
 
-  // --- RENDERING ---
-
   if (error)
     return (
       <div className="flex flex-col items-center justify-center min-h-[90vh]">
@@ -265,30 +264,43 @@ export default function UserBookDetail() {
 
 
           {/* Actions: Cart, Wishlist */}
-          <div className="flex space-x-2 my-2">
-            <button
-              onClick={openCartModal}
-              className="cursor-pointer flex gap-4 bg-indigo-500 text-white px-4 py-2 rounded disabled:opacity-70"
-              disabled={addingCart}
-            >
-              <span>Add to Cart</span>
-              <IoCartOutline size={30} />
-            </button>
-            <button
-              className="cursor-pointer"
-              onClick={handleToggleWishlist}
-              disabled={addingWishlist}
-              aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
-            >
-              {addingWishlist ? (
-                <MdAutorenew size={40} className="animate-spin" />
-              ) : isInWishlist ? (
-                <MdFavorite size={40} />
-              ) : (
-                <MdFavoriteBorder size={40} />
-              )}
-            </button>
+          <div className="flex flex-col space-x-2 my-2 justify-between">
+            <div className="flex space-x-2">
+              <button
+                onClick={openCartModal}
+                className="cursor-pointer flex gap-4 bg-indigo-500 text-white px-4 py-2 rounded disabled:opacity-70"
+                disabled={addingCart || isOutOfStock}
+              >
+                <span>Add to Cart</span>
+                <IoCartOutline size={30} />
+              </button>
+
+
+
+              <button
+                className="cursor-pointer"
+                onClick={handleToggleWishlist}
+                disabled={addingWishlist}
+                aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+              >
+                {addingWishlist ? (
+                  <MdAutorenew size={40} className="animate-spin" />
+                ) : isInWishlist ? (
+                  <MdFavorite size={40} />
+                ) : (
+                  <MdFavoriteBorder size={40} />
+                )}
+              </button>
+            </div>
+                <div>
+            {/* Show out of stock message */}
+            {isOutOfStock && (
+              <span className="text-red-600 font-semibold ml-2">Item out of stock</span>
+            )}
+
+                </div>
           </div>
+
           {cartMsg && <div className="text-green-700 text-sm">{cartMsg}</div>}
           {wishlistMsg && (
             <div className={`${isInWishlist ? "text-red-700" : "text-pink-700"} text-sm`}>
@@ -540,7 +552,6 @@ export default function UserBookDetail() {
             </div>
           </div>
 
-          {/* ... rest of your code: wishlist, cart, etc ... */}
 
           <div className="flex space-x-2 mt-2">
             <Link

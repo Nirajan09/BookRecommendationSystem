@@ -1,5 +1,3 @@
-// components/AddToCartModal.js
-import React from "react";
 
 export default function AddToCartModal({
   open,
@@ -13,7 +11,9 @@ export default function AddToCartModal({
   if (!open || !book) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+    <div
+     onClick={onClose}
+    className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
       <div className="bg-white rounded-md p-6 max-w-sm w-full shadow-lg">
         {book.cover_image && (
           <div className="flex items-center justify-center w-full h-36 rounded mb-4">
