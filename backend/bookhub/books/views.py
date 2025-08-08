@@ -174,3 +174,11 @@ class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = [permissions.IsAdminUser]  # Only admin can access
+
+class UserBookRatingViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = BookRatingSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Return only the reviews for the authenticated user
+        return BookRating.objects.filter(user=self.request.user)

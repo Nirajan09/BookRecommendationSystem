@@ -2,36 +2,23 @@ import React, { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { AiFillStar, AiOutlineStar } from "react-icons/ai";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 export default function UserDashboard() {
   // Section refs for scrolling (optional, used in your original code)
+  const reviewMenuRef = useRef(null);
   const overviewRef = useRef(null);
   const ordersRef = useRef(null);
   const settingsRef = useRef(null);
   const reviewsRef = useRef(null);
   const returnsRef = useRef(null);
-
-  // Dummy reviews and settings (as before)
-  const reviews = [
-    {
-      user: "Olivia Bennett",
-      date: "July 20, 2023",
-      rating: 5,
-      text: "The product exceeded my expectations. The quality is excellent, and it arrived on time. I highly recommend it!",
-      likes: 15,
-      comments: 2,
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    },
-    {
-      user: "Chloe Carter",
-      date: "June 10, 2023",
-      rating: 4,
-      text: "I'm satisfied with my purchase. The product is good, but there's room for improvement in the packaging.",
-      likes: 8,
-      comments: 1,
-      avatar: "https://randomuser.me/api/portraits/women/47.jpg",
-    },
-  ];
+  const [reviewMenuOpenId, setReviewMenuOpenId] = useState(null); // which review is menu open for
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [editComment, setEditComment] = useState("");
+  const [editRating, setEditRating] = useState(0);
   const settings = [
     "Change Password",
     "Update Email Address",
@@ -39,15 +26,30 @@ export default function UserDashboard() {
     "Manage Shipping Addresses",
   ];
 
-  // Navigation handler (optional, if using anchors)
-  const handleNav = (ref) => {
-    ref.current.scrollIntoView({ behavior: "smooth" });
-  };
 
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { token } = useAuth();
+
+  const [reviews, setReviews] = useState([]);
+
+  const fetchUserReviews = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get('http://localhost:8000/books/user-reviews/', {
+        headers: { Authorization: `Token ${token}` },
+      });
+      setReviews(res.data);
+    } catch (err) {
+      toast.error("Failed to load your reviews");
+    }
+  };
+
+  // Call once on mount
+  useEffect(() => {
+    fetchUserReviews();
+  }, [token]);
 
   // Fetch user profile
   useEffect(() => {
@@ -83,7 +85,23 @@ export default function UserDashboard() {
       fetchOrders();
     }
   }, [token]);
-
+useEffect(() => {
+  function handleClickOutside(event) {
+    if (
+      reviewMenuRef.current &&
+      !reviewMenuRef.current.contains(event.target) // click outside
+    ) {
+      // Close the menu
+      setReviewMenuOpenId(null);
+    }
+  }
+  // Bind the event listener
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => {
+    // Unbind event listener on clean up
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [reviewMenuRef]);
   if (!user) return <div>Loading user profile...</div>;
 
   const joined = new Date(user.date_joined).toLocaleDateString("en-US", {
@@ -149,13 +167,12 @@ export default function UserDashboard() {
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              order.status.toLowerCase() === "shipped"
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status.toLowerCase() === "shipped"
                                 ? "bg-blue-100 text-blue-700"
                                 : order.status.toLowerCase() === "delivered"
-                                ? "bg-green-100 text-green-700"
-                                : "bg-yellow-100 text-yellow-700"
-                            }`}
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-yellow-100 text-yellow-700"
+                              }`}
                           >
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
@@ -195,37 +212,83 @@ export default function UserDashboard() {
 
           {/* Reviews */}
           <section ref={reviewsRef} className="mb-12" id="reviews">
-            <h2 className="text-xl font-bold mb-2">Reviews</h2>
-            {reviews.map((review, idx) => (
-              <div key={idx} className="mb-6">
-                <div className="flex items-center mb-1">
-                  <img
-                    src={review.avatar}
-                    alt={review.user}
-                    className="w-8 h-8 rounded-full mr-2"
-                  />
-                  <div>
-                    <div className="font-semibold">{review.user}</div>
-                    <div className="text-xs text-gray-500">{review.date}</div>
+            <h2 className="text-xl font-bold mb-2">My Reviews</h2>
+            {reviews.length === 0 ? (
+              <p>You haven't submitted any reviews yet.</p>
+            ) : (
+              reviews.map((review) => (
+                <div key={review.id} className="mb-6 border rounded p-4 bg-white shadow-sm">
+                  <div className="flex items-center mb-2">
+                    { }
+                    <img
+                      src={
+                        review.book.cover_image?.startsWith("http")
+                          ? review.book.cover_image
+                          : `http://localhost:8000${review.book.cover_image}`
+                      }
+                      alt={review.book.title}
+                      className="w-12 h-16 object-contain rounded mr-4 border"
+                    />
+                    <div>
+                      <div className="font-semibold">{review.book.title}</div>
+                      <div>{review.book.author}</div>
+                      <div className="text-xs text-gray-500">{review.rated_at
+                        ? new Date(review.rated_at).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })
+                        : ""}</div>
+                    </div>
+                    <div style={{ position: "relative" }}>
+                      <button
+                        className="text-gray-500 hover:text-gray-900 p-2 rounded-full ml-auto"
+                        onClick={() => setReviewMenuOpenId(review.id)}
+                        style={{ marginLeft: "auto" }}
+                        aria-label="More options"
+                      >
+                        <BsThreeDotsVertical size={20} />
+                      </button>
+
+                      {reviewMenuOpenId === review.id && (
+                        <div ref={reviewMenuRef} className="absolute right-0 mt-2 w-36 bg-white shadow border rounded z-10">
+                          <button
+                            className="block w-full px-4 py-2 text-left hover:bg-indigo-50"
+                            onClick={() => {
+                              setSelectedReview(review);
+                              setEditRating(review.rating);
+                              setEditComment(review.comment || "");
+                              setShowEditModal(true);
+                              setReviewMenuOpenId(null);
+                            }}
+                          >Edit</button>
+                          <button
+                            className="block w-full px-4 py-2 text-left hover:bg-red-50 text-red-700"
+                            onClick={() => {
+                              setSelectedReview(review);
+                              setShowDeleteModal(true);
+                              setReviewMenuOpenId(null);
+                            }}
+                          >Delete</button>
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  <div className="flex items-center mb-2">
+                    {[1, 2, 3, 4, 5].map((star) =>
+                      star <= review.rating ? (
+                        <AiFillStar key={star} size={22} className="text-yellow-400" />
+                      ) : (
+                        <AiOutlineStar key={star} size={22} className="text-yellow-400" />
+                      )
+                    )}
+                  </div>
+
+                  <p>{review.comment}</p>
                 </div>
-                <div className="flex items-center mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={i < review.rating ? "text-blue-500" : "text-gray-300"}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-                <div className="mb-2">{review.text}</div>
-                <div className="flex space-x-4 text-gray-500 text-sm">
-                  <span>👍 {review.likes}</span>
-                  <span>💬 {review.comments}</span>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </section>
 
           {/* Returns/Exchanges */}
@@ -290,6 +353,113 @@ export default function UserDashboard() {
           </div>
         </div>
       )}
+      {/* Edit Modal */}
+      {showEditModal && selectedReview && (
+        <div
+    className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+    onClick={() => setShowEditModal(false)}   // close modal on overlay click
+  >
+    <form
+      className="bg-white rounded-lg p-6 w-full max-w-md"
+      onClick={(e) => e.stopPropagation()}
+            onSubmit={async (e) => {
+              e.preventDefault();
+              try {
+                await axios.post(
+                  `http://localhost:8000/books/${selectedReview.book.id}/rate/`,
+                  { rating: editRating, comment: editComment },
+                  { headers: { Authorization: `Token ${token}` } }
+                );
+                toast.success("Review updated!");
+                setShowEditModal(false);
+                setSelectedReview(null);
+                // Refresh reviews:
+                const res = await axios.get('http://localhost:8000/books/user-reviews/', {
+                  headers: { Authorization: `Token ${token}` },
+                });
+                setReviews(res.data);
+              } catch {
+                toast.error("Could not update review.");
+              }
+            }}
+          >
+            <h2 className="text-xl font-bold mb-4 text-indigo-700 text-center">Edit Review</h2>
+            <div className="flex items-center justify-center">
+              {[1, 2, 3, 4, 5].map(star =>
+                <span
+                  key={star}
+                  className="cursor-pointer"
+                  onClick={() => setEditRating(star)}
+                >
+                  {star <= editRating
+                    ? <AiFillStar size={28} className="text-yellow-400" />
+                    : <AiOutlineStar size={28} className="text-yellow-400" />}
+                </span>
+              )}
+            </div>
+            <input
+              type="text"
+              className="border px-2 py-1 rounded w-full my-3"
+              value={editComment}
+              onChange={e => setEditComment(e.target.value)}
+              placeholder="Write your review (Optional)"
+            />
+            <div className="flex gap-2 justify-center">
+              <button className="bg-green-600 text-white px-4 py-1 rounded" type="submit">
+                Save
+              </button>
+              <button className="bg-gray-300 px-4 py-1 rounded" type="button" onClick={() => setShowEditModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {showDeleteModal && selectedReview && (
+       <div
+    className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+    onClick={() => setShowDeleteModal(false)}  // close modal on overlay click
+  >
+         <div
+      className="bg-white rounded-lg p-6 w-full max-w-sm"
+      onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold mb-4 text-red-700 text-center">Delete Review</h2>
+            <p className="mb-4 text-center">Are you sure you want to delete your review for "{selectedReview.book.title}"?</p>
+            <div className="flex gap-2 justify-center">
+              <button
+                className="bg-red-600 text-white px-4 py-1 rounded"
+                onClick={async () => {
+                  try {
+                    await axios.delete(
+                      `http://localhost:8000/books/reviews/${selectedReview.id}/`,
+                      { headers: { Authorization: `Token ${token}` } }
+                    );
+                    toast.success("Review deleted!");
+                    setShowDeleteModal(false);
+                    setSelectedReview(null);
+                    // Refresh reviews:
+                    const res = await axios.get('http://localhost:8000/books/user-reviews/', {
+                      headers: { Authorization: `Token ${token}` },
+                    });
+                    setReviews(res.data);
+                  } catch {
+                    toast.error("Could not delete review.");
+                    setShowDeleteModal(false);
+                  }
+                }}
+              >Delete</button>
+              <button
+                className="bg-gray-300 px-4 py-1 rounded"
+                onClick={() => setShowDeleteModal(false)}
+              >Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
+

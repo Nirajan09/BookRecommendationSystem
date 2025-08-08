@@ -10,8 +10,15 @@ class GenreSerializer(serializers.ModelSerializer):
         model = Genre
         fields = ['id', 'name']
 
+class BookMiniSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        fields = ['id', 'title', 'author', 'cover_image']  # include any fields you want
+        
 class BookRatingSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()  # Shows username (or __str__ on your User model)
+    user = serializers.StringRelatedField()  # Keeps username display
+    book = BookMiniSerializer(read_only=True)  # Nest book details here
+
     class Meta:
         model = BookRating
         fields = ['id', 'user', 'book', 'rating', 'comment', 'rated_at']
