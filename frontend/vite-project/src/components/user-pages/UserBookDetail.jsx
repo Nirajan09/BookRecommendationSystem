@@ -7,10 +7,12 @@ import { MdFavorite, MdFavoriteBorder, MdAutorenew } from "react-icons/md";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
 import AddToCartModal from "../../utils/Models/AddToCartModal"; // Update path if needed
+import { useCart } from "../../utils/CartContext/CartContext";
 
 const BASE_URL = "http://localhost:8000";
 
 export default function UserBookDetail() {
+  const { fetchCartCount } = useCart();
   const { id } = useParams();
   const { token, user: currUser } = useAuth();
   const navigate = useNavigate();
@@ -109,6 +111,7 @@ export default function UserBookDetail() {
       );
       toast.success(`Book added to cart!`);
       setShowCartModal(false);
+      fetchCartCount();
       navigate("/cart");
     } catch (err) {
       if (err.response?.data?.quantity) {
