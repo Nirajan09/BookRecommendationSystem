@@ -7,16 +7,15 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookSearchBar from "../search-box/BookSearchBar";
 import UserProfileSnapshot from "../profile-section/UserProfileSnapshot";
 import axios from "axios";
-import { useCart } from "../../utils/CartContext/CartContext";
 const BASE_URL = "http://localhost:8000";
 
 export default function UserHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false); // <-- new
   const { token } = useAuth();
+  const [cartCount, setCartCount] = useState(0);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const { cartCount } = useCart();
   useEffect(() => {
     if (menuOpen || searchOpen) {
       document.body.style.overflow = "hidden";
@@ -26,7 +25,18 @@ export default function UserHeader() {
     return () => (document.body.style.overflow = "");
   }, [menuOpen, searchOpen]);
 
- 
+  useEffect(() => {
+    if (!token) { setCartCount(0); return; }
+    axios.get(`${BASE_URL}/books/cart/`, {
+      headers: { Authorization: `Token ${token}` },
+    }).then((res) => {
+      const totalItems = res.data.reduce(
+        (acc, item) => acc + (item.quantity || 1),
+        0
+      );
+      setCartCount(totalItems);
+    }).catch(() => setCartCount(0));
+  }, [token]);
 
   const handleLinkClick = () => setMenuOpen(false);
 

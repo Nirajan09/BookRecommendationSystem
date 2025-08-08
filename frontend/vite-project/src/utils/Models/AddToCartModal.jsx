@@ -3,7 +3,7 @@ export default function AddToCartModal({
   book,
   quantity,
   onQuantityChange,
-  onAdd,
+  onAddToCart,
   onClose,
   adding,
 }) {
@@ -54,8 +54,7 @@ export default function AddToCartModal({
         <p className="mb-4"><b>Total Price:</b> ${(book.price * quantity).toFixed(2)}</p>
 
         <button
-          onClick={onAdd}
-          disabled={adding}
+          onClick={onAddToCart} disabled={adding}
           className={`w-full py-2 rounded text-white ${adding ? 'bg-gray-400' : 'bg-indigo-600 hover:bg-indigo-700'}`}
         >
           {adding ? 'Adding...' : 'Add to Cart'}
