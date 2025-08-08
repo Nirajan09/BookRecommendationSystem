@@ -17,7 +17,7 @@ import UserBookDetail from './components/user-pages/UserBookDetail'
 import CartPage from './components/cart-page/CartPage'
 import Wishlist from './components/wishlist-page/Wishlist'
 import SearchResultsPage from './components/search-box/SearchResultsPage'
-import Checkout from './components/checkout-page/CheckOutPage'
+import Checkout from './components/checkout-page/CheckoutPage'
 function App() {
 
   return (
