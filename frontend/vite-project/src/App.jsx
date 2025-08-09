@@ -18,6 +18,8 @@ import CartPage from './components/cart-page/CartPage'
 import Wishlist from './components/wishlist-page/Wishlist'
 import SearchResultsPage from './components/search-box/SearchResultsPage'
 import Checkout from './components/checkout-page/CheckoutPage'
+import PaymentFail from './components/payment-section/PaymentFail'
+import PaymentSuccess from './components/payment-section/PaymentSuccess'
 function App() {
 
   return (
@@ -47,20 +49,20 @@ function App() {
           <UserRoute>
             <SearchResultsPage />
           </UserRoute>
-      } 
-      />
+        }
+        />
 
         <Route path="/cart" element={
           <UserRoute>
             <CartPage />
           </UserRoute>
-      } />
+        } />
 
-         <Route path="/books/:id" element={
-           <UserRoute>
-          <UserBookDetail />
+        <Route path="/books/:id" element={
+          <UserRoute>
+            <UserBookDetail />
           </UserRoute>
-          } />
+        } />
 
         <Route path="/wishlist" element={
           <UserRoute>
@@ -72,8 +74,19 @@ function App() {
           <UserRoute>
             <Checkout />
           </UserRoute>
-      } 
+        }
         />
+
+        <Route path="/payment-success" element={
+          <UserRoute>
+            <PaymentSuccess />
+          </UserRoute>
+      } />
+        <Route path="/payment-fail" element={
+          <UserRoute>
+            <PaymentFail />
+          </UserRoute>
+      } />
 
         <Route path="/dashboard/*" element={
           <UserRoute>

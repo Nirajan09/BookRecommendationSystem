@@ -32,7 +32,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Redirect if no items
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[0-9]{7,15}$/;
+
   useEffect(() => {
     if (!cartItems.length) {
       toast.error("No items selected for checkout.");
@@ -40,37 +42,26 @@ export default function CheckoutPage() {
     }
   }, [cartItems, navigate]);
 
-  // Validation regex patterns
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const phoneRegex = /^[0-9]{7,15}$/; // simple numeric phone check
-
-  // Calculate subtotal price of items
   const itemsSubtotal = cartItems.reduce(
     (sum, item) => sum + Number(item.book_detail.price) * item.quantity,
     0
   );
 
-  // Add cost of shipping method
-  const shippingCost = SHIPPING_OPTIONS.find((opt) => opt.id === shippingMethod)?.cost || 0;
+  const shippingCost = SHIPPING_OPTIONS.find(opt => opt.id === shippingMethod)?.cost || 0;
+  const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
 
-  // Grand total
-  const totalPrice = (itemsSubtotal + shippingCost).toFixed(2);
-
-  // Real-time validation flags
   const isAddressValid = address.trim().length > 5;
   const isPhoneValid = phoneRegex.test(phone);
   const isEmailValid = emailRegex.test(email);
 
   const canSubmit = isAddressValid && isPhoneValid && isEmailValid;
-  const totalCost = (itemsSubtotal + shippingCost).toFixed(2);
+
   const handleSubmitOrder = async (e) => {
     e.preventDefault();
-
     if (!canSubmit) {
       toast.error("Please fix validation errors before submitting.");
       return;
     }
-
     setLoading(true);
     setError(null);
 
@@ -87,40 +78,41 @@ export default function CheckoutPage() {
       shipping_method: shippingMethod,
       payment_method: paymentMethod,
       shipping_cost: shippingCost,
-      total: totalPrice,
+      total: totalCost,
       items: orderItems,
     };
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/orders/`, orderPayload, {
-        headers: {
-          Authorization: `Token ${authToken}`,
-          "Content-Type": "application/json",
-        },
+      // Create order
+      const orderResp = await axios.post(`${API_BASE_URL}/orders/`, orderPayload, {
+        headers: { Authorization: `Token ${authToken}` },
       });
 
-      toast.success("Order placed successfully!");
-      navigate("/cart");
-      console.log(response.data)
+      const orderId = orderResp.data.id;
+
+      if (paymentMethod === "cash_on_delivery") {
+        toast.success("Order placed successfully via Cash on Delivery!");
+        navigate("/order-confirmation", { state: { order: orderResp.data } });
+      } 
+      else if (paymentMethod === "esewa") {
+  // Get payment initiation data from backend
+  const payResp = await axios.get(`${API_BASE_URL}/orders/${orderId}/initiate_esewa_payment/`, {
+    headers: { Authorization: `Token ${authToken}` },
+  });
+
+ const { amt, txAmt, psc, pdc, tAmt, pid, scd, su, fu } = payResp.data;
+const paymentUrl = `https://rc.esewa.com.np/epay/main?amt=${amt}&txAmt=${txAmt}&psc=${psc}&pdc=${pdc}&tAmt=${tAmt}&pid=${pid}&scd=${scd}&su=${su}&fu=${fu}`;
+window.open(paymentUrl, "_blank"); // optionally open in new tab
+
+  // OLD → window.location.href = paymentUrl;
+  window.open(paymentUrl, "_blank"); // open in new tab
+}
+
     } catch (err) {
-      console.error("Order submit error:", err.response?.data);
-      const messages = [];
-      if (err.response && err.response.data) {
-        const data = err.response.data;
-        // Collect errors from fields or non_field_errors
-        for (const key in data) {
-          if (Array.isArray(data[key])) {
-            messages.push(`${key}: ${data[key].join(", ")}`);
-          } else {
-            messages.push(`${key}: ${data[key]}`);
-          }
-        }
-      }
-      const message = messages.join(" ") || "Failed to place order. Please try again.";
+      const message = err.response?.data?.detail || "Failed to place order. Try again.";
       setError(message);
       toast.error(message);
-    }
-
+    } 
     finally {
       setLoading(false);
     }
@@ -135,60 +127,47 @@ export default function CheckoutPage() {
       )}
 
       <form onSubmit={handleSubmitOrder} noValidate>
+
         {/* Email */}
-        <label className="block font-semibold mb-2" htmlFor="email">
-          Email Address
-        </label>
+        <label className="block font-semibold mb-2">Email Address</label>
         <input
-          id="email"
           type="email"
           placeholder="Enter your email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className={`input input-bordered w-full mb-4 ${email.length > 0 && !isEmailValid ? "border-red-500" : ""
-            }`}
+          className={`input input-bordered w-full mb-4 ${email.length > 0 && !isEmailValid ? "border-red-500" : ""}`}
         />
         {email.length > 0 && !isEmailValid && (
           <p className="text-red-500 text-sm mb-4">Please enter a valid email.</p>
         )}
 
-        {/* Shipping Address */}
-        <label className="block font-semibold mb-2" htmlFor="address">
-          Shipping Address
-        </label>
+        {/* Address */}
+        <label className="block font-semibold mb-2">Shipping Address</label>
         <input
-          id="address"
           type="text"
           placeholder="Enter shipping address"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           required
-          className={`input input-bordered w-full mb-4 ${address.length > 0 && !isAddressValid ? "border-red-500" : ""
-            }`}
+          className={`input input-bordered w-full mb-4 ${address.length > 0 && !isAddressValid ? "border-red-500" : ""}`}
         />
         {address.length > 0 && !isAddressValid && (
           <p className="text-red-500 text-sm mb-4">Address is too short.</p>
         )}
 
-        {/* Phone Number */}
-        <label className="block font-semibold mb-2" htmlFor="phone">
-          Phone Number
-        </label>
+        {/* Phone */}
+        <label className="block font-semibold mb-2">Phone Number</label>
         <input
-          id="phone"
           type="tel"
           placeholder="Enter phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           required
-          className={`input input-bordered w-full mb-6 ${phone.length > 0 && !isPhoneValid ? "border-red-500" : ""
-            }`}
+          className={`input input-bordered w-full mb-6 ${phone.length > 0 && !isPhoneValid ? "border-red-500" : ""}`}
         />
         {phone.length > 0 && !isPhoneValid && (
-          <p className="text-red-500 text-sm mb-6">
-            Please enter a valid phone number (10 digits).
-          </p>
+          <p className="text-red-500 text-sm mb-6">Please enter a valid phone number (7-15 digits).</p>
         )}
 
         {/* Shipping Method */}
@@ -203,7 +182,6 @@ export default function CheckoutPage() {
                   value={id}
                   checked={shippingMethod === id}
                   onChange={() => setShippingMethod(id)}
-                  className="cursor-pointer"
                 />
                 <div>
                   <div className="font-semibold">{label}</div>
@@ -228,50 +206,43 @@ export default function CheckoutPage() {
                   value={id}
                   checked={paymentMethod === id}
                   onChange={() => setPaymentMethod(id)}
-                  className="cursor-pointer"
                 />
                 <span>{label}</span>
               </label>
             ))}
           </div>
-
         </fieldset>
 
-        {/* Book grid summary */}
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-3xl">
-            {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border rounded shadow p-4 flex flex-col items-center text-center"
-              >
-                <img
-                  src={
-                    item.book_detail.cover_image?.startsWith("http")
-                      ? item.book_detail.cover_image
-                      : `http://localhost:8000${item.book_detail.cover_image}`
-                  }
-                  alt={item.book_detail.title}
-                  className="w-28 h-36 object-contain rounded mb-2"
-                />
-                <div className="font-semibold mt-2 mb-1">{item.book_detail.title}</div>
-                <div className="text-sm text-gray-500 mb-1">{item.book_detail.author}</div>
-                <div className="mb-1">
-                  <span className="font-semibold">${parseFloat(item.book_detail.price).toFixed(2)}</span>
-                  <span className="mx-2">x</span>
-                  <span>{item.quantity}</span>
-                </div>
-                <div className="font-bold text-indigo-600">
-                  Total: ${(parseFloat(item.book_detail.price) * item.quantity).toFixed(2)}
-                </div>
+        {/* Order Summary */}
+        <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+          {cartItems.map((item) => (
+            <div key={item.id} className="bg-white border rounded shadow p-4 flex flex-col items-center text-center">
+              <img
+                src={
+                  item.book_detail.cover_image?.startsWith("http")
+                    ? item.book_detail.cover_image
+                    : `http://localhost:8000${item.book_detail.cover_image}`
+                }
+                alt={item.book_detail.title}
+                className="w-28 h-36 object-contain rounded mb-2"
+              />
+              <div className="font-semibold mt-2 mb-1">{item.book_detail.title}</div>
+              <div className="text-sm text-gray-500 mb-1">{item.book_detail.author}</div>
+              <div className="mb-1">
+                <span className="font-semibold">${parseFloat(item.book_detail.price).toFixed(2)}</span>
+                <span className="mx-2">x</span>
+                <span>{item.quantity}</span>
               </div>
-            ))}
-          </div>
+              <div className="font-bold text-indigo-600">
+                Total: ${(parseFloat(item.book_detail.price) * item.quantity).toFixed(2)}
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Dynamic Cost Summary */}
-        <div className="flex flex-col items-end mb-6 mt-2">
+        {/* Cost Summary */}
+        <div className="flex flex-col items-end mb-6">
           <div className="text-sm">
             <span className="mr-8">Shipping:</span>
             <span className="font-semibold text-indigo-700">${shippingCost.toFixed(2)}</span>
@@ -285,39 +256,13 @@ export default function CheckoutPage() {
           </div>
         </div>
 
+        {/* Submit Button */}
         <button
           disabled={loading}
           type="submit"
-          className={`btn btn-primary bg-amber-500 cursor-pointer w-full flex items-center justify-center gap-2 ${loading ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`btn btn-primary bg-amber-500 w-full flex items-center justify-center gap-2 ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          {loading ? (
-            <>
-              <svg
-                className="animate-spin h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8v8z"
-                />
-              </svg>
-              Processing...
-            </>
-          ) : (
-            "Place Order"
-          )}
+          {loading ? "Processing..." : "Place Order"}
         </button>
       </form>
     </div>
