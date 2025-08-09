@@ -7,8 +7,9 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all()  # Add this line
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -18,7 +19,7 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Order.objects.all()
         return Order.objects.filter(user=user)
 
-    @transaction.atomic  # ensure atomicity
+    @transaction.atomic
     def perform_create(self, serializer):
         # Save order
         order = serializer.save(user=self.request.user)
@@ -27,29 +28,31 @@ class OrderViewSet(viewsets.ModelViewSet):
         for item in order.items.all():
             book = item.book
             if book.quantity is not None:
-                # Ensure no negative stock
                 book.quantity = max(book.quantity - item.quantity, 0)
                 book.save()
 
-        # Optionally, clear cart items corresponding to ordered books
+        # Clear cart items corresponding to ordered books
         ordered_book_ids = order.items.values_list('book__id', flat=True)
         CartItem.objects.filter(user=self.request.user, book__id__in=ordered_book_ids).delete()
 
-        @action(detail=True, methods=['GET'])
-        def initiate_esewa_payment(self, request, pk=None):
-            order = self.get_object()
-            if order.payment_status == 'Completed':
-                return Response({'detail': 'Order already paid.'}, status=400)
+    @action(detail=True, methods=['GET'])
+    def initiate_esewa_payment(self, request, pk=None):
+        order = self.get_object()
+        if order.payment_status == 'Completed':
+            return Response({'detail': 'Order already paid.'}, status=400)
 
-            # Prepare data required by eSewa
-            data = {
-                'amt': str(order.total_amount),  # Make sure your Order has total_amount field
-                'pid': str(order.id),  # product or order ID to track payment
-                'scd': settings.ESEWA_MERCHANT_ID,
-                'su': request.build_absolute_uri('/api/orders/esewa/success/'),  # success callback URL
-                'fu': request.build_absolute_uri('/api/orders/esewa/fail/'),     # failure callback URL
-            }
-            return Response(data)
+        data = {
+            'amt': str(order.total),             # product amount (without tax)
+            'txAmt': "0",                       # set tax amount, 0 if none
+            'psc': "0",                        # service charge, 0 if none
+            'pdc': "0",                        # delivery charge, 0 if none
+            'tAmt': str(order.total),          # total amount = amt + txAmt + psc + pdc
+            'pid': str(order.id),
+            'scd': settings.ESEWA_MERCHANT_ID,  # single merchant ID string
+            'su': request.build_absolute_uri('/payment-success/'),
+            'fu': request.build_absolute_uri('/payment-fail/'),
+        }
+        return Response(data)
 
 class OrderItemViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = OrderItemSerializer

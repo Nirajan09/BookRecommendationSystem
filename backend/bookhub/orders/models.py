@@ -9,7 +9,11 @@ class Order(models.Model):
         ('express', 'Express Delivery'),
         ('pickup', 'Store Pickup'),
     ]
-
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    ]
     PAYMENT_CHOICES = [
         ('esewa', 'E-Sewa'),
         ('cash_on_delivery', 'Cash on Delivery'),
@@ -30,7 +34,13 @@ class Order(models.Model):
     shipping_method = models.CharField(max_length=20, choices=SHIPPING_CHOICES, default='standard')  # new field
     payment_method = models.CharField(max_length=20, choices=PAYMENT_CHOICES, default='cash_on_delivery')  # new field
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)  # new field
-
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='pending'
+    )
+    # Keep your status choice for shipping separately:
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     # Add the reference field here:
     reference = models.CharField(max_length=24, unique=True, editable=False, blank=True, null=True)
 
