@@ -6,7 +6,9 @@ from django.db import transaction
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.conf import settings
-
+from rest_framework.pagination import PageNumberPagination
+class OrderPagination(PageNumberPagination):
+    page_size = 15
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
