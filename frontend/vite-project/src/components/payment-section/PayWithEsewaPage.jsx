@@ -8,7 +8,6 @@ export default function PayWithEsewaPage() {
 
   useEffect(() => {
     if (orderPayload) {
-      // Build eSewa URL (point to your success route in SPA)
       const successUrl = `http://localhost:3000/esewa-success`;
       const failUrl = `http://localhost:3000/esewa-fail`;
 

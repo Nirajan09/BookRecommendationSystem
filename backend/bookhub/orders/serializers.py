@@ -22,24 +22,23 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
     user = serializers.StringRelatedField(read_only=True)
-    reference = serializers.CharField(read_only=True)  # Add this line
+    reference = serializers.CharField(read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'reference', 'user', 'address', 'phone', 'email', 'shipping_method',
-                  'payment_method', 'shipping_cost', 'status', 'total', 'created', 'updated', 'items']
-        read_only_fields = ['status', 'created', 'updated', 'user', 'reference']
+        fields = ['id', 'reference', 'user', 'address', 'phone', 'email',
+                  'shipping_method', 'payment_method', 'shipping_cost',
+                  'status', 'total', 'created', 'updated', 'items']
+        read_only_fields = ['created', 'updated', 'user', 'reference']
+        # ✅ removed 'status' from read-only
 
     def create(self, validated_data):
         user = self.context['request'].user
-        # Remove 'user' from validated_data if it exists to prevent duplication
         validated_data.pop('user', None)
-        
         items_data = validated_data.pop('items')
         order = Order.objects.create(user=user, **validated_data)
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)
         return order
-
 
 

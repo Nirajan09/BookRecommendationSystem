@@ -21,12 +21,13 @@ class Order(models.Model):
     ]
 
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('processing', 'Processing'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled'),
-    ]
+    ('pending', 'Pending'),
+    ('processing', 'Processing'),
+    ('shipped', 'Shipped'),
+    ('delivered', 'Delivered'),
+    ('completed', 'Completed'),       # 👈 Add this!
+    ('cancelled', 'Cancelled'),
+]
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     address = models.CharField(max_length=255)

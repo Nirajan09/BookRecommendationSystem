@@ -5,10 +5,11 @@ const API_BASE_URL = "http://localhost:8000";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
-  completed: "bg-green-100 text-green-800",
-  cancelled: "bg-red-100 text-red-800",
+  processing: "bg-orange-100 text-orange-800",
   shipped: "bg-blue-100 text-blue-800",
   delivered: "bg-indigo-100 text-indigo-800",
+  completed: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
 };
 
 const paymentLabels = {
@@ -29,10 +30,8 @@ export default function AdminOrdersPage() {
   const [dateEnd, setDateEnd] = useState("");
   const [checked, setChecked] = useState([]);
   const [error, setError] = useState(null);
-
-  // Pagination
   const [page, setPage] = useState(1);
-  const pageSize = 15; // fixed 15 per page
+  const pageSize = 15;
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -57,7 +56,7 @@ export default function AdminOrdersPage() {
         params,
       })
       .then((res) => {
-        const results = res.data.results || res.data; // DRF pagination or plain list
+        const results = res.data.results || res.data;
         setOrders(results);
         setChecked([]);
         if (res.data.count) {
@@ -71,22 +70,31 @@ export default function AdminOrdersPage() {
   };
 
   const handleStatusChange = (orderId, newStatus) => {
+    if (!newStatus) return;
     setLoading(true);
+
     axios
       .patch(
         `${API_BASE_URL}/orders/${orderId}/`,
         { status: newStatus },
         { headers: { Authorization: `Token ${localStorage.getItem("token")}` } }
       )
-      .then(() => {
-        setSelectedOrder(null);
+      .then((res) => {
+        const updatedOrder = res.data;
         setOrders((prev) =>
           prev.map((o) =>
-            o.id === orderId ? { ...o, status: newStatus } : o
+            o.id === updatedOrder.id || o.reference === updatedOrder.reference
+              ? updatedOrder
+              : o
           )
         );
+        setSelectedOrder(null); // close modal
+        setStatusUpdate("");
       })
-      .catch(() => setError("Failed to update status"))
+      .catch((err) => {
+        console.error("Status update error:", err.response?.data || err.message);
+        setError("Failed to update status");
+      })
       .finally(() => setLoading(false));
   };
 
@@ -121,13 +129,14 @@ export default function AdminOrdersPage() {
         <select
           className="input input-bordered px-3 py-2 rounded border"
           value={statusFilter}
-          onChange={e => {
+          onChange={(e) => {
             setStatusFilter(e.target.value);
             setPage(1);
           }}
         >
           <option value="">All Statuses</option>
           <option value="pending">Pending</option>
+          <option value="processing">Processing</option>
           <option value="shipped">Shipped</option>
           <option value="delivered">Delivered</option>
           <option value="completed">Completed</option>
@@ -136,7 +145,7 @@ export default function AdminOrdersPage() {
         <select
           className="input input-bordered px-3 py-2 rounded border"
           value={paymentFilter}
-          onChange={e => {
+          onChange={(e) => {
             setPaymentFilter(e.target.value);
             setPage(1);
           }}
@@ -150,7 +159,7 @@ export default function AdminOrdersPage() {
           type="date"
           className="input input-bordered px-3 py-2 rounded border"
           value={dateStart}
-          onChange={e => {
+          onChange={(e) => {
             setDateStart(e.target.value);
             setPage(1);
           }}
@@ -159,13 +168,14 @@ export default function AdminOrdersPage() {
           type="date"
           className="input input-bordered px-3 py-2 rounded border"
           value={dateEnd}
-          onChange={e => {
+          onChange={(e) => {
             setDateEnd(e.target.value);
             setPage(1);
           }}
         />
       </div>
 
+      {/* Orders Table */}
       <div className="bg-white rounded shadow overflow-x-auto">
         {loading ? (
           <div className="p-8 text-center">Loading orders...</div>
@@ -178,7 +188,9 @@ export default function AdminOrdersPage() {
                 <th className="p-2">
                   <input
                     type="checkbox"
-                    checked={checked.length === orders.length && orders.length > 0}
+                    checked={
+                      checked.length === orders.length && orders.length > 0
+                    }
                     onChange={handleCheckAll}
                   />
                 </th>
@@ -224,9 +236,10 @@ export default function AdminOrdersPage() {
                   <td className="p-2">${Number(order.total).toFixed(2)}</td>
                   <td className="p-2">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold
-                        ${statusColors[order.status] || "bg-gray-100 text-gray-800"}
-                      `}
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                        statusColors[order.status] ||
+                        "bg-gray-100 text-gray-800"
+                      }`}
                     >
                       {order.status.charAt(0).toUpperCase() +
                         order.status.substring(1)}
@@ -239,7 +252,10 @@ export default function AdminOrdersPage() {
                   <td className="p-2">
                     <button
                       className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded text-xs font-semibold"
-                      onClick={() => setSelectedOrder(order)}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        setStatusUpdate(order.status);
+                      }}
                     >
                       Details & Manage
                     </button>
@@ -278,6 +294,97 @@ export default function AdminOrdersPage() {
           Next
         </button>
       </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedOrder(null);
+              setStatusUpdate("");
+            }
+          }}
+        >
+          <div
+            className="bg-white rounded shadow-lg p-6 max-w-xl w-full overflow-y-auto max-h-[90vh]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-lg font-bold mb-4">
+              Order #{selectedOrder.reference || selectedOrder.id} Details
+            </h2>
+            <div className="mb-2">
+              <b>Customer:</b> {selectedOrder.customer_name || selectedOrder.email}
+            </div>
+            <div className="mb-2">
+              <b>Date:</b>{" "}
+              {selectedOrder.updated
+                ? new Date(selectedOrder.updated).toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "Invalid Date"}
+            </div>
+            <div className="mb-2">
+              <b>Amount:</b> ${Number(selectedOrder.total).toFixed(2)}
+            </div>
+            <div className="mb-2">
+              <b>Status:</b>{" "}
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                  statusColors[selectedOrder.status] ||
+                  "bg-gray-100 text-gray-800"
+                }`}
+              >
+                {selectedOrder.status.charAt(0).toUpperCase() +
+                  selectedOrder.status.substring(1)}
+              </span>
+            </div>
+
+            {/* Status Update */}
+            <div className="flex gap-2 items-center mb-4">
+              <label htmlFor="order-status" className="font-medium">
+                Update Status:
+              </label>
+              <select
+                id="order-status"
+                value={statusUpdate || selectedOrder.status}
+                onChange={(e) => setStatusUpdate(e.target.value)}
+                className="input input-bordered px-3 py-2 rounded border"
+              >
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="shipped">Shipped</option>
+                <option value="delivered">Delivered</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+              <button
+                className="bg-indigo-600 text-white px-3 py-2 rounded ml-2"
+                onClick={() =>
+                  handleStatusChange(selectedOrder.id, statusUpdate)
+                }
+                disabled={loading}
+              >
+                Update
+              </button>
+            </div>
+
+            <button
+              className="mt-2 bg-gray-500 text-white px-4 py-2 rounded"
+              onClick={() => {
+                setSelectedOrder(null);
+                setStatusUpdate("");
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -7,6 +7,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.conf import settings
 from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+
 class OrderPagination(PageNumberPagination):
     page_size = 15
 
@@ -14,7 +16,8 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer                     # MUST have this to avoid AssertionError
     permission_classes = [permissions.IsAuthenticated]
-
+    filterset_fields = ['status']  # 👈 this enables /orders/?status=cancelled
+    filter_backends = [DjangoFilterBackend]
     def get_queryset(self):
         """Only return orders belonging to the logged-in user unless staff."""
         user = self.request.user
