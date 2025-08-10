@@ -17,6 +17,7 @@ class Order(models.Model):
     PAYMENT_CHOICES = [
         ('esewa', 'E-Sewa'),
         ('cash_on_delivery', 'Cash on Delivery'),
+        ('stripe', 'Stripe'),
     ]
 
     STATUS_CHOICES = [

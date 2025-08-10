@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'books',
     'userprofile',
     'orders',
-    'payment'
+    'payment',
+    'stripePayment'
 ]
 
 MIDDLEWARE = [
@@ -123,4 +124,8 @@ ESEWA_MERCHANT_ID='EPAYTEST'
 ESEWA_MERCHANT_ID = (ESEWA_MERCHANT_ID, 'EPAY1234XYZ')
 ESEWA_VERIFY_URL = 'https://rc.esewa.com.np/api/epay/transaction/status/'
 ESEWA_PAYMENT_URL = 'https://rc-epay.esewa.com.np/api/epay/main/v2/form'
+
+STRIPE_SECRET_KEY = '***REMOVED***'      
+STRIPE_PUBLISHABLE_KEY = 'pk_test_51Ru39zDDPpxrz2C9CfNxjLpKgpTt3YYL6BuHXm5BBcXEHZRoXJeIsWzL1LBxhW1JaFAf90ubPlv6Svaq7HuSmgTz00upC1kfIJ' 
+
 
