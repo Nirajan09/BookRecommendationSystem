@@ -22,6 +22,7 @@ import PaymentFail from './components/payment-section/PaymentFail'
 import StripeForm from "./components/payment-section/PayWithStripeCardPage"
 import PayWithEsewaPage from './components/payment-section/PayWithEsewaPage'
 import OrderConfirmation from "./components/order-processing/OrderConfirmation"
+import AdminOrdersPage from './components/adminorder-page/AdminOrdersPage'
 function App() {
 
   return (
@@ -153,7 +154,14 @@ function App() {
               <AdminEditBook />
             </AdminRoute>
           }
-        />
+          />
+          <Route
+            path="/admin/orders"
+            element={
+              <AdminRoute>
+                <AdminOrdersPage />
+              </AdminRoute>
+            }/>
       </Routes>
     </>
   )

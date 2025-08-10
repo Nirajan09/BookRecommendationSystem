@@ -1,63 +1,120 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
+import axios from "axios";
+
+const API_BASE_URL = "http://localhost:8000";
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const [stats, setStats] = useState({
+    totalSalesToday: 0,
+    totalSalesMonth: 0,
+    numberOfOrders: 0,
+    totalRevenue: 0,
+    bestSellingBooks: [],
+    lowStockAlerts: [],
+  });
 
-  // Example stats - replace with real data from API if available
-  const exampleStats = {
-    totalBooks: 128,
-    totalOrders: 76,
-    recentActivity: "Last order placed 3 mins ago"
-  };
+  useEffect(() => {
+    // Example API call to get dashboard KPIs (replace with real API endpoint)
+    axios
+      .get(`${API_BASE_URL}/admin/dashboard-stats/`, {
+        headers: { Authorization: `Token ${localStorage.getItem("token")}` },
+      })
+      .then((res) => {
+        setStats(res.data);
+      })
+      .catch((err) => {
+        console.error("Error loading dashboard stats", err);
+      });
+  }, []);
 
   return (
-    <div className="min-h-[90vh] bg-gray-100 flex flex-col">
-      {/* Header */}
+    <div className="min-h-[90vh] bg-gray-100 flex flex-col p-4">
+      {/* Welcome Header */}
+      <header className="mb-6">
+        <h1 className="text-3xl font-bold text-indigo-700">
+          Admin Dashboard
+        </h1>
+        <p className="text-gray-600">
+          Welcome, {user?.username}! Here's a quick overview of the store.
+        </p>
+      </header>
+
+      {/* KPI Cards */}
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <KpiCard label="Sales Today" value={`$${stats.totalSalesToday}`} />
+        <KpiCard label="Sales This Month" value={`$${stats.totalSalesMonth}`} />
+        <KpiCard label="Orders" value={stats.numberOfOrders} />
+        <KpiCard label="Total Revenue" value={`$${stats.totalRevenue}`} />
+      </section>
+
+      {/* Best-Selling Books & Low Stock */}
+      <section className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold mb-3">Best-Selling Books</h2>
+         {Array.isArray(stats.bestSellingBooks) && stats.bestSellingBooks.length > 0 ? (
+  <ul>
+              {stats.bestSellingBooks.map((book, idx) => (
+                <li key={idx}>
+                  {book.title} — {book.sold} sold
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">No data available</p>
+          )}
+        </div>
+
+        <div className="bg-white p-4 rounded shadow">
+          <h2 className="text-lg font-semibold mb-3">Low Stock Alerts</h2>
+          {Array.isArray(stats.lowStockAlerts) && stats.lowStockAlerts.length > 0 ? (
+            <ul className="list-disc pl-5 text-red-600">
+              {stats.lowStockAlerts.map((book, idx) => (
+                <li key={idx}>
+                  {book.title} — {book.stock} left
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-500">No alerts</p>
+          )}
+        </div>
+      </section>
       
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col items-center px-4 py-8">
-        {/* Quick Stats Section */}
-        <section className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center">
-            <span className="text-gray-500 text-sm">Total Books</span>
-            <span className="text-2xl font-bold text-indigo-600">{exampleStats.totalBooks}</span>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center">
-            <span className="text-gray-500 text-sm">Total Orders</span>
-            <span className="text-2xl font-bold text-indigo-600">{exampleStats.totalOrders}</span>
-          </div>
-          <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center">
-            <span className="text-gray-500 text-sm">Recent Activity</span>
-            <span className="text-base text-gray-700">{exampleStats.recentActivity}</span>
-          </div>
-        </section>
-
-        {/* Navigation Links */}
-        <nav className="w-full max-w-2xl flex flex-col sm:flex-row gap-4 justify-center mb-10">
-          <Link
-            to="/admin/books"
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium px-6 py-3 rounded-lg flex-1 text-center shadow"
-          >
-            Manage Books
-          </Link>
-          {/* Future: Add more links here */}
-        </nav>
-
-        {/* Welcome Message */}
-        <section className="w-full max-w-2xl bg-white rounded-lg p-6 shadow flex flex-col items-center">
-          <h2 className="text-xl font-semibold mb-2 text-indigo-700">
-            Welcome, {user && user.username}!
-          </h2>
-          <p className="text-gray-700 text-center">
-            Here you can manage your store's books, review recent activity, and access all admin tools.
-          </p>
-          <p className="text-xs text-gray-400 mt-4">
-            Today is {new Date().toLocaleString(undefined, { dateStyle: "full", timeStyle: "short" })}
-          </p>
-        </section>
-      </main>
+      {/* Admin Navigation */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <NavCard to="/admin/books" label="Book Management" />
+        <NavCard to="/admin/orders" label="Order Management" />
+        <NavCard to="/admin/customers" label="Customer Management" />
+        <NavCard to="/admin/inventory" label="Inventory & Stock" />
+        <NavCard to="/admin/promotions" label="Promotions & Discounts" />
+        <NavCard to="/admin/reviews" label="Reviews & Ratings" />
+        <NavCard to="/admin/reports" label="Reports & Analytics" />
+        <NavCard to="/admin/settings" label="Admin Settings" />
+        <NavCard to="/admin/notifications" label="Notifications" />
+      </section>
     </div>
+  );
+}
+
+function KpiCard({ label, value }) {
+  return (
+    <div className="bg-white p-6 rounded shadow flex flex-col items-center">
+      <span className="text-gray-500 text-sm">{label}</span>
+      <span className="text-xl font-bold text-indigo-600">{value}</span>
+    </div>
+  );
+}
+
+function NavCard({ to, label }) {
+  return (
+    <Link
+      to={to}
+      className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium p-4 rounded shadow text-center flex items-center justify-center"
+    >
+      {label}
+    </Link>
   );
 }
