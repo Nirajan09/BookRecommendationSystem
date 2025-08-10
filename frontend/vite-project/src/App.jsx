@@ -19,7 +19,9 @@ import Wishlist from './components/wishlist-page/Wishlist'
 import SearchResultsPage from './components/search-box/SearchResultsPage'
 import Checkout from './components/checkout-page/CheckoutPage'
 import PaymentFail from './components/payment-section/PaymentFail'
-import PaymentSuccess from './components/payment-section/PaymentSuccess'
+import StripeForm from "./components/payment-section/PayWithStripeCardPage"
+import PayWithEsewaPage from './components/payment-section/PayWithEsewaPage'
+import OrderConfirmation from "./components/order-processing/OrderConfirmation"
 function App() {
 
   return (
@@ -77,14 +79,27 @@ function App() {
         }
         />
 
-        <Route path="/payment-success" element={
+        <Route path="/pay-with-card" element={
           <UserRoute>
-            <PaymentSuccess />
+            <StripeForm />
           </UserRoute>
       } />
+
+        <Route path="/pay-with-esewa" element={
+          <UserRoute>
+            <PayWithEsewaPage />
+          </UserRoute>
+      } />
+
         <Route path="/payment-fail" element={
           <UserRoute>
             <PaymentFail />
+          </UserRoute>
+      } />
+
+        <Route path="/order-confirmation/:orderId" element={
+          <UserRoute>
+            <OrderConfirmation />
           </UserRoute>
       } />
 
