@@ -32,7 +32,7 @@ export default function UserDashboard() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { token } = useAuth();
 
-  const [reviews, setReviews] = useState([]);
+  const [ reviews, setReviews] = useState([]);
 
   const fetchUserReviews = async () => {
     if (!token) return;
@@ -40,7 +40,7 @@ export default function UserDashboard() {
       const res = await axios.get('http://localhost:8000/books/user-reviews/', {
         headers: { Authorization: `Token ${token}` },
       });
-      setReviews(res.data);
+      setReviews(res.data.results);
     } catch (err) {
       toast.error("Failed to load your reviews");
     }
@@ -75,7 +75,7 @@ export default function UserDashboard() {
         const res = await axios.get("http://localhost:8000/orders/", {
           headers: { Authorization: `Token ${token}` },
         });
-        setOrders(res.data); // Make sure each order includes nested items array
+        setOrders(res.data.results);
       } catch (error) {
         toast.error("Failed to load order history.");
         console.error(error);
