@@ -16,7 +16,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer                     # MUST have this to avoid AssertionError
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ['status']  # 👈 this enables /orders/?status=cancelled
+    filterset_fields = ['status','payment_method']  # 👈 this enables /orders/?status=cancelled
     filter_backends = [DjangoFilterBackend]
     def get_queryset(self):
         """Only return orders belonging to the logged-in user unless staff."""

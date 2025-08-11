@@ -143,17 +143,14 @@ export default function AdminOrdersPage() {
           <option value="cancelled">Cancelled</option>
         </select>
         <select
-          className="input input-bordered px-3 py-2 rounded border"
+          className="border p-2 rounded"
           value={paymentFilter}
-          onChange={(e) => {
-            setPaymentFilter(e.target.value);
-            setPage(1);
-          }}
+          onChange={(e) => setPaymentFilter(e.target.value)}
         >
           <option value="">All Payments</option>
-          <option value="stripe">Stripe</option>
-          <option value="esewa">E-Sewa</option>
           <option value="cash_on_delivery">Cash On Delivery</option>
+          <option value="esewa">E-Sewa</option>
+          <option value="stripe">Stripe</option>
         </select>
         <input
           type="date"
@@ -225,21 +222,20 @@ export default function AdminOrdersPage() {
                   <td className="p-2">
                     {order.updated
                       ? new Date(order.updated).toLocaleString(undefined, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
                       : "Invalid Date"}
                   </td>
                   <td className="p-2">${Number(order.total).toFixed(2)}</td>
                   <td className="p-2">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        statusColors[order.status] ||
+                      className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[order.status] ||
                         "bg-gray-100 text-gray-800"
-                      }`}
+                        }`}
                     >
                       {order.status.charAt(0).toUpperCase() +
                         order.status.substring(1)}
@@ -320,12 +316,12 @@ export default function AdminOrdersPage() {
               <b>Date:</b>{" "}
               {selectedOrder.updated
                 ? new Date(selectedOrder.updated).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
                 : "Invalid Date"}
             </div>
             <div className="mb-2">
@@ -334,10 +330,9 @@ export default function AdminOrdersPage() {
             <div className="mb-2">
               <b>Status:</b>{" "}
               <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                  statusColors[selectedOrder.status] ||
+                className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[selectedOrder.status] ||
                   "bg-gray-100 text-gray-800"
-                }`}
+                  }`}
               >
                 {selectedOrder.status.charAt(0).toUpperCase() +
                   selectedOrder.status.substring(1)}

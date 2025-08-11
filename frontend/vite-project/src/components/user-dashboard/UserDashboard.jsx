@@ -33,6 +33,7 @@ export default function UserDashboard() {
   const { token } = useAuth();
 
   const [ reviews, setReviews] = useState([]);
+const [paymentMethodFilter, setPaymentMethodFilter] = useState("");
 
   const fetchUserReviews = async () => {
     if (!token) return;
