@@ -4,7 +4,8 @@ from .models import CartItem
 from .models import WishlistItem
 from .models import BookRating
 from .models import Genre
-
+from urllib.parse import urlparse
+from django.conf import settings
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
         model = Genre
@@ -25,13 +26,34 @@ class BookRatingSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'book', 'rated_at']
 
 class BookSerializer(serializers.ModelSerializer):
+    cover_image = serializers.SerializerMethodField()
     price = serializers.FloatField()
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
     genres = serializers.ListField(child=serializers.CharField(), write_only=True)
     genres_detail = GenreSerializer(source='genres', many=True, read_only=True)
+
     class Meta:
         model = Book
         fields = "__all__"
+
+    def get_cover_image(self, obj):
+        """
+        Fixes /media/http:/... issue by detecting full URLs.
+        """
+        value = obj.cover_image
+        if not value:
+            return None
+
+        # If it's already a full URL, return as is
+        if str(value).startswith("http://") or str(value).startswith("https://"):
+            return str(value)
+
+        # Else, build full URL for local images
+        request = self.context.get('request')
+        if request:
+            return request.build_absolute_uri(value.url if hasattr(value, 'url') else value)
+        return f"{settings.MEDIA_URL}{value}"
+
     def create(self, validated_data):
         genre_names = validated_data.pop('genres', [])
         book = super().create(validated_data)
