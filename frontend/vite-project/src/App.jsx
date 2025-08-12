@@ -23,6 +23,7 @@ import StripeForm from "./components/payment-section/PayWithStripeCardPage"
 import PayWithEsewaPage from './components/payment-section/PayWithEsewaPage'
 import OrderConfirmation from "./components/order-processing/OrderConfirmation"
 import AdminOrdersPage from './components/adminorder-page/AdminOrdersPage'
+import EsewaSuccessPage from './components/payment-section/EsewaSuccessPage'
 function App() {
 
   return (
@@ -89,6 +90,12 @@ function App() {
         <Route path="/pay-with-esewa" element={
           <UserRoute>
             <PayWithEsewaPage />
+          </UserRoute>
+      } />
+
+        <Route path="/esewa-success" element={
+          <UserRoute>
+            <EsewaSuccessPage />
           </UserRoute>
       } />
 

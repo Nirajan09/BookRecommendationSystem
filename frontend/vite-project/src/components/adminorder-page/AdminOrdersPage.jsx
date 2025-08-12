@@ -116,16 +116,6 @@ export default function AdminOrdersPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6 items-center">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="input input-bordered px-3 py-2 rounded border"
-          value={filter}
-          onChange={(e) => {
-            setFilter(e.target.value);
-            setPage(1);
-          }}
-        />
         <select
           className="input input-bordered px-3 py-2 rounded border"
           value={statusFilter}

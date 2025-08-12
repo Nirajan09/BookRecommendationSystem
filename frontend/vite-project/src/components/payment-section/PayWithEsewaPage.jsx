@@ -8,8 +8,8 @@ export default function PayWithEsewaPage() {
 
   useEffect(() => {
     if (orderPayload) {
-      const successUrl = `http://localhost:3000/esewa-success`;
-      const failUrl = `http://localhost:3000/esewa-fail`;
+      const successUrl = `http://localhost:5173/esewa-success`;
+      const failUrl = `http://localhost:5173/esewa-fail`;
 
       const paymentUrl = `https://rc.esewa.com.np/epay/main?amt=${totalCost}&txAmt=0&psc=0&pdc=0&tAmt=${totalCost}&pid=TEMP123&scd=EPAYTEST&su=${encodeURIComponent(successUrl)}&fu=${encodeURIComponent(failUrl)}`;
       window.location.href = paymentUrl;

@@ -30,7 +30,8 @@ export default function CartPage() {
       const res = await axios.get(`${BASE_URL}/books/cart/`, {
         headers: { Authorization: `Token ${token}` },
       });
-      setCartItems(res.data);
+      setCartItems(res.data.results);
+      console.log(res.data)
       setSelectedItems(new Set());
       setSelectAll(false);
     } catch {
