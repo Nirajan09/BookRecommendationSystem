@@ -62,3 +62,13 @@ class WishlistItem(models.Model):
     added_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         unique_together = ('user', 'book')  # Each book appears once per user in the wishlist
+
+class BookRecommendation(models.Model):
+    """
+    Links a single book to multiple recommended books based on similarity.
+    """
+    book = models.OneToOneField(Book, on_delete=models.CASCADE, related_name="recommendations")
+    recommended_books = models.ManyToManyField(Book, related_name="recommended_for")
+
+    def __str__(self):
+        return f"Recommendations for {self.book.title}"

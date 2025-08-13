@@ -24,3 +24,6 @@ db.sqlite3
 staticfiles/
 local_settings.py
 .env
+
+/data/*.csv
+/data/*.pkl
