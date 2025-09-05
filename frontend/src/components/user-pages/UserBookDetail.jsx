@@ -1,3 +1,4 @@
+// UserBookDetail.jsx
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -38,6 +39,7 @@ export default function UserBookDetail() {
   const [showCartModal, setShowCartModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const isOutOfStock = book?.quantity === 0;
+
   // Fetch book, wishlist, and set userReview if exists
   useEffect(() => {
     if (!token) return;
@@ -52,10 +54,10 @@ export default function UserBookDetail() {
         // Find user's own review (review.user is string or object)
         const selfReview = Array.isArray(res.data.reviews)
           ? res.data.reviews.find((rv) =>
-            typeof rv.user === "string"
-              ? rv.user === currUser?.username
-              : rv.user?.username === currUser?.username
-          )
+              typeof rv.user === "string"
+                ? rv.user === currUser?.username
+                : rv.user?.username === currUser?.username
+            )
           : null;
         setUserReview(selfReview || null);
 
@@ -86,14 +88,14 @@ export default function UserBookDetail() {
         const wishlistBooks = res.data.map((item) => item.book);
         setIsInWishlist(wishlistBooks.includes(Number(id)));
       })
-      .catch(() => { });
+      .catch(() => {});
   }, [id, token, currUser]);
 
   // Cart modal
   const openCartModal = () => {
-     if (isOutOfStock) return; // Do nothing or show a toast
-  setQuantity(1);
-  setShowCartModal(true);
+    if (isOutOfStock) return; // Do nothing or show a toast
+    setQuantity(1);
+    setShowCartModal(true);
   };
   const closeCartModal = () => setShowCartModal(false);
 
@@ -175,10 +177,10 @@ export default function UserBookDetail() {
 
       const selfReview = Array.isArray(res.data.reviews)
         ? res.data.reviews.find((rv) =>
-          typeof rv.user === "string"
-            ? rv.user === currUser?.username
-            : rv.user?.username === currUser?.username
-        )
+            typeof rv.user === "string"
+              ? rv.user === currUser?.username
+              : rv.user?.username === currUser?.username
+          )
         : null;
       setUserReview(selfReview || null);
       setEditMode(false);
@@ -187,7 +189,6 @@ export default function UserBookDetail() {
       toast.error("Could not submit review.");
     }
   };
-
 
   // Edit and cancel
   const handleEdit = () => setEditMode(true);
@@ -244,10 +245,6 @@ export default function UserBookDetail() {
           <p className="mb-1">
             <b>Price:</b> ${book.price}
           </p>
-          <p className="mb-4 text-gray-600">
-            <b>Description:</b> {book.description}
-          </p>
-
 
           {book.genres_detail && book.genres_detail.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-2">
@@ -262,7 +259,6 @@ export default function UserBookDetail() {
             </div>
           )}
 
-
           {/* Actions: Cart, Wishlist */}
           <div className="flex flex-col space-x-2 my-2 justify-between">
             <div className="flex space-x-2">
@@ -274,8 +270,6 @@ export default function UserBookDetail() {
                 <span>Add to Cart</span>
                 <IoCartOutline size={30} />
               </button>
-
-
 
               <button
                 className="cursor-pointer"
@@ -292,13 +286,12 @@ export default function UserBookDetail() {
                 )}
               </button>
             </div>
-                <div>
-            {/* Show out of stock message */}
-            {isOutOfStock && (
-              <span className="text-red-600 font-semibold ml-2">Item out of stock</span>
-            )}
-
-                </div>
+            <div>
+              {/* Show out of stock message */}
+              {isOutOfStock && (
+                <span className="text-red-600 font-semibold ml-2">Item out of stock</span>
+              )}
+            </div>
           </div>
 
           {cartMsg && <div className="text-green-700 text-sm">{cartMsg}</div>}
@@ -388,7 +381,9 @@ export default function UserBookDetail() {
                     <button
                       type="submit"
                       className="bg-green-600 text-white px-4 py-1 rounded"
-                    >Save</button>
+                    >
+                      Save
+                    </button>
                     <button
                       type="button"
                       className="bg-gray-300 px-4 py-1 rounded"
@@ -396,7 +391,9 @@ export default function UserBookDetail() {
                         setShowReviewModal(false);
                         handleCancelEdit();
                       }}
-                    >Cancel</button>
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </form>
               </div>
@@ -438,17 +435,19 @@ export default function UserBookDetail() {
                           setShowDeleteModal(false);
                         }
                       }}
-
-                    >Delete</button>
+                    >
+                      Delete
+                    </button>
                     <button
                       className="bg-gray-300 px-4 py-1 rounded"
                       onClick={() => setShowDeleteModal(false)}
-                    >Cancel</button>
+                    >
+                      Cancel
+                    </button>
                   </div>
                 </div>
               </div>
             )}
-
 
             {/* Edit mode or leave a review form */}
             {(editMode || !userReview) && (
@@ -526,8 +525,8 @@ export default function UserBookDetail() {
                               : review.user?.username) === currUser?.username
                               ? "You"
                               : typeof review.user === "string"
-                                ? review.user
-                                : review.user?.username
+                              ? review.user
+                              : review.user?.username
                             }:{" "}
                           </span>
                           {review.comment}
@@ -551,7 +550,6 @@ export default function UserBookDetail() {
               )}
             </div>
           </div>
-
 
           <div className="flex space-x-2 mt-2">
             <Link

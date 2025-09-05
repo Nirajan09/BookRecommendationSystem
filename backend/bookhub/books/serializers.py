@@ -1,24 +1,14 @@
 from rest_framework import serializers
-from .models import Book
-from .models import CartItem
-from .models import WishlistItem
-from .models import BookRating
-from .models import Genre
-from urllib.parse import urlparse
-from django.conf import settings
-class GenreSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Genre
-        fields = ['id', 'name']
+from .models import Book, CartItem, WishlistItem, BookRating
 
 class BookMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ['id', 'title', 'author', 'cover_image']  # include any fields you want
-        
+        fields = ['id', 'title', 'author', 'cover_image']
+
 class BookRatingSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()  # Keeps username display
-    book = BookMiniSerializer(read_only=True)  # Nest book details here
+    user = serializers.StringRelatedField()
+    book = BookMiniSerializer(read_only=True)
 
     class Meta:
         model = BookRating
@@ -29,51 +19,23 @@ class BookSerializer(serializers.ModelSerializer):
     cover_image = serializers.SerializerMethodField()
     price = serializers.FloatField()
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
-    genres = serializers.ListField(child=serializers.CharField(), write_only=True)
-    genres_detail = GenreSerializer(source='genres', many=True, read_only=True)
 
     class Meta:
         model = Book
-        fields = "__all__"
+        # Removed description and genres
+        exclude = ['created_at']  # you can adjust as needed
 
     def get_cover_image(self, obj):
-        """
-        Fixes /media/http:/... issue by detecting full URLs.
-        """
         value = obj.cover_image
         if not value:
             return None
-
-        # If it's already a full URL, return as is
         if str(value).startswith("http://") or str(value).startswith("https://"):
             return str(value)
-
-        # Else, build full URL for local images
         request = self.context.get('request')
         if request:
             return request.build_absolute_uri(value.url if hasattr(value, 'url') else value)
+        from django.conf import settings
         return f"{settings.MEDIA_URL}{value}"
-
-    def create(self, validated_data):
-        genre_names = validated_data.pop('genres', [])
-        book = super().create(validated_data)
-        genres = []
-        for name in genre_names:
-            genre, _ = Genre.objects.get_or_create(name=name)
-            genres.append(genre)
-        book.genres.set(genres)
-        return book
-
-    def update(self, instance, validated_data):
-        genre_names = validated_data.pop('genres', None)
-        book = super().update(instance, validated_data)
-        if genre_names is not None:
-            genres = []
-            for name in genre_names:
-                genre, _ = Genre.objects.get_or_create(name=name)
-                genres.append(genre)
-            book.genres.set(genres)
-        return book
 
 class CartItemSerializer(serializers.ModelSerializer):
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all(), write_only=True)

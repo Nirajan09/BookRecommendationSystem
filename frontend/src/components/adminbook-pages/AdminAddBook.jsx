@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
@@ -16,9 +16,6 @@ export default function AdminAddBook() {
     formState: { errors, isSubmitting }
   } = useForm();
 
-  // State for genre input
-  const [genreInput, setGenreInput] = useState("");
-
   const onSubmit = async (data) => {
     try {
       const formData = new FormData();
@@ -26,24 +23,7 @@ export default function AdminAddBook() {
       formData.append("author", data.author);
       formData.append("isbn", data.isbn);
       formData.append("price", data.price);
-      formData.append("description", data.description || "");
       formData.append("quantity", data.quantity);
-
-      // Parse genres: comma separated, trimmed, not empty
-      const genreList = genreInput
-        .split(",")
-        .map((g) => g.trim())
-        .filter(Boolean);
-
-      if (genreList.length === 0) {
-        toast.error("At least one genre is required!");
-        return;
-      }
-
-      for (const genre of genreList) {
-        formData.append("genres", genre);
-      }
-
       if (data.cover_image?.[0]) {
         formData.append("cover_image", data.cover_image[0]);
       }
@@ -70,23 +50,6 @@ export default function AdminAddBook() {
       >
         <h2 className="text-xl font-bold text-indigo-700 mb-4">Add New Book</h2>
 
-        {/* Genre input */}
-        <label className="mb-2 text-sm text-gray-600">Genres (comma-separated):</label>
-        <input
-          value={genreInput}
-          onChange={e => setGenreInput(e.target.value)}
-          placeholder="e.g. Fantasy, Romance, Adventure"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-          required
-        />
-        {/* Optionally: Validate */}
-        {genreInput.trim() === "" &&
-          <span className="text-red-500 text-xs mb-1">
-            At least one genre is required
-          </span>
-        }
-
-        {/* ...rest of your form fields as before... */}
         <input
           {...register("title", { required: true })}
           placeholder="Title"
@@ -106,10 +69,7 @@ export default function AdminAddBook() {
         )}
 
         <input
-          {...register("isbn", {
-            required: true,
-            maxLength: 13
-          })}
+          {...register("isbn", { required: true, maxLength: 13 })}
           placeholder="ISBN"
           maxLength={13}
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
@@ -154,13 +114,6 @@ export default function AdminAddBook() {
           </span>
         )}
 
-        <textarea
-          {...register("description")}
-          placeholder="Description"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-          rows={3}
-        />
-
         <label className="mb-2 text-sm text-gray-600">Cover Image:</label>
         <input
           {...register("cover_image", { required: true })}
@@ -169,9 +122,7 @@ export default function AdminAddBook() {
           className="mb-3"
         />
         {errors.cover_image && (
-          <span className="text-red-500 text-xs mb-1">
-            Cover image is required
-          </span>
+          <span className="text-red-500 text-xs mb-1">Cover image is required</span>
         )}
 
         <button

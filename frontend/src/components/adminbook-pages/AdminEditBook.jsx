@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
@@ -17,10 +17,6 @@ export default function AdminEditBook() {
     formState: { errors, isSubmitting },
   } = useForm();
 
-  // For genres input
-  const [genreInput, setGenreInput] = useState("");
-
-  // Fetch book info (including genres)
   useEffect(() => {
     axios
       .get(`http://localhost:8000/books/admin/books/${id}/`, {
@@ -32,46 +28,18 @@ export default function AdminEditBook() {
         setValue("author", book.author);
         setValue("isbn", book.isbn);
         setValue("price", book.price);
-        setValue("description", book.description);
         setValue("quantity", book.quantity);
-
-        // For genres: join by comma (assumes genres_detail in API response)
-        if (book.genres_detail && book.genres_detail.length) {
-          setGenreInput(book.genres_detail.map(g => g.name).join(", "));
-        } else if (book.genres && book.genres.length) {
-          // fallback: if only an array of strings
-          setGenreInput(book.genres.join(", "));
-        } else {
-          setGenreInput("");
-        }
       })
       .catch(() => navigate("/admin/books"));
   }, [id, setValue, token, navigate]);
 
-  // Submit updated book info (with optional cover and genres)
   const onSubmit = async (data) => {
     const formData = new FormData();
     formData.append("title", data.title);
     formData.append("author", data.author);
     formData.append("isbn", data.isbn);
     formData.append("price", data.price);
-    formData.append("description", data.description || "");
     formData.append("quantity", data.quantity);
-
-    // Parse genres: comma separated, trimmed, skip empty
-    const genreList = genreInput
-      .split(",")
-      .map(g => g.trim())
-      .filter(Boolean);
-
-    if (genreList.length === 0) {
-      toast.error("At least one genre is required!");
-      return;
-    }
-    for (const genre of genreList) {
-      formData.append("genres", genre);
-    }
-
     if(data.cover_image?.[0]) {
       formData.append("cover_image", data.cover_image[0]);
     }
@@ -97,21 +65,6 @@ export default function AdminEditBook() {
         encType="multipart/form-data"
       >
         <h2 className="text-xl font-bold text-indigo-700 mb-4">Edit Book</h2>
-
-        {/* Genre input */}
-        <label className="mb-2 text-sm text-gray-600">Genres (comma-separated):</label>
-        <input
-          value={genreInput}
-          onChange={e => setGenreInput(e.target.value)}
-          placeholder="e.g. Fantasy, Romance"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-          required
-        />
-        {genreInput.trim() === "" && (
-          <span className="text-red-500 text-xs mb-1">
-            At least one genre is required
-          </span>
-        )}
 
         <input
           {...register("title", { required: true })}
@@ -161,13 +114,6 @@ export default function AdminEditBook() {
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
         {errors.quantity && <span className="text-red-500 text-xs mb-1">Quantity is required (0+)</span>}
-
-        <textarea
-          {...register("description")}
-          placeholder="Description"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-          rows={3}
-        />
 
         <label className="mb-2 text-sm text-gray-600">Replace Cover Image (optional):</label>
         <input

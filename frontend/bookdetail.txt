@@ -1,0 +1,63 @@
+ean Code
+Title: Clean Code: A Handbook of Agile Software Craftsmanship
+
+Author: Robert C. Martin
+
+ISBN: 9780132350884
+
+Price: $30–$50 USD (varies by store and condition)
+
+Quantity: Commonly available
+
+Description:
+A classic guide for software developers on writing readable, maintainable, and efficient code. Covers principles and best practices for better programming and professionalism.
+
+Cover Image:
+
+2. Automate the Boring Stuff with Python
+Title: Automate the Boring Stuff with Python: Practical Programming for Total Beginners
+
+Author: Al Sweigart
+
+ISBN: 9781593275990
+
+Price: $20–$30 USD on most platforms
+
+Quantity: Commonly available
+
+Description:
+Introduces Python programming through real-world automation projects. Step-by-step instructions teach how to automate tasks like updating spreadsheets, handling files, and interacting with websites—no prior programming experience required.
+
+Cover Image:
+
+3. Python Crash Course
+Title: Python Crash Course: A Hands-On, Project-Based Introduction to Programming
+
+Author: Eric Matthes
+
+ISBN: 9781718502703 (3rd Edition)
+
+Price: $21–$40 USD, depending on retailer and edition
+
+Quantity: Commonly available
+
+Description:
+One of the best-selling programming books, it covers Python fundamentals plus practical projects like games, data visualization, and simple web apps. Ideal for beginners and those who want a practical, project-based approach.
+
+Cover Image:
+
+4. The Pragmatic Programmer
+Title: The Pragmatic Programmer: From Journeyman to Master (20th Anniversary Edition: Your Journey to Mastery)
+
+Authors: Andrew Hunt, David Thomas
+
+ISBN: 9780135957059 (20th Anniversary Edition)
+
+Price: $27–$36 USD (varies)
+
+Quantity: Widely available
+
+Description:
+Essential reading for developers, this book combines practical tips for software development with insights into problem-solving, career growth, and code craftsmanship. Known for popularizing best practices such as DRY and robust debugging techniques.
+
+Cover Image:
