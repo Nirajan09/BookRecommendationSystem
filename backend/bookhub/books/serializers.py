@@ -17,6 +17,27 @@ class BookRatingSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'book', 'rating', 'comment', 'rated_at']
         read_only_fields = ['id', 'user', 'book', 'rated_at']
 
+    def validate_rating(self, value):
+        if not (1 <= value <= 5):
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value
+
+    def validate_comment(self, value):
+        if value and len(value.strip()) > 2000:
+            raise serializers.ValidationError("Comment cannot exceed 2000 characters.")
+        return value
+
+    def validate(self, attrs):
+        rating = attrs.get("rating", None)
+        comment = attrs.get("comment", "")
+        if rating is not None and rating <= 2:
+            if not comment or len(comment.strip()) < 20:
+                raise serializers.ValidationError(
+                    {"comment": "A comment of at least 20 characters is required for low ratings (≤ 2)."}
+                )
+        return attrs
+
+
 class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book

@@ -134,24 +134,30 @@ class BookViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
         book = self.get_object()
-        rating_value = request.data.get('rating')
-        comment = request.data.get('comment', "")
-        try:
-            rating_value = int(rating_value)
-        except (TypeError, ValueError):
-            return Response({'detail': 'Invalid rating.'}, status=status.HTTP_400_BAD_REQUEST)
-        if not (1 <= rating_value <= 5):
-            return Response({'detail': 'Rating must be 1-5.'}, status=status.HTTP_400_BAD_REQUEST)
+        data = {
+            "rating": request.data.get("rating"),
+            "comment": request.data.get("comment", ""),
+        }
+
+        serializer = BookRatingSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+
+        rating_value = serializer.validated_data["rating"]
+        comment = serializer.validated_data.get("comment", "")
 
         rating_obj, created = BookRating.objects.update_or_create(
-            user=request.user, book=book,
-            defaults={'rating': rating_value, 'comment': comment}
+            user=request.user,
+            book=book,
+            defaults={"rating": rating_value, "comment": comment},
         )
-        avg = book.ratings.aggregate(avg=Avg('rating'))['avg']
-        book.average_rating = round(avg if avg is not None else 0, 2)
-        book.save(update_fields=['average_rating'])
 
-        return Response({'detail': 'Review submitted!'}, status=status.HTTP_201_CREATED)
+        # Recalculate average rating
+        avg = book.ratings.aggregate(avg=Avg("rating"))["avg"] or 0
+        book.average_rating = round(avg, 2)
+        book.save(update_fields=["average_rating"])
+
+        return Response({"detail": "Review submitted!"}, status=status.HTTP_201_CREATED)
+
 
 
 class UserBookRatingViewSet(viewsets.ReadOnlyModelViewSet):

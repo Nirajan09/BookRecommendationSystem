@@ -54,13 +54,28 @@ class Book(models.Model):
 
 class BookRating(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="book_ratings")
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="ratings")
     comment = models.TextField(blank=True, null=True)
     rating = models.PositiveSmallIntegerField()
     rated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ('user', 'book')
+
+    def clean(self):
+        # Rating validation
+        if not (1 <= self.rating <= 5):
+            raise ValidationError("Rating must be between 1 and 5.")
+
+        # Comment length validation
+        if self.comment:
+            if len(self.comment.strip()) > 2000:
+                raise ValidationError("Comment cannot exceed 2000 characters.")
+
+        # Conditional rule: if rating <= 2, require 20+ characters
+        if self.rating <= 2:
+            if not self.comment or len(self.comment.strip()) < 20:
+                raise ValidationError("A comment of at least 20 characters is required for ratings 2 or below.")
 
     def __str__(self):
         return f"{self.user} - {self.book.title}: {self.rating}"
