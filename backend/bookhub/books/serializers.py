@@ -4,7 +4,8 @@ from .models import Book, CartItem, WishlistItem, BookRating
 class BookMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ['id', 'title', 'author', 'cover_image']
+        fields = ['id', 'title', 'author', 'cover_image', 'year_of_publication']  # Added year_of_publication here
+
 
 class BookRatingSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
@@ -22,8 +23,7 @@ class BookSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Book
-        # Removed description and genres
-        exclude = ['created_at']  # you can adjust as needed
+        fields="__all__"
 
     def get_cover_image(self, obj):
         value = obj.cover_image

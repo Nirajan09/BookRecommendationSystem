@@ -29,6 +29,7 @@ export default function AdminEditBook() {
         setValue("isbn", book.isbn);
         setValue("price", book.price);
         setValue("quantity", book.quantity);
+        setValue("year_of_publication", book.year_of_publication); // Added here
       })
       .catch(() => navigate("/admin/books"));
   }, [id, setValue, token, navigate]);
@@ -40,7 +41,8 @@ export default function AdminEditBook() {
     formData.append("isbn", data.isbn);
     formData.append("price", data.price);
     formData.append("quantity", data.quantity);
-    if(data.cover_image?.[0]) {
+    formData.append("year_of_publication", data.year_of_publication); // Added here
+    if (data.cover_image?.[0]) {
       formData.append("cover_image", data.cover_image[0]);
     }
     try {
@@ -114,6 +116,25 @@ export default function AdminEditBook() {
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
         {errors.quantity && <span className="text-red-500 text-xs mb-1">Quantity is required (0+)</span>}
+
+        <input
+          {...register("year_of_publication", {
+            required: true,
+            min: 0,
+            max: new Date().getFullYear(),
+            valueAsNumber: true
+          })}
+          placeholder="Year of Publication"
+          type="number"
+          min="0"
+          max={new Date().getFullYear()}
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.year_of_publication && (
+          <span className="text-red-500 text-xs mb-1">
+            Year of publication is required and must be a valid year
+          </span>
+        )}
 
         <label className="mb-2 text-sm text-gray-600">Replace Cover Image (optional):</label>
         <input

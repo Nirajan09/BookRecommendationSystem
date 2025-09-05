@@ -67,6 +67,10 @@ export default function BookCard({ book }) {
         />
         <h3 className="font-semibold text-gray-800 mb-2 w-full">{book.title}</h3>
         <p className="text-xs text-gray-500 mb-1">{book.author}</p>
+        {/* Display year of publication if exists */}
+        {book.year_of_publication && (
+          <p className="text-xs text-gray-400 mb-1">Published: {book.year_of_publication}</p>
+        )}
         <div className="flex items-center justify-center mb-2">
           {book.average_rating ? (
             <div className="flex items-center gap-x-2">
@@ -84,3 +88,4 @@ export default function BookCard({ book }) {
     </Link>
   );
 }
+

@@ -24,20 +24,21 @@ export default function AdminAddBook() {
       formData.append("isbn", data.isbn);
       formData.append("price", data.price);
       formData.append("quantity", data.quantity);
+      formData.append("year_of_publication", data.year_of_publication); // Added
       if (data.cover_image?.[0]) {
         formData.append("cover_image", data.cover_image[0]);
       }
 
       await axios.post("http://localhost:8000/books/admin/books/", formData, {
         headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data"
+          Authorization: `Token ${token}`
         }
       });
       toast.success("Book added successfully!");
       navigate("/admin/books");
     } catch (err) {
-      toast.error("Failed to add book.");
+      console.error("Upload error:", err.response || err);  // <-- Add here
+    toast.error("Failed to add book."); 
     }
   };
 
@@ -111,6 +112,25 @@ export default function AdminAddBook() {
         {errors.quantity && (
           <span className="text-red-500 text-xs mb-1">
             Quantity is required and must be 0 or more
+          </span>
+        )}
+
+        <input
+          {...register("year_of_publication", {
+            required: true,
+            min: 0,
+            max: new Date().getFullYear(),
+            valueAsNumber: true
+          })}
+          placeholder="Year of Publication"
+          type="number"
+          min="0"
+          max={new Date().getFullYear()}
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.year_of_publication && (
+          <span className="text-red-500 text-xs mb-1">
+            Year of publication is required and must be a valid year
           </span>
         )}
 

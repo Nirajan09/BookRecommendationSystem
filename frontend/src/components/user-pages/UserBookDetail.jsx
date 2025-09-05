@@ -239,6 +239,8 @@ export default function UserBookDetail() {
           <p className="mb-1">
             <b>Author:</b> {book.author}
           </p>
+          <p className="mb-1"><b>Year of Publication:</b> {book.year_of_publication ?? "N/A"}</p>
+
           <p className="mb-1">
             <b>ISBN:</b> {book.isbn}
           </p>

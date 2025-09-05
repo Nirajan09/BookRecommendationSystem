@@ -17,7 +17,11 @@ export default function AdminBooksGrid() {
       .get("http://localhost:8000/books/admin/books/", {
         headers: { Authorization: `Token ${token}` }
       })
-      .then(res => setBooks(res.data.results))
+      .then(res => 
+        // setBooks(res.data.results)
+        console.log(res.data.results)
+      
+      )
       .catch(err => {
         if (err.response?.status === 403) {
           navigate("/login");
