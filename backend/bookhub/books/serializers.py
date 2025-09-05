@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Book, CartItem, WishlistItem, BookRating
+import datetime, re
 
 class BookMiniSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,25 +18,50 @@ class BookRatingSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'book', 'rated_at']
 
 class BookSerializer(serializers.ModelSerializer):
-    cover_image = serializers.SerializerMethodField()
-    price = serializers.FloatField()
-    reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
-
     class Meta:
         model = Book
-        fields="__all__"
+        fields = "__all__"
 
-    def get_cover_image(self, obj):
-        value = obj.cover_image
-        if not value:
-            return None
-        if str(value).startswith("http://") or str(value).startswith("https://"):
-            return str(value)
-        request = self.context.get('request')
-        if request:
-            return request.build_absolute_uri(value.url if hasattr(value, 'url') else value)
-        from django.conf import settings
-        return f"{settings.MEDIA_URL}{value}"
+    def validate_title(self, value):
+        if not value or len(value.strip()) < 2:
+            raise serializers.ValidationError("Title must be at least 2 characters.")
+        if len(value) > 200:
+            raise serializers.ValidationError("Title must be under 200 characters.")
+        return value
+
+    def validate_author(self, value):
+        if not value or len(value.strip()) < 2:
+            raise serializers.ValidationError("Author must be at least 2 characters.")
+        if len(value) > 100:
+            raise serializers.ValidationError("Author must be under 100 characters.")
+        if not re.match(r"^[a-zA-Z\s.'-]+$", value):
+            raise serializers.ValidationError("Author name contains invalid characters.")
+        return value
+
+    def validate_isbn(self, value):
+        if not re.match(r"^\d{13}$", value):
+            raise serializers.ValidationError("ISBN must be exactly 13 digits.")
+        return value
+
+    def validate_price(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Price cannot be negative.")
+        if round(value, 2) != value:
+            raise serializers.ValidationError("Price must have at most 2 decimal places.")
+        return value
+
+    def validate_quantity(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Quantity cannot be negative.")
+        return value
+
+    def validate_year_of_publication(self, value):
+        current_year = datetime.date.today().year
+        if value < 1900:
+            raise serializers.ValidationError("Year must be after 1900.")
+        if value > current_year:
+            raise serializers.ValidationError(f"Year cannot be after {current_year}.")
+        return value
 
 class CartItemSerializer(serializers.ModelSerializer):
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all(), write_only=True)

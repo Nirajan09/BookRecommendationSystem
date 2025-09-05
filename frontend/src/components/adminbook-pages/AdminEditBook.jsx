@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 
 export default function AdminEditBook() {
   const { token } = useAuth();
@@ -14,22 +14,20 @@ export default function AdminEditBook() {
     register,
     handleSubmit,
     setValue,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting }
   } = useForm();
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/books/admin/books/${id}/`, {
-        headers: { Authorization: `Token ${token}` }
-      })
-      .then(res => {
+      .get(`http://localhost:8000/books/admin/books/${id}/`, { headers: { Authorization: `Token ${token}` } })
+      .then((res) => {
         const book = res.data;
         setValue("title", book.title);
         setValue("author", book.author);
         setValue("isbn", book.isbn);
         setValue("price", book.price);
         setValue("quantity", book.quantity);
-        setValue("year_of_publication", book.year_of_publication); // Added here
+        setValue("year_of_publication", book.year_of_publication);
       })
       .catch(() => navigate("/admin/books"));
   }, [id, setValue, token, navigate]);
@@ -41,16 +39,12 @@ export default function AdminEditBook() {
     formData.append("isbn", data.isbn);
     formData.append("price", data.price);
     formData.append("quantity", data.quantity);
-    formData.append("year_of_publication", data.year_of_publication); // Added here
-    if (data.cover_image?.[0]) {
-      formData.append("cover_image", data.cover_image[0]);
-    }
+    formData.append("year_of_publication", data.year_of_publication);
+    if (data.cover_image?.[0]) formData.append("cover_image", data.cover_image[0]);
+
     try {
       await axios.patch(`http://localhost:8000/books/admin/books/${id}/`, formData, {
-        headers: {
-          Authorization: `Token ${token}`,
-          "Content-Type": "multipart/form-data"
-        }
+        headers: { Authorization: `Token ${token}`, "Content-Type": "multipart/form-data" }
       });
       toast.success("Book updated successfully!");
       navigate(`/admin/books/${id}`);
@@ -68,82 +62,85 @@ export default function AdminEditBook() {
       >
         <h2 className="text-xl font-bold text-indigo-700 mb-4">Edit Book</h2>
 
+        {/* Title */}
         <input
-          {...register("title", { required: true })}
+          {...register("title", {
+            required: "Title is required",
+            minLength: { value: 2, message: "Title must be at least 2 characters" },
+            maxLength: { value: 200, message: "Title must be under 200 characters" }
+          })}
           placeholder="Title"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.title && <span className="text-red-500 text-xs mb-1">Title required</span>}
+        {errors.title && <span className="text-red-500 text-xs mb-1">{errors.title.message}</span>}
 
+        {/* Author */}
         <input
-          {...register("author", { required: true })}
+          {...register("author", {
+            required: "Author is required",
+            minLength: { value: 2, message: "Author must be at least 2 characters" },
+            maxLength: { value: 100, message: "Author must be under 100 characters" },
+            pattern: { value: /^[a-zA-Z\s.'-]+$/, message: "Author name contains invalid characters" }
+          })}
           placeholder="Author"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.author && <span className="text-red-500 text-xs mb-1">Author required</span>}
+        {errors.author && <span className="text-red-500 text-xs mb-1">{errors.author.message}</span>}
 
+        {/* ISBN */}
         <input
-          {...register("isbn", { required: true, maxLength: 13 })}
+          {...register("isbn", {
+            required: "ISBN is required",
+            pattern: { value: /^\d{13}$/, message: "ISBN must be exactly 13 digits" }
+          })}
           placeholder="ISBN"
-          maxLength={13}
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.isbn && <span className="text-red-500 text-xs mb-1">ISBN must be at most 13 characters</span>}
+        {errors.isbn && <span className="text-red-500 text-xs mb-1">{errors.isbn.message}</span>}
 
+        {/* Price */}
         <input
           {...register("price", {
-            required: true,
-            pattern: /^\d+(\.\d{1,2})?$/,
-            validate: v => (v && v.toString().split(".")[1]?.length <= 2) || "Max 2 decimals"
+            required: "Price is required",
+            pattern: { value: /^\d+(\.\d{1,2})?$/, message: "Price must be a valid number with up to 2 decimals" },
+            min: { value: 0, message: "Price cannot be negative" }
           })}
           placeholder="Price"
-          type="number"
-          step="0.01"
-          min="0"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.price && <span className="text-red-500 text-xs mb-1">Price must have at most 2 decimal places</span>}
+        {errors.price && <span className="text-red-500 text-xs mb-1">{errors.price.message}</span>}
 
+        {/* Quantity */}
         <input
           {...register("quantity", {
-            required: true,
-            min: 0,
+            required: "Quantity is required",
+            min: { value: 0, message: "Quantity cannot be negative" },
             valueAsNumber: true
           })}
           placeholder="Quantity"
-          type="number"
-          min="0"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.quantity && <span className="text-red-500 text-xs mb-1">Quantity is required (0+)</span>}
+        {errors.quantity && <span className="text-red-500 text-xs mb-1">{errors.quantity.message}</span>}
 
+        {/* Year of Publication */}
         <input
           {...register("year_of_publication", {
-            required: true,
-            min: 0,
-            max: new Date().getFullYear(),
+            required: "Year of publication is required",
+            min: { value: 1900, message: "Year must be after 1900" },
+            max: { value: new Date().getFullYear(), message: `Year cannot be after ${new Date().getFullYear()}` },
             valueAsNumber: true
           })}
           placeholder="Year of Publication"
           type="number"
-          min="0"
-          max={new Date().getFullYear()}
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.year_of_publication && (
-          <span className="text-red-500 text-xs mb-1">
-            Year of publication is required and must be a valid year
-          </span>
-        )}
+        {errors.year_of_publication && <span className="text-red-500 text-xs mb-1">{errors.year_of_publication.message}</span>}
 
+        {/* Cover Image */}
         <label className="mb-2 text-sm text-gray-600">Replace Cover Image (optional):</label>
-        <input
-          {...register("cover_image")}
-          type="file"
-          accept="image/*"
-          className="mb-3"
-        />
+        <input {...register("cover_image")} type="file" accept="image/*" className="mb-3" />
 
+        {/* Buttons */}
         <button
           type="submit"
           disabled={isSubmitting}
@@ -153,7 +150,7 @@ export default function AdminEditBook() {
         </button>
         <button
           type="button"
-          onClick={() => navigate(`/admin/books`)}
+          onClick={() => navigate("/admin/books")}
           className="w-full mt-2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-medium transition"
         >
           Back to Books Grid

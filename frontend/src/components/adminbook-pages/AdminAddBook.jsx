@@ -24,21 +24,19 @@ export default function AdminAddBook() {
       formData.append("isbn", data.isbn);
       formData.append("price", data.price);
       formData.append("quantity", data.quantity);
-      formData.append("year_of_publication", data.year_of_publication); // Added
+      formData.append("year_of_publication", data.year_of_publication);
       if (data.cover_image?.[0]) {
         formData.append("cover_image", data.cover_image[0]);
       }
 
       await axios.post("http://localhost:8000/books/admin/books/", formData, {
-        headers: {
-          Authorization: `Token ${token}`
-        }
+        headers: { Authorization: `Token ${token}` }
       });
       toast.success("Book added successfully!");
       navigate("/admin/books");
     } catch (err) {
-      console.error("Upload error:", err.response || err);  // <-- Add here
-    toast.error("Failed to add book."); 
+      console.error("Upload error:", err.response || err);
+      toast.error("Failed to add book.");
     }
   };
 
@@ -51,100 +49,91 @@ export default function AdminAddBook() {
       >
         <h2 className="text-xl font-bold text-indigo-700 mb-4">Add New Book</h2>
 
+        {/* Title */}
         <input
-          {...register("title", { required: true })}
+          {...register("title", {
+            required: "Title is required",
+            minLength: { value: 2, message: "Title must be at least 2 characters" },
+            maxLength: { value: 200, message: "Title must be under 200 characters" }
+          })}
           placeholder="Title"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.title && (
-          <span className="text-red-500 text-xs mb-1">Title is required</span>
-        )}
+        {errors.title && <span className="text-red-500 text-xs mb-1">{errors.title.message}</span>}
 
+        {/* Author */}
         <input
-          {...register("author", { required: true })}
+          {...register("author", {
+            required: "Author is required",
+            minLength: { value: 2, message: "Author must be at least 2 characters" },
+            maxLength: { value: 100, message: "Author must be under 100 characters" },
+            pattern: { value: /^[a-zA-Z\s.'-]+$/, message: "Author name contains invalid characters" }
+          })}
           placeholder="Author"
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.author && (
-          <span className="text-red-500 text-xs mb-1">Author is required</span>
-        )}
+        {errors.author && <span className="text-red-500 text-xs mb-1">{errors.author.message}</span>}
 
-        <input
-          {...register("isbn", { required: true, maxLength: 13 })}
-          placeholder="ISBN"
-          maxLength={13}
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-        />
-        {errors.isbn && (
-          <span className="text-red-500 text-xs mb-1">
-            ISBN is required and must be at most 13 characters
-          </span>
-        )}
-
-        <input
-          {...register("price", {
-            required: true,
-            pattern: /^\d+(\.\d{1,2})?$/
-          })}
-          placeholder="Price"
-          type="number"
-          step="0.01"
-          min="0"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-        />
-        {errors.price && (
-          <span className="text-red-500 text-xs mb-1">
-            Price is required and must be a valid number with up to 2 decimals
-          </span>
-        )}
-
-        <input
-          {...register("quantity", {
-            required: true,
-            min: 0,
-            valueAsNumber: true
-          })}
-          placeholder="Quantity"
-          type="number"
-          min="0"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
-        />
-        {errors.quantity && (
-          <span className="text-red-500 text-xs mb-1">
-            Quantity is required and must be 0 or more
-          </span>
-        )}
-
+        {/* Year of Publication */}
         <input
           {...register("year_of_publication", {
-            required: true,
-            min: 0,
-            max: new Date().getFullYear(),
+            required: "Year of publication is required",
+            min: { value: 1900, message: "Year must be after 1900" },
+            max: { value: new Date().getFullYear(), message: `Year cannot be after ${new Date().getFullYear()}` },
             valueAsNumber: true
           })}
           placeholder="Year of Publication"
           type="number"
-          min="0"
-          max={new Date().getFullYear()}
           className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
         />
-        {errors.year_of_publication && (
-          <span className="text-red-500 text-xs mb-1">
-            Year of publication is required and must be a valid year
-          </span>
-        )}
+        {errors.year_of_publication && <span className="text-red-500 text-xs mb-1">{errors.year_of_publication.message}</span>}
 
+        {/* ISBN */}
+        <input
+          {...register("isbn", {
+            required: "ISBN is required",
+            pattern: { value: /^\d{13}$/, message: "ISBN must be exactly 13 digits" }
+          })}
+          placeholder="ISBN"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.isbn && <span className="text-red-500 text-xs mb-1">{errors.isbn.message}</span>}
+
+        {/* Price */}
+        <input
+          {...register("price", {
+            required: "Price is required",
+            pattern: { value: /^\d+(\.\d{1,2})?$/, message: "Price must be a valid number with up to 2 decimals" },
+            min: { value: 0, message: "Price cannot be negative" }
+          })}
+          placeholder="Price"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.price && <span className="text-red-500 text-xs mb-1">{errors.price.message}</span>}
+
+        {/* Quantity */}
+        <input
+          {...register("quantity", {
+            required: "Quantity is required",
+            min: { value: 0, message: "Quantity cannot be negative" },
+            valueAsNumber: true
+          })}
+          placeholder="Quantity"
+          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+        />
+        {errors.quantity && <span className="text-red-500 text-xs mb-1">{errors.quantity.message}</span>}
+
+        {/* Cover Image */}
         <label className="mb-2 text-sm text-gray-600">Cover Image:</label>
         <input
-          {...register("cover_image", { required: true })}
+          {...register("cover_image", { required: "Cover image is required" })}
           type="file"
           accept="image/*"
           className="mb-3"
         />
-        {errors.cover_image && (
-          <span className="text-red-500 text-xs mb-1">Cover image is required</span>
-        )}
+        {errors.cover_image && <span className="text-red-500 text-xs mb-1">{errors.cover_image.message}</span>}
 
+        {/* Submit Button */}
         <button
           disabled={isSubmitting}
           type="submit"
@@ -153,6 +142,7 @@ export default function AdminAddBook() {
           {isSubmitting ? "Saving..." : "Add Book"}
         </button>
 
+        {/* Back Button */}
         <button
           type="button"
           onClick={() => navigate("/admin/books")}
