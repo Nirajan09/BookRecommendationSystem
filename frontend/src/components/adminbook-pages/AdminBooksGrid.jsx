@@ -18,8 +18,7 @@ export default function AdminBooksGrid() {
         headers: { Authorization: `Token ${token}` }
       })
       .then(res => 
-        // setBooks(res.data.results)
-        console.log(res.data.results)
+        setBooks(res.data.results)
       
       )
       .catch(err => {

@@ -87,13 +87,6 @@ export default function AdminDashboard() {
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <NavCard to="/admin/books" label="Book Management" />
         <NavCard to="/admin/orders" label="Order Management" />
-        <NavCard to="/admin/customers" label="Customer Management" />
-        <NavCard to="/admin/inventory" label="Inventory & Stock" />
-        <NavCard to="/admin/promotions" label="Promotions & Discounts" />
-        <NavCard to="/admin/reviews" label="Reviews & Ratings" />
-        <NavCard to="/admin/reports" label="Reports & Analytics" />
-        <NavCard to="/admin/settings" label="Admin Settings" />
-        <NavCard to="/admin/notifications" label="Notifications" />
       </section>
     </div>
   );

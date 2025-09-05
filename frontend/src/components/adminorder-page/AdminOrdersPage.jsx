@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const API_BASE_URL = "http://localhost:8000";
 
@@ -110,9 +111,18 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="min-h-[90vh] bg-gray-100 p-6">
-      <h1 className="text-2xl font-bold mb-6 text-indigo-700">
-        Order Management
-      </h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold mb-6 text-indigo-700">
+          Order Management
+        </h1>
+        <Link
+          to="/admin/"
+          className="flex justify-center bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded shadow"
+        >
+          <span>Continue to Dashboard</span>
+          
+        </Link>
+      </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6 items-center">

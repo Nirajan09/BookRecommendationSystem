@@ -54,7 +54,7 @@ class Book(models.Model):
 
 class BookRating(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="book_ratings")
-    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="ratings")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, null=True)
     comment = models.TextField(blank=True, null=True)
     rating = models.PositiveSmallIntegerField()
     rated_at = models.DateTimeField(auto_now=True)
