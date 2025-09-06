@@ -32,7 +32,7 @@ export default function UserDashboard() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { token } = useAuth();
 
-  const [ reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState([]);
 
   const fetchUserReviews = async () => {
     if (!token) return;
@@ -41,7 +41,7 @@ export default function UserDashboard() {
         headers: { Authorization: `Token ${token}` },
       });
       setReviews(res.data.results);
-      console.log("review",res.data)
+      console.log("review", res.data)
     } catch (err) {
       toast.error("Failed to load your reviews");
     }
@@ -60,7 +60,7 @@ export default function UserDashboard() {
           headers: { Authorization: `Token ${token}` },
         });
         setUser(res.data);
-        console.log("user",res.data)
+        console.log("user", res.data)
       } catch (err) {
         console.error("User profile fetch error:", err);
       }
@@ -87,23 +87,23 @@ export default function UserDashboard() {
       fetchOrders();
     }
   }, [token]);
-useEffect(() => {
-  function handleClickOutside(event) {
-    if (
-      reviewMenuRef.current &&
-      !reviewMenuRef.current.contains(event.target) // click outside
-    ) {
-      // Close the menu
-      setReviewMenuOpenId(null);
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        reviewMenuRef.current &&
+        !reviewMenuRef.current.contains(event.target) // click outside
+      ) {
+        // Close the menu
+        setReviewMenuOpenId(null);
+      }
     }
-  }
-  // Bind the event listener
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    // Unbind event listener on clean up
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, [reviewMenuRef]);
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [reviewMenuRef]);
   if (!user) return <div>Loading user profile...</div>;
 
   const joined = new Date(user.date_joined).toLocaleDateString("en-US", {
@@ -125,11 +125,18 @@ useEffect(() => {
                 src={
                   user.image?.startsWith("http")
                     ? user.image
-                    : `http://localhost:8000${user.profile.avatar}`
+                    : user.profile?.avatar
+                      ? `http://localhost:8000${user.profile.avatar}`
+                      : "/DefaultAvatar.png"
                 }
                 alt={user.name || "User"}
                 className="w-20 h-20 rounded-full mr-4"
+                onError={(e) => {
+                  e.target.onerror = null; // Prevent infinite loop
+                  e.target.src = "/DefaultAvatar.png";
+                }}
               />
+
               <div>
                 <div className="font-semibold text-xl">
                   {user.first_name + " " + user.last_name}
@@ -170,10 +177,10 @@ useEffect(() => {
                         <td className="py-3 px-4">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status.toLowerCase() === "shipped"
-                                ? "bg-blue-100 text-blue-700"
-                                : order.status.toLowerCase() === "delivered"
-                                  ? "bg-green-100 text-green-700"
-                                  : "bg-yellow-100 text-yellow-700"
+                              ? "bg-blue-100 text-blue-700"
+                              : order.status.toLowerCase() === "delivered"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-yellow-100 text-yellow-700"
                               }`}
                           >
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -358,12 +365,12 @@ useEffect(() => {
       {/* Edit Modal */}
       {showEditModal && selectedReview && (
         <div
-    className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
-    onClick={() => setShowEditModal(false)}   // close modal on overlay click
-  >
-    <form
-      className="bg-white rounded-lg p-6 w-full max-w-md"
-      onClick={(e) => e.stopPropagation()}
+          className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+          onClick={() => setShowEditModal(false)}   // close modal on overlay click
+        >
+          <form
+            className="bg-white rounded-lg p-6 w-full max-w-md"
+            onClick={(e) => e.stopPropagation()}
             onSubmit={async (e) => {
               e.preventDefault();
               try {
@@ -380,8 +387,23 @@ useEffect(() => {
                   headers: { Authorization: `Token ${token}` },
                 });
                 setReviews(res.data);
-              } catch {
-                toast.error("Could not update review.");
+              } catch (error) {
+                let message = "Could not update review.";
+                if (error.response && error.response.data) {
+                  const data = error.response.data;
+                  if (data.comment && Array.isArray(data.comment) && data.comment.length > 0) {
+                    message = data.comment[0]; // Take the first comment error message
+                  } else if (typeof data === "string") {
+                    message = data; // If server just sends a string message
+                  } else {
+                    // fallback: try to get first error value from object values
+                    const firstError = Object.values(data)[0];
+                    if (Array.isArray(firstError) && firstError.length > 0) {
+                      message = firstError[0];
+                    }
+                  }
+                }
+                toast.error(message);
               }
             }}
           >
@@ -420,13 +442,13 @@ useEffect(() => {
 
       {/* Delete Modal */}
       {showDeleteModal && selectedReview && (
-       <div
-    className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
-    onClick={() => setShowDeleteModal(false)}  // close modal on overlay click
-  >
-         <div
-      className="bg-white rounded-lg p-6 w-full max-w-sm"
-      onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+          onClick={() => setShowDeleteModal(false)}  // close modal on overlay click
+        >
+          <div
+            className="bg-white rounded-lg p-6 w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}>
             <h2 className="text-lg font-bold mb-4 text-red-700 text-center">Delete Review</h2>
             <p className="mb-4 text-center">Are you sure you want to delete your review for "{selectedReview.book.title}"?</p>
             <div className="flex gap-2 justify-center">

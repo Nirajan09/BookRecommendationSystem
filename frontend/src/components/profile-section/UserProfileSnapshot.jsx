@@ -41,6 +41,7 @@ useEffect(() => {
       headers: { Authorization: `Token ${token}` }
     }).then(res => {
       setProfile(res.data);
+      console.log("profile",res.data)
       setForm({
         first_name: res.data.first_name || "",
         last_name: res.data.last_name || "",
