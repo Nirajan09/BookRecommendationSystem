@@ -40,7 +40,7 @@ function AddToCartModal({
           <b>Author:</b> {book.author}
         </p>
         <p>
-          <b>Price per unit:</b> ${Number(book.price).toFixed(2)}
+          <b>Price per unit:</b> Rs. {Number(book.price).toFixed(2)}
         </p>
         <p className="mb-4">
           <b>Available Quantity:</b> {book.quantity ?? 1}
@@ -71,7 +71,7 @@ function AddToCartModal({
           </button>
         </div>
         <p className="mb-4">
-          <b>Total Price:</b> ${(book.price * quantity).toFixed(2)}
+          <b>Total Price:</b> Rs. {(book.price * quantity).toFixed(2)}
         </p>
         <button
           onClick={onAddToCart}
@@ -265,7 +265,7 @@ const Wishlist = () => {
                 <div className="text-lg font-semibold">{book.title}</div>
                 <div className="text-sm text-gray-600 mb-1">by {book.author}</div>
                 <div className="font-semibold text-pink-700 mb-2">
-                  ${Number(book.price).toFixed(2)}
+                  Rs. {Number(book.price).toFixed(2)}
                 </div>
               </div>
               <div className="flex flex-col space-y-2">

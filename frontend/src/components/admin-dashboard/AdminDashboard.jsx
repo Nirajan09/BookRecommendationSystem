@@ -44,10 +44,10 @@ export default function AdminDashboard() {
 
       {/* KPI Cards */}
       <section className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <KpiCard label="Sales Today" value={`$${stats.totalSalesToday}`} />
-        <KpiCard label="Sales This Month" value={`$${stats.totalSalesMonth}`} />
+        <KpiCard label="Sales Today" value={`Rs. ${stats.totalSalesToday}`} />
+        <KpiCard label="Sales This Month" value={`Rs. ${stats.totalSalesMonth}`} />
         <KpiCard label="Orders" value={stats.numberOfOrders} />
-        <KpiCard label="Total Revenue" value={`$${stats.totalRevenue}`} />
+        <KpiCard label="Total Revenue" value={`Rs. ${stats.totalRevenue}`} />
       </section>
 
       {/* Best-Selling Books & Low Stock */}

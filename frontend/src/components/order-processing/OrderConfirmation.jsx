@@ -80,7 +80,7 @@ export default function OrderConfirmation() {
                     </div>
                     <div>
                         <p className="font-medium">Total Amount</p>
-                        <p>${Number(order.total).toFixed(2)}</p>
+                        <p>Rs. {Number(order.total).toFixed(2)}</p>
                     </div>
                     <div>
                         <p className="font-medium">Payment Method</p>
@@ -118,7 +118,7 @@ export default function OrderConfirmation() {
                                     </p>
                                 </div>
                             </div>
-                            <p className="font-semibold">${Number(item.price).toFixed(2)}</p>
+                            <p className="font-semibold">Rs. {Number(item.price).toFixed(2)}</p>
                         </div>
                     ))}
                 </div>

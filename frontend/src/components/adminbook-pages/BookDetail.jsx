@@ -70,7 +70,7 @@ export default function BookDetail() {
         <h2 className="text-2xl font-bold mb-2">{book.title}</h2>
         <p className="mb-1"><b>Author:</b> {book.author}</p>
         <p className="mb-1"><b>ISBN:</b> {book.isbn}</p>
-        <p className="mb-1"><b>Price:</b> ${book.price}</p>
+        <p className="mb-1"><b>Price:</b> Rs. {book.price}</p>
         <p className="mb-1">
           <b>Average Rating:</b>{" "}
           {book.average_rating && book.average_rating > 0 ? (

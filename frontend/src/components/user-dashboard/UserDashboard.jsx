@@ -177,7 +177,7 @@ useEffect(() => {
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
                         </td>
-                        <td className="py-3 px-4">${Number(order.total).toFixed(2)}</td>
+                        <td className="py-3 px-4">Rs. {Number(order.total).toFixed(2)}</td>
                         <td className="py-3 px-4">
                           <button
                             onClick={() => setSelectedOrder(order)}
@@ -345,7 +345,7 @@ useEffect(() => {
                   <div className="font-semibold">{item.book_title}</div>
                   <div className="text-sm mb-1">Quantity: {item.quantity}</div>
                   <div className="font-bold text-indigo-600">
-                    Total: ${(parseFloat(item.price) * item.quantity).toFixed(2)}
+                    Total: Rs. {(parseFloat(item.price) * item.quantity).toFixed(2)}
                   </div>
                 </div>
               ))}

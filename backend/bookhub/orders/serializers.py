@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import Order, OrderItem
 import re
 
+
 PROVINCES = ["Province 1", "Province 2", "Bagmati", "Gandaki", "Lumbini", "Karnali", "Sudurpashchim"]
 
 CITIES_BY_PROVINCE = {
@@ -13,6 +14,7 @@ CITIES_BY_PROVINCE = {
     "Karnali": ["Surkhet", "Jumla", "Dolpa"],
     "Sudurpashchim": ["Dhangadhi", "Mahendranagar", "Dadeldhura"]
 }
+
 
 class OrderItemSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title', read_only=True)
@@ -30,6 +32,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(url)
             return url
         return None
+
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
@@ -70,7 +73,9 @@ class OrderSerializer(serializers.ModelSerializer):
         phone = data.get('phone')
         nepal_mobile_regex = re.compile(r'^(98|97)\d{8}$')
         if not phone or not nepal_mobile_regex.match(phone):
-            raise serializers.ValidationError({"phone": "Phone must be a valid Nepal mobile number (starts with 97 or 98 and 10 digits)."})
+            raise serializers.ValidationError(
+                {"phone": "Phone must be a valid Nepal mobile number (starts with 97 or 98 and 10 digits)."}
+            )
 
         # Shipping & Payment
         if data.get('shipping_method') not in dict(Order.SHIPPING_CHOICES):
@@ -83,6 +88,10 @@ class OrderSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = self.context['request'].user
         items_data = validated_data.pop('items')
+
+        # Remove 'user' from validated_data if it accidentally exists to avoid conflict
+        validated_data.pop('user', None)
+
         order = Order.objects.create(user=user, **validated_data)
         for item_data in items_data:
             OrderItem.objects.create(order=order, **item_data)

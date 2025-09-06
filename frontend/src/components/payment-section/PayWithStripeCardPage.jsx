@@ -65,7 +65,7 @@ function StripeForm({ orderPayload, totalCost }) {
       <div className="mb-4 p-3 border rounded">
         <CardElement options={{ hidePostalCode: true }} />
       </div>
-      <button className="btn btn-primary w-full">Pay ${totalCost}</button>
+      <button className="btn btn-primary w-full">Pay Rs. {totalCost}</button>
     </form>
   );
 }

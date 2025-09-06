@@ -226,7 +226,7 @@ export default function CartPage() {
                 Author: {book_detail?.author || "Unknown"}
               </p>
               <p className="text-indigo-600 font-semibold mt-1">
-                ${Number(book_detail?.price).toFixed(2)}
+Rs. {Number(book_detail?.price).toFixed(2)}
               </p>
               <p className="text-sm mt-1">
                 Available: {book_detail?.quantity ?? 0}
@@ -282,7 +282,7 @@ export default function CartPage() {
             {/* Total price */}
             <div className="ml-6 text-right min-w-[90px]">
               <p className="font-semibold text-lg">
-                ${(Number(book_detail?.price) * quantity).toFixed(2)}
+                Rs. {(Number(book_detail?.price) * quantity).toFixed(2)}
               </p>
               <p className="text-xs text-gray-400">Total</p>
             </div>
@@ -293,7 +293,7 @@ export default function CartPage() {
       {/* Cart Subtotal */}
       <div className="mt-6 flex justify-end items-center space-x-3">
         <span className="font-semibold text-xl">
-          Subtotal: ${selectedSubtotal.toFixed(2)}
+          Subtotal: Rs. {selectedSubtotal.toFixed(2)}
         </span>
       </div>
 

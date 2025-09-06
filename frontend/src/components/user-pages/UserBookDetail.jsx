@@ -64,7 +64,6 @@ export default function UserBookDetail() {
       })
       .then((res) => {
         setBook(res.data);
-        console.log("book", res.data)
         const selfReview = Array.isArray(res.data.reviews)
           ? res.data.reviews.find((rv) =>
             typeof rv.user === "string"
@@ -328,7 +327,7 @@ function formatDateWithOrdinal(dateString) {
             <b>ISBN:</b> {book.isbn}
           </p>
           <p className="mb-1">
-            <b>Price:</b> ${book.price}
+            <b>Price:</b> Rs. {book.price}
           </p>
 
           {/* Cart + Wishlist */}

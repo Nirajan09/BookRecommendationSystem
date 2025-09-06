@@ -92,7 +92,7 @@ export default function AdminBooksGrid() {
               )}
               <h3 className="font-semibold text-lg text-center mb-1">{book.title}</h3>
               <p className="text-gray-700 text-center mb-1"><b>Author:</b> {book.author}</p>
-              <p className="text-indigo-700 font-semibold text-center mb-2"><b>Price:</b> ${book.price}</p>
+              <p className="text-indigo-700 font-semibold text-center mb-2"><b>Price:</b> Rs. {book.price}</p>
               <div className="flex w-full space-x-2 mt-auto">
                 <Link
                   to={`/admin/books/${book.id}`}

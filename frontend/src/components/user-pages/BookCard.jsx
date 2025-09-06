@@ -82,7 +82,7 @@ export default function BookCard({ book }) {
             <span className="text-gray-400 text-xs">No ratings yet</span>
           )}
         </div>
-        <span className="text-blue-700 font-bold text-xl mb-2">${book.price}</span>
+        <span className="text-blue-700 font-bold text-xl mb-2">Rs. {book.price}</span>
         <div className="flex space-x-2"></div>
       </div>
     </Link>

@@ -9,8 +9,8 @@ import { FaCreditCard, FaMoneyBillWave, FaWallet } from "react-icons/fa";
 const API_BASE_URL = "http://localhost:8000";
 
 const SHIPPING_OPTIONS = [
-  { id: "standard", label: "Standard Delivery", cost: 5, eta: "3-5 business days" },
-  { id: "express", label: "Express Delivery", cost: 15, eta: "1-2 business days" },
+  { id: "standard", label: "Standard Delivery", cost: 50, eta: "3-5 business days" },
+  { id: "express", label: "Express Delivery", cost: 150, eta: "1-2 business days" },
   { id: "pickup", label: "Store Pickup", cost: 0, eta: "Ready within 24 hrs" },
 ];
 
@@ -64,7 +64,6 @@ export default function CheckoutPage() {
   const shippingCost = SHIPPING_OPTIONS.find(opt => opt.id === shippingMethod)?.cost || 0;
   const tax = (itemsSubtotal * 0.13).toFixed(2);
   const totalCost = (itemsSubtotal + shippingCost + parseFloat(tax)).toFixed(2);
-
   useEffect(() => {
     if (!cartItems.length) {
       toast.error("No items for checkout.");
@@ -82,13 +81,16 @@ export default function CheckoutPage() {
 
     const orderPayload = {
       full_name: data.fullName,
-      address,
+      street: data.street,
+      ward: data.ward,
+      province: province,
+      city: city,
+      postal_code: data.postalCode,
       phone: data.phone,
       email: data.email,
       shipping_method: shippingMethod,
       payment_method: paymentMethod,
-      shipping_cost: shippingCost,
-      tax,
+      shipping_cost: shippingCost.toFixed(2),
       total: totalCost,
       items: cartItems.map(item => ({
         book: item.book_detail.id,
@@ -96,7 +98,6 @@ export default function CheckoutPage() {
         price: Number(item.book_detail.price).toFixed(2),
       })),
     };
-
     setLoading(true);
 
     if (paymentMethod === "cash_on_delivery") {
@@ -139,16 +140,16 @@ export default function CheckoutPage() {
 
         {/* Phone */}
         <label>Phone (Nepal mobile number)</label>
-      <input
-        {...register("phone", { 
-          required: "Phone number is required",
-          pattern: {
-            value: /^(98|97)\d{8}$/,
-            message: "Phone must start with 97 or 98 and have 10 digits"
-          }
-        })}
-      />
-      {errors.phone && <p className="text-red-500">{errors.phone.message}</p>}
+        <input
+          {...register("phone", {
+            required: "Phone number is required",
+            pattern: {
+              value: /^(98|97)\d{8}$/,
+              message: "Phone must start with 97 or 98 and have 10 digits"
+            }
+          })}
+        />
+        {errors.phone && <p className="text-red-500">{errors.phone.message}</p>}
         {errors.phone && <p className="text-red-500 mb-2">{errors.phone.message}</p>}
 
         {/* Street */}
@@ -206,7 +207,7 @@ export default function CheckoutPage() {
                 className="mr-2"
               />
               <span className="font-medium">{opt.label}</span> -
-              <span>{opt.cost === 0 ? " Free" : ` $${opt.cost}`}</span>
+              <span>{opt.cost === 0 ? " Free" : ` Rs. ${opt.cost}`}</span>
               <span className="text-gray-500"> - {opt.eta}</span>
             </label>
           ))}
@@ -232,19 +233,19 @@ export default function CheckoutPage() {
         <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
         {cartItems.map((item) => (
           <div key={item.id} className="flex items-center mb-2">
-            <img src={item.book_detail.image_url} alt={item.book_detail.title} className="w-12 h-16 mr-2" />
+            <img src={item.book_detail.cover_image} alt={item.book_detail.title} className="w-40 h-40 mr-2" />
             <div>
               <div>{item.book_detail.title}</div>
-              <div>{item.quantity} × ${item.book_detail.price}</div>
+              <div>{item.quantity} × Rs. {item.book_detail.price}</div>
             </div>
           </div>
         ))}
 
         <div className="border-t my-2"></div>
-        <div className="flex justify-between mb-1">Subtotal: <span>${itemsSubtotal.toFixed(2)}</span></div>
-        <div className="flex justify-between mb-1">Shipping Fee: <span>${shippingCost.toFixed(2)}</span></div>
-        <div className="flex justify-between mb-1">Tax: <span>${tax}</span></div>
-        <div className="flex justify-between font-bold mb-4">Grand Total: <span>${totalCost}</span></div>
+        <div className="flex justify-between mb-1">Subtotal: <span>Rs. {itemsSubtotal.toFixed(2)}</span></div>
+        <div className="flex justify-between mb-1">Shipping Fee: <span>Rs. {shippingCost.toFixed(2)}</span></div>
+        <div className="flex justify-between mb-1">Tax: <span>Rs. {tax}</span></div>
+        <div className="flex justify-between font-bold mb-4">Grand Total: <span>Rs. {totalCost}</span></div>
 
         <button className="btn btn-primary w-full" type="submit" disabled={loading}>
           {loading ? "Processing..." : "Continue"}

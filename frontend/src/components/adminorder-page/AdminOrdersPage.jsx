@@ -230,7 +230,7 @@ export default function AdminOrdersPage() {
                       })
                       : "Invalid Date"}
                   </td>
-                  <td className="p-2">${Number(order.total).toFixed(2)}</td>
+                  <td className="p-2">Rs. {Number(order.total).toFixed(2)}</td>
                   <td className="p-2">
                     <span
                       className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[order.status] ||
@@ -325,7 +325,7 @@ export default function AdminOrdersPage() {
                 : "Invalid Date"}
             </div>
             <div className="mb-2">
-              <b>Amount:</b> ${Number(selectedOrder.total).toFixed(2)}
+              <b>Amount:</b> Rs. {Number(selectedOrder.total).toFixed(2)}
             </div>
             <div className="mb-2">
               <b>Status:</b>{" "}

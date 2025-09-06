@@ -34,7 +34,7 @@ export default function AddToCartModal({
         )}
         <h3 className="text-xl font-semibold mb-4">{book.title}</h3>
         <p><b>Author:</b> {book.author}</p>
-        <p><b>Price per unit:</b> ${Number(book.price).toFixed(2)}</p>
+        <p><b>Price per unit:</b> Rs. {Number(book.price).toFixed(2)}</p>
         <p className="mb-4"><b>Available Quantity:</b> {book.quantity}</p>
 
         <div className="flex items-center mb-4 space-x-4">
@@ -51,7 +51,7 @@ export default function AddToCartModal({
           >+</button>
         </div>
 
-        <p className="mb-4"><b>Total Price:</b> ${(book.price * quantity).toFixed(2)}</p>
+        <p className="mb-4"><b>Total Price:</b> Rs. {(book.price * quantity).toFixed(2)}</p>
 
         <button
           onClick={onAddToCart} disabled={adding}
