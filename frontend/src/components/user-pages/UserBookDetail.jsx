@@ -94,14 +94,27 @@ export default function UserBookDetail() {
       });
 
     axios
-      .get(`${BASE_URL}/books/wishlist/`, {
-        headers: { Authorization: `Token ${token}` },
-      })
-      .then((res) => {
-        const wishlistBooks = res.data.map((item) => item.book);
-        setIsInWishlist(wishlistBooks.includes(Number(id)));
-      })
-      .catch(() => {});
+    .get(`${BASE_URL}/books/wishlist/`, {
+      headers: { Authorization: `Token ${token}` },
+    })
+    .then((res) => {
+      // Handle paginated or normal list response:
+      const items = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data.results)
+        ? res.data.results
+        : [];
+
+      const wishlistBookIds = items.map((item) =>
+        typeof item.book === "number" ? item.book : item.book?.id
+      );
+
+      setIsInWishlist(wishlistBookIds.includes(Number(id)));
+    })
+    .catch((e) => {
+      // Optionally handle errors
+      setIsInWishlist(false);
+    });
   }, [id, token, currUser, reset]);
 
   // Cart modal
@@ -136,37 +149,47 @@ export default function UserBookDetail() {
   };
 
   // Wishlist
-  const handleToggleWishlist = async () => {
-    setAddingWishlist(true);
-    setWishlistMsg("");
-    try {
-      if (isInWishlist) {
-        const res = await axios.get(`${BASE_URL}/books/wishlist/`, {
-          headers: { Authorization: `Token ${token}` },
-        });
-        const wishlistItem = res.data.find((item) => item.book === book.id);
-        if (!wishlistItem) throw new Error("Wishlist item not found.");
-        await axios.delete(
-          `${BASE_URL}/books/wishlist/${wishlistItem.id}/`,
-          { headers: { Authorization: `Token ${token}` } }
-        );
-        toast.success("Removed from wishlist!");
-        setIsInWishlist(false);
-      } else {
-        await axios.post(
-          `${BASE_URL}/books/wishlist/`,
-          { book: book.id },
-          { headers: { Authorization: `Token ${token}` } }
-        );
-        toast.success("Added to wishlist!");
-        setIsInWishlist(true);
-      }
-    } catch (err) {
-      toast.error("Could not update wishlist.");
-    } finally {
-      setAddingWishlist(false);
+const handleToggleWishlist = async () => {
+  setAddingWishlist(true);
+  setWishlistMsg("");
+  try {
+    if (isInWishlist) {
+      // Find the wishlist item ID for current book efficiently
+      const res = await axios.get(`${BASE_URL}/books/wishlist/`, {
+        headers: { Authorization: `Token ${token}` },
+      });
+      const items = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data.results)
+        ? res.data.results
+        : [];
+      const wishlistItem = items.find((item) =>
+        typeof item.book === "number"
+          ? item.book === book.id
+          : item.book?.id === book.id
+      );
+      if (!wishlistItem) throw new Error("Wishlist item not found.");
+      await axios.delete(
+        `${BASE_URL}/books/wishlist/${wishlistItem.id}/`,
+        { headers: { Authorization: `Token ${token}` } }
+      );
+      toast.success("Removed from wishlist!");
+      setIsInWishlist(false); // Set immediately on success
+    } else {
+      await axios.post(
+        `${BASE_URL}/books/wishlist/`,
+        { book: book.id },
+        { headers: { Authorization: `Token ${token}` } }
+      );
+      toast.success("Added to wishlist!");
+      setIsInWishlist(true); // Set immediately on success
     }
-  };
+  } catch (err) {
+    toast.error("Could not update wishlist.");
+  } finally {
+    setAddingWishlist(false);
+  }
+};
 
   // Submit review
   const onSubmitReview = async (data) => {

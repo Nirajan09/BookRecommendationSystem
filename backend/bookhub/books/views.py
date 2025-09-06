@@ -123,7 +123,11 @@ class WishlistItemViewSet(viewsets.ModelViewSet):
         return WishlistItem.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        user = self.request.user
+        book = serializer.validated_data.get('book')
+        if WishlistItem.objects.filter(user=user, book=book).exists():
+            raise ValidationError({'detail': 'This book is already in your wishlist.'})
+        serializer.save(user=user)
 
 
 class BookViewSet(viewsets.ReadOnlyModelViewSet):

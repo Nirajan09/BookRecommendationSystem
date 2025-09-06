@@ -93,6 +93,36 @@ function AddToCartModal({
   );
 }
 
+// Confirmation modal for removing item from wishlist
+function RemoveConfirmModal({ open, book, onConfirm, onCancel, removing }) {
+  if (!open || !book) return null;
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div className="bg-white rounded-md p-6 max-w-md w-full shadow-lg">
+        <h3 className="text-xl font-semibold mb-4 text-red-600">Remove from Wishlist</h3>
+        <p className="mb-2">
+          Are you sure you want to remove <b>{book.title}</b> by {book.author} from your wishlist?
+        </p>
+        <div className="flex space-x-4 mt-4">
+          <button
+            onClick={onConfirm}
+            disabled={removing}
+            className="flex-1 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700 disabled:bg-red-300"
+          >
+            {removing ? "Removing..." : "Yes, Remove"}
+          </button>
+          <button
+            onClick={onCancel}
+            className="flex-1 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium transition"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const BASE_URL = "http://localhost:8000";
 
 const Wishlist = () => {
@@ -101,11 +131,16 @@ const Wishlist = () => {
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState(null);
 
-  // For Add to Cart Modal
+  // Add-to-cart modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalBook, setModalBook] = useState(null); // book_detail
+  const [modalBook, setModalBook] = useState(null);
   const [addQuantity, setAddQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
+
+  // Remove confirmation modal state
+  const [removeModalOpen, setRemoveModalOpen] = useState(false);
+  const [removeBook, setRemoveBook] = useState(null);
+  const [removeItemId, setRemoveItemId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -117,7 +152,7 @@ const Wishlist = () => {
         const res = await axios.get(`${BASE_URL}/books/wishlist/`, {
           headers: { Authorization: `Token ${token}` },
         });
-        setWishlist(res.data); // expects nested book_detail in response
+        setWishlist(res.data.results);
       } catch {
         toast.error("Failed to load wishlist.");
       }
@@ -126,30 +161,40 @@ const Wishlist = () => {
     if (token) fetchWishlist();
   }, [token]);
 
-  // Remove from wishlist
-  const handleRemove = async (wishlistItemId) => {
-    setRemovingId(wishlistItemId);
+  // Remove from wishlist (after confirmation)
+  const actuallyRemove = async () => {
+    setRemovingId(removeItemId);
     try {
-      await axios.delete(`${BASE_URL}/books/wishlist/${wishlistItemId}/`, {
+      await axios.delete(`${BASE_URL}/books/wishlist/${removeItemId}/`, {
         headers: { Authorization: `Token ${token}` },
       });
-      setWishlist((prev) => prev.filter((item) => item.id !== wishlistItemId));
+      setWishlist((prev) => prev.filter((item) => item.id !== removeItemId));
       toast.success("Removed from wishlist.");
     } catch {
       toast.error("Could not remove item.");
     } finally {
       setRemovingId(null);
+      setRemoveModalOpen(false);
+      setRemoveBook(null);
+      setRemoveItemId(null);
     }
   };
 
-  // Open modal for Add to Cart
+  // Open remove confirmation modal
+  const handleRemove = (wishlistItemId, book) => {
+    setRemoveModalOpen(true);
+    setRemoveBook(book);
+    setRemoveItemId(wishlistItemId);
+  };
+
+  // Add to cart modal
   const openAddToCartModal = (book) => {
     setModalBook(book);
     setAddQuantity(1);
     setModalOpen(true);
   };
 
-  // Add to cart (from modal) - Do NOT remove from wishlist!
+  // Add to cart (from modal)
   const handleAddToCart = async () => {
     if (!modalBook) return;
     setAdding(true);
@@ -162,7 +207,6 @@ const Wishlist = () => {
       toast.success("Added to cart!");
       setModalOpen(false);
       setModalBook(null);
-      // Redirect to cart page
       navigate("/cart");
     } catch {
       toast.error("Could not add to cart.");
@@ -174,6 +218,12 @@ const Wishlist = () => {
   const closeModal = () => {
     setModalOpen(false);
     setModalBook(null);
+  };
+
+  const closeRemoveModal = () => {
+    setRemoveModalOpen(false);
+    setRemoveBook(null);
+    setRemoveItemId(null);
   };
 
   if (loading) {
@@ -221,7 +271,7 @@ const Wishlist = () => {
               <div className="flex flex-col space-y-2">
                 <button
                   disabled={removingId === item.id}
-                  onClick={() => handleRemove(item.id)}
+                  onClick={() => handleRemove(item.id, book)}
                   className="px-3 py-1 rounded bg-pink-600 text-white transition hover:bg-pink-700 text-sm disabled:bg-pink-300"
                 >
                   {removingId === item.id ? "Removing..." : "Remove from wishlist"}
@@ -248,6 +298,15 @@ const Wishlist = () => {
         onAddToCart={handleAddToCart}
         adding={adding}
         onClose={closeModal}
+      />
+
+      {/* Remove Confirmation Modal */}
+      <RemoveConfirmModal
+        open={removeModalOpen}
+        book={removeBook}
+        onConfirm={actuallyRemove}
+        onCancel={closeRemoveModal}
+        removing={removingId === removeItemId}
       />
     </div>
   );
