@@ -39,6 +39,7 @@ class BookRatingSerializer(serializers.ModelSerializer):
 
 
 class BookSerializer(serializers.ModelSerializer):
+    reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
     class Meta:
         model = Book
         fields = "__all__"

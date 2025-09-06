@@ -1,4 +1,4 @@
-ean Code
+
 Title: Clean Code: A Handbook of Agile Software Craftsmanship
 
 Author: Robert C. Martin
@@ -9,8 +9,6 @@ Price: $30–$50 USD (varies by store and condition)
 
 Quantity: Commonly available
 
-Description:
-A classic guide for software developers on writing readable, maintainable, and efficient code. Covers principles and best practices for better programming and professionalism.
 
 Cover Image:
 
