@@ -1,4 +1,4 @@
-import { FiSearch } from "react-icons/fi"; // feather search icon
+import { FiSearch } from "react-icons/fi"; 
 
 export default function BookSearchBar({ value, onChange, onSearch }) {
   const handleKeyDown = (e) => {
@@ -10,7 +10,7 @@ export default function BookSearchBar({ value, onChange, onSearch }) {
       <div className="relative w-full max-w-xl flex justify-between">
         <input
           type="text"
-          placeholder="Search books, genre, authors, ISBN..."
+          placeholder="Search books, authors, ISBN..."
           value={value}
           onChange={onChange}
           onKeyDown={handleKeyDown}
