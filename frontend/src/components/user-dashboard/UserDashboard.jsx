@@ -41,6 +41,7 @@ export default function UserDashboard() {
         headers: { Authorization: `Token ${token}` },
       });
       setReviews(res.data.results);
+      console.log("review",res.data)
     } catch (err) {
       toast.error("Failed to load your reviews");
     }
@@ -59,6 +60,7 @@ export default function UserDashboard() {
           headers: { Authorization: `Token ${token}` },
         });
         setUser(res.data);
+        console.log("user",res.data)
       } catch (err) {
         console.error("User profile fetch error:", err);
       }

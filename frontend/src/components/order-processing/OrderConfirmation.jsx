@@ -26,7 +26,6 @@ export default function OrderConfirmation() {
       .then((response) => {
         setOrder(response.data);
         setLoading(false);
-        console.log(response.data);
       })
       .catch((err) => {
         setError(err.response?.data?.detail || "Failed to load order data");

@@ -137,35 +137,54 @@ function formatDateWithOrdinal(dateString) {
 }
 
   const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(
-        `${BASE_URL}/books/${book.id}/rate/`,
-        { rating: Number(ratingValue), comment: reviewText },
-        { headers: { Authorization: `Token ${token}` } }
-      );
-      toast.success(!editMode ? "Review updated!" : "Review submitted!");
+  e.preventDefault();
+  try {
+    await axios.post(
+      `${BASE_URL}/books/${book.id}/rate/`,
+      { rating: Number(ratingValue), comment: reviewText },
+      { headers: { Authorization: `Token ${token}` } }
+    );
+    toast.success(!editMode ? "Review updated!" : "Review submitted!");
 
-      // Reload book data (and thus reviews)
-      const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
-        headers: { Authorization: `Token ${token}` },
-      });
-      setBook(res.data);
+    // Reload book data (and thus reviews)
+    const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
+      headers: { Authorization: `Token ${token}` },
+    });
+    setBook(res.data);
 
-      const selfReview = Array.isArray(res.data.reviews)
-        ? res.data.reviews.find((rv) =>
+    const selfReview = Array.isArray(res.data.reviews)
+      ? res.data.reviews.find((rv) =>
           typeof rv.user === "string"
             ? rv.user === currUser?.username
             : rv.user?.username === currUser?.username
         )
-        : null;
-      setUserReview(selfReview || null);
-      setEditMode(false);
-      setShowReviewModal(false);
-    } catch {
+      : null;
+    setUserReview(selfReview || null);
+    setEditMode(false);
+    setShowReviewModal(false);
+  } catch (err) {
+    // Log detailed error for debugging
+    console.error("Review submission error:", err.response?.data || err.message);
+
+    // Show backend validation error messages if available, else generic error
+    if (err.response?.data) {
+      if (typeof err.response.data === "string") {
+        toast.error(err.response.data);
+      } else if (typeof err.response.data === "object") {
+        // Show all validation errors in a toast
+        const errors = Object.entries(err.response.data)
+          .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
+          .join("\n");
+        toast.error(errors);
+      } else {
+        toast.error("Could not submit review.");
+      }
+    } else {
       toast.error("Could not submit review.");
     }
-  };
+  }
+};
+
   // Cart modal
   const openCartModal = () => {
     if (isOutOfStock) return;
