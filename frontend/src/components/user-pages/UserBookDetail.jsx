@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import AddToCartModal from "../../utils/Models/AddToCartModal";
 
 const BASE_URL = "http://localhost:8000";
+const HEADER_HEIGHT = 64; 
 
 export default function UserBookDetail() {
   const { id } = useParams();
@@ -18,15 +19,9 @@ export default function UserBookDetail() {
 
   const [book, setBook] = useState(null);
   const [error, setError] = useState(null);
-
-  // Cart/Wishlist state
   const [addingCart, setAddingCart] = useState(false);
   const [addingWishlist, setAddingWishlist] = useState(false);
-  const [cartMsg, setCartMsg] = useState("");
-  const [wishlistMsg, setWishlistMsg] = useState("");
   const [isInWishlist, setIsInWishlist] = useState(false);
-
-  // Review/Rating state
   const [ratingValue, setRatingValue] = useState(0);
   const [hoverValue, setHoverValue] = useState(0);
   const [reviewText, setReviewText] = useState("");
@@ -34,43 +29,30 @@ export default function UserBookDetail() {
   const [userReview, setUserReview] = useState(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  // Cart modal
   const [showCartModal, setShowCartModal] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const isOutOfStock = book?.quantity === 0;
 
-  // React Hook Form for review
   const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
     reset,
-    formState: { errors },
-  } = useForm({
-    defaultValues: { rating: 0, comment: "" },
-  });
+  } = useForm({ defaultValues: { rating: 0, comment: "" } });
 
-  const watchRating = watch("rating", ratingValue);
-
-  // Fetch book + user review + wishlist
   useEffect(() => {
     if (!token) return;
 
     axios
-      .get(`${BASE_URL}/books/${id}/`, {
-        headers: { Authorization: `Token ${token}` },
-      })
+      .get(`${BASE_URL}/books/${id}/`, { headers: { Authorization: `Token ${token}` } })
       .then((res) => {
         setBook(res.data);
+
         const selfReview = Array.isArray(res.data.reviews)
           ? res.data.reviews.find((rv) =>
-            typeof rv.user === "string"
-              ? rv.user === currUser?.username
-              : rv.user?.username === currUser?.username
-          )
+              typeof rv.user === "string"
+                ? rv.user === currUser?.username
+                : rv.user?.username === currUser?.username
+            )
           : null;
+
         setUserReview(selfReview || null);
 
         if (selfReview) {
@@ -93,109 +75,77 @@ export default function UserBookDetail() {
       });
 
     axios
-      .get(`${BASE_URL}/books/wishlist/`, {
-        headers: { Authorization: `Token ${token}` },
-      })
+      .get(`${BASE_URL}/books/wishlist/`, { headers: { Authorization: `Token ${token}` } })
       .then((res) => {
-        // Handle paginated or normal list response:
         const items = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data.results)
             ? res.data.results
             : [];
-
         const wishlistBookIds = items.map((item) =>
           typeof item.book === "number" ? item.book : item.book?.id
         );
-
         setIsInWishlist(wishlistBookIds.includes(Number(id)));
       })
-      .catch((e) => {
-        // Optionally handle errors
-        setIsInWishlist(false);
-      });
+      .catch(() => setIsInWishlist(false));
   }, [id, token, currUser, reset]);
 
   function getOrdinalSuffix(day) {
-  if (day > 3 && day < 21) return "th"; // Special case: 11th,12th,13th
-  switch (day % 10) {
-    case 1: return "st";
-    case 2: return "nd";
-    case 3: return "rd";
-    default: return "th";
-  }
-}
-
-function formatDateWithOrdinal(dateString) {
-  if (!dateString) return "";
-  const date = new Date(dateString);
-  const day = date.getDate();
-  const suffix = getOrdinalSuffix(day);
-  const month = date.toLocaleString("default", { month: "long" }); // ex: June
-  const year = date.getFullYear();
-  return `${day}${suffix} ${month} ${year}`;
-}
-
-  const handleReviewSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    await axios.post(
-      `${BASE_URL}/books/${book.id}/rate/`,
-      { rating: Number(ratingValue), comment: reviewText },
-      { headers: { Authorization: `Token ${token}` } }
-    );
-    toast.success(!editMode ? "Review updated!" : "Review submitted!");
-
-    // Reload book data (and thus reviews)
-    const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
-      headers: { Authorization: `Token ${token}` },
-    });
-    setBook(res.data);
-
-    const selfReview = Array.isArray(res.data.reviews)
-      ? res.data.reviews.find((rv) =>
-          typeof rv.user === "string"
-            ? rv.user === currUser?.username
-            : rv.user?.username === currUser?.username
-        )
-      : null;
-    setUserReview(selfReview || null);
-    setEditMode(false);
-    setShowReviewModal(false);
-  } catch (err) {
-    // Log detailed error for debugging
-    console.error("Review submission error:", err.response?.data || err.message);
-
-    // Show backend validation error messages if available, else generic error
-    if (err.response?.data) {
-      if (typeof err.response.data === "string") {
-        toast.error(err.response.data);
-      } else if (typeof err.response.data === "object") {
-        // Show all validation errors in a toast
-        const errors = Object.entries(err.response.data)
-          .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
-          .join("\n");
-        toast.error(errors);
-      } else {
-        toast.error("Could not submit review.");
-      }
-    } else {
-      toast.error("Could not submit review.");
+    if (day > 3 && day < 21) return "th";
+    switch (day % 10) {
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
     }
   }
-};
 
-  // Cart modal
+  function formatDateWithOrdinal(dateString) {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const suffix = getOrdinalSuffix(day);
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+    return `${day}${suffix} ${month} ${year}`;
+  }
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(
+        `${BASE_URL}/books/${book.id}/rate/`,
+        { rating: Number(ratingValue), comment: reviewText },
+        { headers: { Authorization: `Token ${token}` } }
+      );
+      toast.success(!editMode ? "Review updated!" : "Review submitted!");
+      const res = await axios.get(`${BASE_URL}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
+      setBook(res.data);
+      const selfReview = Array.isArray(res.data.reviews)
+        ? res.data.reviews.find((rv) =>
+            typeof rv.user === "string"
+              ? rv.user === currUser?.username
+              : rv.user?.username === currUser?.username
+          )
+        : null;
+      setUserReview(selfReview || null);
+      setEditMode(false);
+      setShowReviewModal(false);
+    } catch (err) {
+      toast.error("Could not submit review.");
+    }
+  };
+
   const openCartModal = () => {
     if (isOutOfStock) return;
     setQuantity(1);
     setShowCartModal(true);
   };
+
   const closeCartModal = () => setShowCartModal(false);
 
   const handleAddToCartFromModal = async () => {
     setAddingCart(true);
-    setCartMsg("");
     try {
       await axios.post(
         `${BASE_URL}/books/cart/`,
@@ -206,26 +156,17 @@ function formatDateWithOrdinal(dateString) {
       setShowCartModal(false);
       navigate("/cart");
     } catch (err) {
-      if (err.response?.data?.quantity) {
-        toast.error(err.response.data.quantity);
-      } else {
-        toast.error("Could not add to cart.");
-      }
+      toast.error("Could not add to cart.");
     } finally {
       setAddingCart(false);
     }
   };
 
-  // Wishlist
   const handleToggleWishlist = async () => {
     setAddingWishlist(true);
-    setWishlistMsg("");
     try {
       if (isInWishlist) {
-        // Find the wishlist item ID for current book efficiently
-        const res = await axios.get(`${BASE_URL}/books/wishlist/`, {
-          headers: { Authorization: `Token ${token}` },
-        });
+        const res = await axios.get(`${BASE_URL}/books/wishlist/`, { headers: { Authorization: `Token ${token}` } });
         const items = Array.isArray(res.data)
           ? res.data
           : Array.isArray(res.data.results)
@@ -242,7 +183,7 @@ function formatDateWithOrdinal(dateString) {
           { headers: { Authorization: `Token ${token}` } }
         );
         toast.success("Removed from wishlist!");
-        setIsInWishlist(false); // Set immediately on success
+        setIsInWishlist(false);
       } else {
         await axios.post(
           `${BASE_URL}/books/wishlist/`,
@@ -250,45 +191,20 @@ function formatDateWithOrdinal(dateString) {
           { headers: { Authorization: `Token ${token}` } }
         );
         toast.success("Added to wishlist!");
-        setIsInWishlist(true); // Set immediately on success
+        setIsInWishlist(true);
       }
-    } catch (err) {
+    } catch {
       toast.error("Could not update wishlist.");
     } finally {
       setAddingWishlist(false);
     }
   };
 
-  // Submit review
-  const onSubmitReview = async (data) => {
-    try {
-      await axios.post(
-        `${BASE_URL}/books/${book.id}/rate/`,
-        { rating: Number(data.rating), comment: data.comment.trim() },
-        { headers: { Authorization: `Token ${token}` } }
-      );
-      toast.success(userReview ? "Review updated!" : "Review submitted!");
-
-      const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
-        headers: { Authorization: `Token ${token}` },
-      });
-      setBook(res.data);
-
-      const selfReview = Array.isArray(res.data.reviews)
-        ? res.data.reviews.find((rv) =>
-          typeof rv.user === "string"
-            ? rv.user === currUser?.username
-            : rv.user?.username === currUser?.username
-        )
-        : null;
-      setUserReview(selfReview || null);
-      setEditMode(false);
-      setShowReviewModal(false);
-    } catch {
-      toast.error("Could not submit review.");
-    }
+  const handleEdit = () => {
+    setEditMode(true);
+    setShowReviewModal(true);
   };
-  const handleEdit = () => setEditMode(true);
+
   const handleCancelEdit = () => {
     setEditMode(false);
     if (userReview) {
@@ -296,249 +212,177 @@ function formatDateWithOrdinal(dateString) {
       setReviewText(userReview.comment);
       reset({ rating: userReview.rating, comment: userReview.comment });
     }
+    setShowReviewModal(false);
+  };
+
+  const handleDelete = async () => {
+    if (!userReview?.id) {
+      toast.error("No review ID found.");
+      setShowDeleteModal(false);
+      return;
+    }
+    try {
+      await axios.delete(
+        `${BASE_URL}/books/reviews/${userReview.id}/`,
+        { headers: { Authorization: `Token ${token}` } }
+      );
+      toast.success("Review deleted!");
+      setShowDeleteModal(false);
+      const res = await axios.get(`${BASE_URL}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
+      setBook(res.data);
+      setUserReview(null);
+      setReviewText("");
+      setRatingValue(0);
+    } catch {
+      toast.error("Could not delete review.");
+      setShowDeleteModal(false);
+    }
   };
 
   if (error)
     return (
-      <div className="flex flex-col items-center justify-center min-h-[90vh]">
-        <div className="bg-red-100 text-red-800 rounded p-4">{error}</div>
-        <Link to="/user-home" className="mt-4 bg-gray-200 px-4 py-2 rounded">
-          Back to Home
-        </Link>
+      <div className="flex flex-col items-center justify-center min-h-[70vh]">
+        <div className="bg-red-100 border border-red-300 text-red-800 font-semibold rounded-lg p-6 shadow">{error}</div>
+        <Link to="/user-home" className="mt-6 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded shadow transition">Back to Home</Link>
       </div>
     );
 
   if (!book)
     return (
-      <div className="flex items-center justify-center min-h-[90vh]">
-        <span>Loading...</span>
+      <div className="flex items-center justify-center min-h-[70vh]">
+        <span className="text-gray-500 text-xl font-semibold">Loading...</span>
       </div>
     );
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-shrink-0 flex flex-col items-center"></div>
-        <div className="bg-blue-50 rounded shadow-lg p-6 w-full max-w-4xl flex flex-col">
-          {/* Book Details */}
-          {book.cover_image && (
-            <div className="flex items-center justify-center w-full h-44 rounded mb-3">
-              <img
-                src={
-                  book.cover_image.startsWith("http")
-                    ? book.cover_image
-                    : `${BASE_URL}${book.cover_image}`
-                }
-                alt={book.title}
-                className="max-h-full max-w-full object-contain"
-              />
+    <div
+      className="w-full flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-white py-6 px-2"
+      style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px)` }}
+    >
+      <div
+        className="w-full max-w-5xl bg-white rounded-xl shadow-2xl overflow-hidden flex flex-col"
+        style={{
+          minHeight: `calc(80vh - ${HEADER_HEIGHT}px)`,
+          maxHeight: `calc(95vh - ${HEADER_HEIGHT}px)`,
+        }}
+      >
+        <div
+          className="flex flex-row gap-0 p-8 items-start"
+          style={{
+            minHeight: "260px",
+            alignItems: "stretch",
+          }}
+        >
+          <div
+            className="flex-shrink-0 flex flex-col items-center justify-center"
+            style={{ width: "250px", height: "260px" }}
+          >
+            {book.cover_image && (
+              <div className="flex items-center justify-center bg-gray-100 rounded-lg shadow p-4 w-full h-full">
+                <img
+                  src={
+                    book.cover_image.startsWith("http")
+                      ? book.cover_image
+                      : `${BASE_URL}${book.cover_image}`
+                  }
+                  alt={book.title}
+                  style={{ height: "180px", width: "120px", objectFit: "contain" }}
+                  className="rounded"
+                />
+              </div>
+            )}
+          </div>
+          <div
+            className="flex flex-col justify-between px-8 py-3 flex-1"
+            style={{ minHeight: "260px" }}
+          >
+            <h2 className="text-2xl font-bold text-indigo-800 mb-2">{book.title}</h2>
+            <div className="text-gray-700 mb-1">
+              <span className="font-semibold">Author:</span> {book.author}
             </div>
-          )}
-          <h2 className="text-2xl font-bold mb-2">{book.title}</h2>
-          <p className="mb-1">
-            <b>Author:</b> {book.author}
-          </p>
-          <p className="mb-1">
-            <b>Year of Publication:</b>{" "}
-            {book.year_of_publication ?? "N/A"}
-          </p>
-          <p className="mb-1">
-            <b>ISBN:</b> {book.isbn}
-          </p>
-          <p className="mb-1">
-            <b>Price:</b> Rs. {book.price}
-          </p>
-
-          {/* Cart + Wishlist */}
-          <div className="flex flex-col space-x-2 my-2 justify-between">
-            <div className="flex space-x-2">
+            <div className="text-gray-700 mb-1">
+              <span className="font-semibold">Year of Publication:</span>{" "}
+              {book.year_of_publication ?? "N/A"}
+            </div>
+            <div className="text-gray-700 mb-1">
+              <span className="font-semibold">ISBN:</span> {book.isbn}
+            </div>
+            <div className="text-gray-700 mb-1">
+              <span className="font-semibold">Price:</span>
+              <span className="text-xl text-green-700 font-bold"> Rs. {book.price}</span>
+            </div>
+            <div className="flex flex-row gap-4 my-3 items-center">
               <button
                 onClick={openCartModal}
-                className="cursor-pointer flex gap-4 bg-indigo-500 text-white px-4 py-2 rounded disabled:opacity-70"
                 disabled={addingCart || isOutOfStock}
+                className={`flex gap-2 items-center font-semibold px-6 py-2 rounded-lg shadow ${
+                  isOutOfStock
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-indigo-600 text-white hover:bg-indigo-700"
+                } transition`}
               >
-                <span>Add to Cart</span>
-                <IoCartOutline size={30} />
+                <IoCartOutline size={24} /> Add to Cart
               </button>
               <button
-                className="cursor-pointer"
+                className="flex items-center justify-center px-4 py-2 rounded-lg shadow border bg-white hover:bg-pink-50 transition"
                 onClick={handleToggleWishlist}
                 disabled={addingWishlist}
-                aria-label={
-                  isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"
-                }
+                aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
               >
                 {addingWishlist ? (
-                  <MdAutorenew size={40} className="animate-spin" />
+                  <MdAutorenew size={28} className="animate-spin text-indigo-400" />
                 ) : isInWishlist ? (
-                  <MdFavorite size={40} />
+                  <MdFavorite size={28} className="text-pink-500" />
                 ) : (
-                  <MdFavoriteBorder size={40} />
+                  <MdFavoriteBorder size={28} className="text-gray-400" />
                 )}
               </button>
+              {isOutOfStock && <span className="text-red-600 font-bold ml-2">Item out of stock</span>}
             </div>
-            {isOutOfStock && (
-              <span className="text-red-600 font-semibold ml-2">
-                Item out of stock
-              </span>
-            )}
+            <div className="mb-1">
+              <span className="font-semibold">Average Rating:</span>
+              {book.average_rating ? (
+                <span className="text-indigo-700"> {book.average_rating} / 5</span>
+              ) : (
+                <span className="text-gray-400"> No rating yet</span>
+              )}
+            </div>
           </div>
+        </div>
 
-          {/* Ratings */}
-          <div className="mt-4 mb-2">
-            <b>Average Rating:</b>{" "}
-            {book.average_rating ? (
-              <span>{book.average_rating} / 5</span>
-            ) : (
-              <span className="text-gray-400">No rating yet</span>
-            )}
-          </div>
-
-          {/* Play Store style review UI */}
-          <div className="mb-4">
-            <b>Reviews:</b>
-            {/* Show user's own review first, special UI */}
+        {(userReview || editMode) && (
+          <div className="px-8 py-4 flex flex-col">
+            <span className="font-bold text-lg mb-1 mt-7">Reviews:</span>
             {userReview && !editMode && (
-              <div className="mb-4 p-4 bg-green-50 border rounded flex flex-col sm:flex-row justify-between items-center gap-2">
+              <div className="my-2 p-4 bg-green-50 border border-green-200 rounded flex flex-col sm:flex-row justify-between items-center gap-2">
                 <div>
-                <div className="font-semibold text-green-700">Your review</div>
-                <span className="flex items-center">
-                  {[1, 2, 3, 4, 5].map((star) =>
-                    star <= userReview.rating ? (
-                      <AiFillStar key={star} size={22} className="text-yellow-400" />
-                    ) : (
-                      <AiOutlineStar key={star} size={22} className="text-yellow-400" />
-                    )
-                  )}
-                </span>
-                <div className="flex-1">
-                  
-                  <div>{userReview.comment}</div>
+                  <div className="font-semibold text-green-700">Your review</div>
+                  <span className="flex items-center">
+                    {[1, 2, 3, 4, 5].map((star) =>
+                      star <= userReview.rating ? (
+                        <AiFillStar key={star} size={22} className="text-yellow-400" />
+                      ) : (
+                        <AiOutlineStar key={star} size={22} className="text-yellow-400" />
+                      )
+                    )}
+                  </span>
+                  <div className="flex-1">
+                    <div>{userReview.comment}</div>
+                  </div>
                 </div>
-                </div>
-
                 <div className="flex gap-2">
-                  <button
-                    className="px-3 py-1 bg-blue-600 text-white rounded"
-                    onClick={() => setShowReviewModal(true)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="px-3 py-1 bg-red-500 text-white rounded"
-                    onClick={() => setShowDeleteModal(true)}
-                  >
-                    Delete
-                  </button>
+                  <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={handleEdit}>Edit</button>
+                  <button className="px-3 py-1 bg-red-500 text-white rounded" onClick={() => setShowDeleteModal(true)}>Delete</button>
                 </div>
               </div>
             )}
-
-            {showReviewModal && (
-              <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-                <form
-                  className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md space-y-4"
-                  onSubmit={handleReviewSubmit}
-                >
-                  <h2 className="text-xl font-bold mb-2 text-indigo-700 text-center">Edit Review</h2>
-                  <div className="flex items-center justify-center" onMouseLeave={() => setHoverValue(0)}>
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <span
-                        key={star}
-                        className="cursor-pointer"
-                        onClick={() => setRatingValue(star)}
-                        onMouseEnter={() => setHoverValue(star)}
-                      >
-                        {(hoverValue || ratingValue) >= star ? (
-                          <AiFillStar size={28} className="text-yellow-400" />
-                        ) : (
-                          <AiOutlineStar size={28} className="text-yellow-400" />
-                        )}
-                      </span>
-                    ))}
-                  </div>
-                  <input
-                    type="text"
-                    className="border px-2 py-1 rounded w-full"
-                    placeholder="Write your review (Optional)"
-                    value={reviewText}
-                    onChange={(e) => setReviewText(e.target.value)}
-                  />
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      type="submit"
-                      className="bg-green-600 text-white px-4 py-1 rounded"
-                    >Save</button>
-                    <button
-                      type="button"
-                      className="bg-gray-300 px-4 py-1 rounded"
-                      onClick={() => {
-                        setShowReviewModal(false);
-                        handleCancelEdit();
-                      }}
-                    >Cancel</button>
-                  </div>
-                </form>
-              </div>
-            )}
-
-            {/* Delete Review Modal */}
-            {showDeleteModal && (
-              <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-                <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm">
-                  <h2 className="text-lg font-bold mb-4 text-red-700 text-center">Delete Review</h2>
-                  <p className="mb-4 text-center">Are you sure you want to permanently delete your review?</p>
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      className="bg-red-600 text-white px-4 py-1 rounded"
-                      onClick={async () => {
-                        try {
-                          if (!userReview?.id) {
-                            toast.error("No review ID found.");
-                            setShowDeleteModal(false);
-                            return;
-                          }
-                          await axios.delete(
-                            `${BASE_URL}/books/reviews/${userReview.id}/`,
-                            { headers: { Authorization: `Token ${token}` } }
-                          );
-                          toast.success("Review deleted!");
-                          setShowDeleteModal(false);
-
-                          // reload book + UI
-                          const res = await axios.get(`${BASE_URL}/books/${book.id}/`, {
-                            headers: { Authorization: `Token ${token}` },
-                          });
-                          setBook(res.data);
-                          setUserReview(null);
-                          setReviewText("");
-                          setRatingValue(0);
-                        } catch (e) {
-                          toast.error("Could not delete review.");
-                          setShowDeleteModal(false);
-                        }
-                      }}
-
-                    >Delete</button>
-                    <button
-                      className="bg-gray-300 px-4 py-1 rounded"
-                      onClick={() => setShowDeleteModal(false)}
-                    >Cancel</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-
-            {/* Edit mode or leave a review form */}
             {(editMode || !userReview) && (
-              <div className="border-t pt-4 mt-4 mb-2">
+              <div className="border-t pt-4 mt-2 mb-2">
                 <b>{userReview ? "Edit your review:" : "Leave a review:"}</b>
                 <form
                   className="mt-2 flex flex-col sm:flex-row items-center gap-2"
                   onSubmit={handleReviewSubmit}
                 >
-                  {/* Star input */}
                   <div className="flex items-center" onMouseLeave={() => setHoverValue(0)}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <span
@@ -555,7 +399,6 @@ function formatDateWithOrdinal(dateString) {
                       </span>
                     ))}
                   </div>
-                  {/* Review input */}
                   <input
                     type="text"
                     className="border px-2 py-1 rounded w-60"
@@ -566,11 +409,10 @@ function formatDateWithOrdinal(dateString) {
                   <button
                     className="bg-green-600 text-white px-3 py-1 rounded"
                     type="submit"
-                    disabled={!ratingValue} // ✅ Only rating is required
+                    disabled={!ratingValue}
                   >
                     {userReview ? "Save" : "Submit"}
                   </button>
-
                   {userReview && (
                     <button
                       type="button"
@@ -583,68 +425,78 @@ function formatDateWithOrdinal(dateString) {
                 </form>
               </div>
             )}
-
-            {/* All reviews list */}
-            <div>
-              {Array.isArray(book.reviews) && book.reviews.length > 0 ? (
-                <div className="mt-4">
-                  <h3 className="font-bold text-lg mb-2">All Reviews</h3>
-                  <div className="space-y-3">
-                    {book.reviews
-                      ?.filter(rv =>
-                        typeof rv.user === "string"
-                          ? rv.user !== currUser?.username
-                          : rv.user?.username !== currUser?.username
-                      )
-                      .map((review, i) => (
-                        <div
-                          key={i}
-                          className="border rounded-lg p-3 shadow-sm bg-white"
-                        >
-                          {/* Header */}
-                          <div className="flex items-center justify-between">
-                            <span className="font-semibold">
-                              {typeof review.user === "string"
-                                ? review.user
-                                : review.user?.username}
-                            </span>
-                            <span className="flex items-center text-yellow-400">
-                              {[1, 2, 3, 4, 5].map(num =>
-                                num <= review.rating ? (
-                                  <AiFillStar key={num} size={18} />
-                                ) : (
-                                  <AiOutlineStar key={num} size={18} />
-                                )
-                              )}
-                            </span>
-                          </div>
-
-                          {/* Comment */}
-                          {review.comment && (
-                            <p className="mt-2 text-gray-700">{review.comment}</p>
-                          )}
-
-                          {/* Date (if available) */}
-                          {review.rated_at && (
-                            <span className="text-xs text-gray-400">
-                              {formatDateWithOrdinal(review.rated_at)}
-                            </span>
-                          )}
+            <div
+              style={{
+                maxHeight: "220px",
+                overflowY: "auto",
+                borderRadius: "0.7rem",
+                background: "#f8faff",
+                border: "1px solid #edf2fa",
+                boxShadow: "0 0 8px 0 #f0f7ff inset",
+              }}
+              className="mt-2"
+            >
+              <h3 className="font-bold text-lg mb-2 ml-4">All Reviews</h3>
+              <div className="space-y-3 pb-4">
+                {Array.isArray(book.reviews) &&
+                book.reviews.filter((rv) =>
+                  typeof rv.user === "string"
+                    ? rv.user !== currUser?.username
+                    : rv.user?.username !== currUser?.username
+                ).length > 0 ? (
+                  book.reviews
+                    ?.filter((rv) =>
+                      typeof rv.user === "string"
+                        ? rv.user !== currUser?.username
+                        : rv.user?.username !== currUser?.username
+                    )
+                    .map((review, i) => (
+                      <div
+                        key={i}
+                        className="border rounded-lg p-3 shadow-sm bg-white mx-4"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-semibold">
+                            {typeof review.user === "string"
+                              ? review.user
+                              : review.user?.username}
+                          </span>
+                          <span className="flex items-center text-yellow-400">
+                            {[1, 2, 3, 4, 5].map((num) =>
+                              num <= review.rating ? (
+                                <AiFillStar key={num} size={18} />
+                              ) : (
+                                <AiOutlineStar key={num} size={18} />
+                              )
+                            )}
+                          </span>
                         </div>
-                      ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="text-gray-400 text-sm">No reviews yet.</div>
-              )}
+                        {review.comment && (
+                          <p className="mt-2 text-gray-700">{review.comment}</p>
+                        )}
+                        {review.rated_at && (
+                          <span className="text-xs text-gray-400">
+                            {formatDateWithOrdinal(review.rated_at)}
+                          </span>
+                        )}
+                      </div>
+                    ))
+                ) : (
+                  <div className="text-gray-400 text-sm ml-4 mt-2">No reviews yet.</div>
+                )}
+              </div>
             </div>
           </div>
-
-          <div className="flex space-x-2 mt-2"> <Link to="/user-home" className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded" > Back to Home </Link> </div>
+        )}
+        <div className="flex justify-end px-8 py-4">
+          <Link
+            to="/user-home"
+            className="bg-gray-300 hover:bg-gray-400 px-5 py-2 rounded-lg text-gray-800 shadow transition"
+          >
+            Back to Home
+          </Link>
         </div>
       </div>
-
-      {/* Add to Cart Modal */}
       <AddToCartModal
         open={showCartModal}
         book={book}
@@ -654,6 +506,6 @@ function formatDateWithOrdinal(dateString) {
         adding={addingCart}
         onClose={closeCartModal}
       />
-    </>
+    </div>
   );
 }

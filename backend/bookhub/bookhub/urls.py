@@ -32,7 +32,7 @@ urlpatterns = [
     path('userprofile/', include('userprofile.urls')),
     path('',include('orders.urls')),
     path('',include('payment.urls')),
-    path('',include('stripePayment.urls'))
+    path('',include('stripePayment.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

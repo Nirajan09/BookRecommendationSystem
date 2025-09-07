@@ -93,9 +93,9 @@ export default function AdminOrdersPage() {
         setStatusUpdate("");
       })
       .catch((err) => {
-        console.error("Status update error:", err.response?.data || err.message);
-        setError("Failed to update status");
-      })
+  console.error("Status update error:", err.response?.data || err.message);
+  setError(err.response?.data?.detail || "Failed to update status");
+})
       .finally(() => setLoading(false));
   };
 

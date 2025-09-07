@@ -49,39 +49,67 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ['created', 'updated', 'user', 'reference']
 
     def validate(self, data):
-        # Full Name
-        if not data.get('full_name') or len(data['full_name']) < 2:
-            raise serializers.ValidationError({"full_name": "Full Name must be at least 2 characters."})
+        if self.partial:
+            # Only validate fields if present in data (patch update)
+            if 'full_name' in data and len(data['full_name']) < 2:
+                raise serializers.ValidationError({"full_name": "Full Name must be at least 2 characters."})
 
-        # Street
-        if not data.get('street') or len(data['street']) < 5:
-            raise serializers.ValidationError({"street": "Street address must be at least 5 characters."})
+            if 'street' in data and len(data['street']) < 5:
+                raise serializers.ValidationError({"street": "Street address must be at least 5 characters."})
 
-        # Province/City validation
-        province = data.get('province')
-        city = data.get('city')
-        if province not in PROVINCES:
-            raise serializers.ValidationError({"province": "Invalid province selected."})
-        if city not in CITIES_BY_PROVINCE.get(province, []):
-            raise serializers.ValidationError({"city": "Invalid city for the selected province."})
+            province = data.get('province')
+            city = data.get('city')
+            if province and province not in PROVINCES:
+                raise serializers.ValidationError({"province": "Invalid province selected."})
+            if city and city not in CITIES_BY_PROVINCE.get(province, []):
+                raise serializers.ValidationError({"city": "Invalid city for the selected province."})
 
-        # Email
-        if not data.get('email'):
-            raise serializers.ValidationError({"email": "Email is required."})
+            if 'email' in data and not data.get('email'):
+                raise serializers.ValidationError({"email": "Email is required."})
 
-        # Phone (Nepal format)
-        phone = data.get('phone')
-        nepal_mobile_regex = re.compile(r'^(98|97)\d{8}$')
-        if not phone or not nepal_mobile_regex.match(phone):
-            raise serializers.ValidationError(
-                {"phone": "Phone must be a valid Nepal mobile number (starts with 97 or 98 and 10 digits)."}
-            )
+            phone = data.get('phone')
+            if phone is not None:
+                nepal_mobile_regex = re.compile(r'^(98|97)\d{8}$')
+                if not nepal_mobile_regex.match(phone):
+                    raise serializers.ValidationError(
+                        {"phone": "Phone must be a valid Nepal mobile number (starts with 97 or 98 and 10 digits)."}
+                    )
 
-        # Shipping & Payment
-        if data.get('shipping_method') not in dict(Order.SHIPPING_CHOICES):
-            raise serializers.ValidationError({"shipping_method": "Invalid shipping method."})
-        if data.get('payment_method') not in dict(Order.PAYMENT_CHOICES):
-            raise serializers.ValidationError({"payment_method": "Invalid payment method."})
+            if 'shipping_method' in data and data.get('shipping_method') not in dict(Order.SHIPPING_CHOICES):
+                raise serializers.ValidationError({"shipping_method": "Invalid shipping method."})
+
+            if 'payment_method' in data and data.get('payment_method') not in dict(Order.PAYMENT_CHOICES):
+                raise serializers.ValidationError({"payment_method": "Invalid payment method."})
+
+        else:
+            # Full validation for non-partial operations (e.g., POST, PUT)
+            if not data.get('full_name') or len(data['full_name']) < 2:
+                raise serializers.ValidationError({"full_name": "Full Name must be at least 2 characters."})
+            if not data.get('street') or len(data['street']) < 5:
+                raise serializers.ValidationError({"street": "Street address must be at least 5 characters."})
+
+            province = data.get('province')
+            city = data.get('city')
+            if province not in PROVINCES:
+                raise serializers.ValidationError({"province": "Invalid province selected."})
+            if city not in CITIES_BY_PROVINCE.get(province, []):
+                raise serializers.ValidationError({"city": "Invalid city for the selected province."})
+
+            if not data.get('email'):
+                raise serializers.ValidationError({"email": "Email is required."})
+
+            phone = data.get('phone')
+            nepal_mobile_regex = re.compile(r'^(98|97)\d{8}$')
+            if not phone or not nepal_mobile_regex.match(phone):
+                raise serializers.ValidationError({
+                    "phone": "Phone must be a valid Nepal mobile number (starts with 97 or 98 and 10 digits)."
+                })
+
+            if data.get('shipping_method') not in dict(Order.SHIPPING_CHOICES):
+                raise serializers.ValidationError({"shipping_method": "Invalid shipping method."})
+
+            if data.get('payment_method') not in dict(Order.PAYMENT_CHOICES):
+                raise serializers.ValidationError({"payment_method": "Invalid payment method."})
 
         return data
 
