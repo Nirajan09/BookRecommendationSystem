@@ -38,12 +38,44 @@ class BookRatingSerializer(serializers.ModelSerializer):
         return attrs
 
 
+from rest_framework import serializers
+
 class BookSerializer(serializers.ModelSerializer):
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
+    cover_image_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Book
-        fields = "__all__"
+        fields = [
+            'id',
+            'title',
+            'author',
+            'isbn',
+            'created_at',
+            'sold_count',
+            'average_rating',
+            'price',
+            'cover_image',
+            'dataset_image_url',
+            'quantity',
+            'year_of_publication',
+            'reviews',            # explicitly added
+            'cover_image_url',    # explicitly added
+        ]
 
+    def get_cover_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.dataset_image_url:
+            url = obj.dataset_image_url
+        elif obj.cover_image and hasattr(obj.cover_image, 'url'):
+            url = obj.cover_image.url
+        else:
+            url = None
+
+        if url and request:
+            return request.build_absolute_uri(url)
+        return url
+    
     def validate_title(self, value):
         if not value or len(value.strip()) < 2:
             raise serializers.ValidationError("Title must be at least 2 characters.")

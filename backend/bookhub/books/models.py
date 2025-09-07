@@ -11,7 +11,10 @@ class Book(models.Model):
     sold_count = models.PositiveIntegerField(default=0)
     average_rating = models.DecimalField(max_digits=3, decimal_places=2, default=0)
     price = models.DecimalField(max_digits=8, decimal_places=2)
+    # Image uploaded by admin
     cover_image = models.ImageField(upload_to='covers/', null=True, blank=True)
+    # Image URL from dataset (CSV)
+    dataset_image_url = models.URLField(max_length=500, null=True, blank=True)
     quantity = models.PositiveIntegerField(default=0)
     year_of_publication = models.PositiveIntegerField(null=True, blank=True)
 

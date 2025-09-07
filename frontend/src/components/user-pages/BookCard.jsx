@@ -52,19 +52,26 @@ const StarRating = ({ rating }) => {
 };
 
 export default function BookCard({ book }) {
+  console.log(book)
   return (
     <Link to={`/books/${book.id}`} className="no-underline">
       <div className="bg-white rounded-2xl shadow-lg p-5 w-64 h-100 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-xl">
         <img
-          src={
-            book.cover_image?.startsWith("http")
-              ? book.cover_image
-              : `http://localhost:8000${book.cover_image}`
-          }
-          alt={book.title}
-          className="h-56 w-auto object-contain rounded-xl mb-4 border border-gray-200 bg-gray-100"
-          style={{ maxWidth: 150 }}
-        />
+  src={
+    book.dataset_image_url
+      ? book.cover_image_url
+      : book.cover_image?.startsWith("http")
+        ? book.cover_image
+        : `http://localhost:8000${book.cover_image}`
+  }
+  alt={book.title}
+  className="h-56 w-auto object-contain rounded-xl mb-4 border border-gray-200 bg-gray-100"
+  style={{ maxWidth: 150 }}
+  onError={(e) => {
+  e.target.onerror = null;
+  e.target.src = "https://via.placeholder.com/150x220?text=No+Cover";
+}}
+/>
         <h3 className="font-semibold text-gray-800 mb-2 w-full">{book.title}</h3>
         <p className="text-xs text-gray-500 mb-1">{book.author}</p>
         {/* Display year of publication if exists */}
