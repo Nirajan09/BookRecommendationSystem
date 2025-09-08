@@ -41,7 +41,7 @@ function StripeForm({ orderPayload, totalCost }) {
         const completedPayload = {
           ...orderPayload,
           payment_method: "stripe",
-          payment_status: "completed" // REQUIRED for backend to accept Stripe orders
+          payment_status: "completed"
         };
 
         // 4. Create order in backend
@@ -50,9 +50,7 @@ function StripeForm({ orderPayload, totalCost }) {
         });
 
         toast.success("Payment successful, order placed!");
-        
         navigate(`/order-confirmation/${orderRes.data.id}`);
-
       }
     } catch (err) {
       toast.error(err.response?.data?.detail || "Stripe payment failed.");
@@ -60,12 +58,25 @@ function StripeForm({ orderPayload, totalCost }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-lg mx-auto mt-8 p-6 bg-white rounded shadow">
-      <h2 className="text-lg font-semibold mb-4">Enter your card details</h2>
-      <div className="mb-4 p-3 border rounded">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-md mx-auto mt-12 bg-white/90 rounded-3xl shadow-xl p-8 border-2 border-blue-200"
+    >
+      <h2 className="text-2xl font-extrabold mb-6 text-gray-900 text-center">
+        Enter your card details
+      </h2>
+      <div className="mb-8 p-4 border border-gray-300 rounded-lg bg-gray-50">
         <CardElement options={{ hidePostalCode: true }} />
       </div>
-      <button className="btn btn-primary w-full">Pay Rs. {totalCost}</button>
+      <button
+        type="submit"
+        disabled={!stripe || loading}
+        className={`w-full py-3 font-bold text-lg text-white rounded-lg shadow-lg transition-transform active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed
+    bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700
+    ${loading ? 'cursor-wait' : ''}`}
+      >
+        {loading ? "Processing..." : `Pay Rs. ${totalCost}`}
+      </button>
     </form>
   );
 }
@@ -75,12 +86,15 @@ export default function PayWithCardPage() {
   const { orderPayload, totalCost } = location.state || {};
 
   if (!orderPayload) {
-    return <div>No order data found. Please return to checkout.</div>;
+    return (
+      <div className="max-w-md mx-auto mt-20 p-6 text-center text-red-600 font-semibold">
+        No order data found. Please return to checkout.
+      </div>
+    );
   }
 
   return (
     <Elements stripe={stripePromise}>
       <StripeForm orderPayload={orderPayload} totalCost={totalCost} />
-    </Elements>
-  );
+    </Elements>);
 }
