@@ -1,6 +1,6 @@
 import pickle
 from books.models import Book
-
+from django.http import JsonResponse
 # Load trained model once at startup
 with open("recommendation/item_cf_model.pkl", "rb") as f:
     model_data = pickle.load(f)
@@ -10,7 +10,7 @@ similarity_df = model_data["similarity_df"]
 
 def recommend_books(request):
     book_title = request.GET.get("book", "")
-    recommendations = get_recommendations(book_title, top_n=5)
+    recommendations = get_recommendations(book_title, top_n=8)
     if not recommendations:
         return JsonResponse({
             "book": book_title,
@@ -19,7 +19,7 @@ def recommend_books(request):
         })
     return JsonResponse({"book": book_title, "recommendations": recommendations})
 
-def get_recommendations(book_title, top_n=5):
+def get_recommendations(book_title, top_n=8):
     if book_title not in similarity_df.columns:
         return []
 
@@ -32,7 +32,7 @@ def get_recommendations(book_title, top_n=5):
 
     # Query all books matching those titles
     books = Book.objects.filter(title__in=similar_books).values(
-        "isbn", "title", "author", "year_of_publication",
+        "id","isbn", "title", "author", "year_of_publication",
         "cover_image", "dataset_image_url", "average_rating", "price", "quantity"
     )
 
