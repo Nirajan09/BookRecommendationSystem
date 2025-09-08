@@ -1,98 +1,56 @@
-// BookCard.jsx
-import { Link } from "react-router-dom";
-
-const StarRating = ({ rating }) => {
-  const rounded = Math.round(rating * 2) / 2;
-  const fullStars = Math.floor(rounded);
-  const hasHalfStar = rounded - fullStars === 0.5;
-  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
-  return (
-    <span className="mr-1 flex">
-      {Array(fullStars)
-        .fill(0)
-        .map((_, i) => (
-          <svg
-            key={`full-${i}`}
-            className="w-4 h-4 text-yellow-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z" />
-          </svg>
-        ))}
-      {hasHalfStar && (
-        <svg key="half" className="w-4 h-4 text-yellow-400" viewBox="0 0 20 20">
-          <defs>
-            <linearGradient id="half-grad">
-              <stop offset="50%" stopColor="currentColor" />
-              <stop offset="50%" stopColor="transparent" stopOpacity="1" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z"
-            fill="url(#half-grad)"
-          />
-        </svg>
-      )}
-      {Array(emptyStars)
-        .fill(0)
-        .map((_, i) => (
-          <svg
-            key={`empty-${i}`}
-            className="w-4 h-4 text-gray-300"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.561-.955L10 0l2.951 5.955 6.561.955-4.756 4.635 1.122 6.545z" />
-          </svg>
-        ))}
-    </span>
-  );
-};
+import { Link, useNavigate } from "react-router-dom";
+import StarRating from "./StarRating";
 
 export default function BookCard({ book }) {
-  console.log(book)
+  console.log("Book", book)
+
+  const navigate = useNavigate();
+
+  const handleAddToCart = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    navigate("/cart");
+  };
+
   return (
-    <Link to={`/books/${book.id}`} className="no-underline">
-      <div className="bg-white rounded-2xl shadow-lg p-5 w-64 h-100 flex flex-col items-center text-center transition-transform hover:-translate-y-1 hover:shadow-xl">
+    <Link
+      to={`/books/${book.id}`}
+      className="bg-white/90 backdrop-blur border border-blue-100 rounded-2xl shadow-md overflow-hidden group transition hover:-translate-y-1 hover:shadow-blue-100/60 hover:shadow-xl flex flex-col no-underline text-inherit"
+    >
+      <div className="bg-gray-100 flex items-center justify-center h-56 w-full overflow-hidden">
         <img
-  src={
-    book.dataset_image_url
-      ? book.cover_image_url
-      : book.cover_image?.startsWith("http")
-        ? book.cover_image
-        : `http://localhost:8000${book.cover_image}`
-  }
-  alt={book.title}
-  className="h-56 w-auto object-contain rounded-xl mb-4 border border-gray-200 bg-gray-100"
-  style={{ maxWidth: 150 }}
-  onError={(e) => {
-  e.target.onerror = null;
-  e.target.src = "https://via.placeholder.com/150x220?text=No+Cover";
-}}
-/>
-        <h3 className="font-semibold text-gray-800 mb-2 w-full">{book.title}</h3>
-        <p className="text-xs text-gray-500 mb-1">{book.author}</p>
-        {/* Display year of publication if exists */}
-        {book.year_of_publication && (
-          <p className="text-xs text-gray-400 mb-1">Published: {book.year_of_publication}</p>
-        )}
-        <div className="flex items-center justify-center mb-2">
-          {book.average_rating ? (
-            <div className="flex items-center gap-x-2">
-              <span className="text-gray-700 text-sm">{book.average_rating}</span>
-              <StarRating rating={book.average_rating} />
-              <span className="text-gray-700 text-sm">{book.ratings_count ?? 500}</span>
-            </div>
-          ) : (
-            <span className="text-gray-400 text-xs">No ratings yet</span>
-          )}
+          src={
+            book.cover_image
+              ? `http://127.0.0.1:8000${book.cover_image}`
+              : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
+          }
+          alt={book.title}
+          className="object-contain h-full w-full"
+        />
+
+      </div>
+      <div className="p-5 flex flex-col flex-1">
+        <h2 className="font-bold text-lg min-h-[3em] line-clamp-2 mb-1">{book.title}</h2>
+        <div className="text-gray-500 text-sm mb-2 line-clamp-1">By {book.author}</div>
+        <span className="inline-flex px-2 py-0.5 rounded bg-blue-100 text-blue-600 text-xs mb-2 w-max">
+          {book.year_of_publication}
+        </span>
+        <div className="flex items-center space-x-2 mb-2">
+          <StarRating rating={Number(book.average_rating) || 0} />
+          <span className="text-gray-400">({Number(book.average_rating).toFixed(1)})</span>
         </div>
-        <span className="text-blue-700 font-bold text-xl mb-2">Rs. {book.price}</span>
-        <div className="flex space-x-2"></div>
+        <div className="flex items-center justify-between mt-auto">
+          <span className="font-semibold text-blue-700">Rs. {book.price}</span>
+          <span className="text-xs text-gray-500">Qty: {book.quantity}</span>
+        </div>
+        <button
+          onClick={handleAddToCart}
+          className="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold shadow hover:shadow-md hover:-translate-y-0.5 transition"
+          type="button"
+        >
+          Add to Cart
+        </button>
       </div>
     </Link>
   );
 }
-

@@ -10,10 +10,8 @@ import AdminRoute from './utils/RouteProtection/AdminRoute'
 import AdminBooksGrid from "./components/adminbook-pages/AdminBooksGrid";
 import AdminAddBook from "./components/adminbook-pages/AdminAddBook";
 import AdminEditBook from "./components/adminbook-pages/AdminEditBook";
-import BookDetail from './components/adminbook-pages/BookDetail'
 import UserHome from './components/user-pages/UserHome'
 import UserDashboard from './components/user-dashboard/UserDashboard'
-import UserBookDetail from './components/user-pages/UserBookDetail'
 import CartPage from './components/cart-page/CartPage'
 import Wishlist from './components/wishlist-page/Wishlist'
 import SearchResultsPage from './components/search-box/SearchResultsPage'
@@ -25,6 +23,8 @@ import OrderConfirmation from "./components/order-processing/OrderConfirmation"
 import AdminOrdersPage from './components/adminorder-page/AdminOrdersPage'
 import EsewaSuccessPage from './components/payment-section/EsewaSuccessPage'
 import Recommend from './components/recommendation/Recommend'
+import UserBookDetail from './components/book-details/UserBookDetail'
+import BookDetail from "./components/adminbook-pages/BookDetail"
 function App() {
 
   return (
