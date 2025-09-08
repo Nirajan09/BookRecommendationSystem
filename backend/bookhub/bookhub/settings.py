@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'payment',
     'stripePayment',    # if this is your Stripe app
     'django_filters',
+    "recommendation"
 ]
 
 MIDDLEWARE = [
