@@ -248,7 +248,7 @@ export default function UserBookDetail() {
               <div className="flex flex-wrap gap-3 items-center mt-2">
                 <button
                   onClick={openCartModal}
-                  className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl shadow hover:shadow-lg transition disabled:opacity-60"
+                  className="cursor-pointer px-6 py-2 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-semibold rounded-xl shadow hover:shadow-lg transition disabled:opacity-60"
                   disabled={addingCart || isOutOfStock}
                 >
                   <span className="inline-flex items-center gap-2">
@@ -257,7 +257,7 @@ export default function UserBookDetail() {
                   </span>
                 </button>
                 <button
-                  className="flex items-center justify-center w-11 h-11 rounded-full border bg-blue-100 text-blue-600 hover:bg-purple-100 transition"
+                  className="cursor-pointer flex items-center justify-center w-11 h-11 rounded-full border bg-blue-100 text-blue-600 hover:bg-purple-100 transition"
                   onClick={handleToggleWishlist}
                   disabled={addingWishlist}
                   aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
@@ -297,11 +297,11 @@ export default function UserBookDetail() {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="px-5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold shadow hover:shadow-md"
+                    className="cursor-pointer px-5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold shadow hover:shadow-md"
                     onClick={() => setShowReviewModal(true)}
                   >Edit</button>
                   <button
-                    className="px-5 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold shadow hover:shadow-md"
+                    className="cursor-pointer px-5 py-1.5 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold shadow hover:shadow-md"
                     onClick={() => setShowDeleteModal(true)}
                   >Delete</button>
                 </div>
