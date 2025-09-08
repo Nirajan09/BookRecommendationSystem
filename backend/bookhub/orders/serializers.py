@@ -15,20 +15,29 @@ CITIES_BY_PROVINCE = {
     "Sudurpashchim": ["Dhangadhi", "Mahendranagar", "Dadeldhura"]
 }
 
-
 class OrderItemSerializer(serializers.ModelSerializer):
     book_title = serializers.CharField(source='book.title', read_only=True)
     book_cover = serializers.SerializerMethodField()
+    dataset_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'book', 'book_title', 'book_cover', 'price', 'quantity']
+        fields = ['id', 'book', 'book_title', 'book_cover', 'dataset_image_url', 'price', 'quantity']
 
     def get_book_cover(self, obj):
         request = self.context.get('request')
         if obj.book.cover_image:
             url = obj.book.cover_image.url
             if request is not None:
+                return request.build_absolute_uri(url)
+            return url
+        return None
+
+    def get_dataset_image_url(self, obj):
+        request = self.context.get('request')
+        if hasattr(obj.book, 'dataset_image_url') and obj.book.dataset_image_url:
+            url = obj.book.dataset_image_url
+            if request is not None and not url.startswith('http'):
                 return request.build_absolute_uri(url)
             return url
         return None

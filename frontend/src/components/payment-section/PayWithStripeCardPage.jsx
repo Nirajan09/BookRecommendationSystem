@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
@@ -14,11 +14,13 @@ function StripeForm({ orderPayload, totalCost }) {
   const elements = useElements();
   const { token: authToken } = useAuth();
   const navigate = useNavigate();
+const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
+    setLoading(true); 
     try {
       // 1. Create PaymentIntent on backend
       const resp = await axios.post(
@@ -54,6 +56,8 @@ function StripeForm({ orderPayload, totalCost }) {
       }
     } catch (err) {
       toast.error(err.response?.data?.detail || "Stripe payment failed.");
+    } finally {
+      setLoading(false);  // End loading regardless of success or failure
     }
   };
 
