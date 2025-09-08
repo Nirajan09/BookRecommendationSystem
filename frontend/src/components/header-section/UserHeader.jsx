@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { HiMenu, HiX, HiOutlineSearch, HiArrowLeft } from "react-icons/hi";
 import { IoCartOutline } from "react-icons/io5";
 import { MdFavoriteBorder } from "react-icons/md";
@@ -10,6 +10,7 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8000";
 
 export default function UserHeader() {
+  const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false); // <-- new
   const { token } = useAuth();
@@ -47,27 +48,33 @@ export default function UserHeader() {
       <Link to={token ? "/user-home" : "/"} className="text-2xl font-bold text-blue-700 tracking-wide select-none whitespace-nowrap" onClick={handleLinkClick}>BookStore</Link>
 
       {/* SearchBar (desktop only) */}
-{token && (
-  <div className="hidden lg:flex flex-[0.75] justify-center items-center mt-8">
-    <div className="w-full max-w-xl">
-      <BookSearchBar
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        onSearch={() => {
-          if (query.trim()) {
-            navigate(`/search?q=${encodeURIComponent(query)}`);
-            setMenuOpen(false);
-          }
-        }}
-      />
-    </div>
-  </div>
-)}
+      {token && (
+        <div className="hidden lg:flex flex-[0.75] justify-center items-center mt-8">
+          <div className="w-full max-w-xl">
+            <BookSearchBar
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              onSearch={() => {
+                if (query.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(query)}`);
+                  setMenuOpen(false);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
 
 
       {/* Desktop Nav Links */}
       <div className="hidden lg:flex items-center gap-4 ml-6">
         <Link to={token ? "/user-home" : "/"} className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Home</Link>
+        {token && <Link
+                to="/recommend"
+                className={`flex items-center gap-2 ${pathname === "/recommend" ? "text-blue-600 font-bold" : "text-gray-700"} hover:text-blue-500 transition`}
+              >
+                Recommendations
+              </Link>}
         {token && <Link to="/cart" className="relative text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50 flex items-center">
           <IoCartOutline size={26} />
           {cartCount > 0 && (
@@ -115,6 +122,12 @@ export default function UserHeader() {
             </button>
             <div className="pt-16 px-6 flex flex-col gap-4">
               <Link to={token ? "/user-home" : "/"} className="text-blue-700 font-medium py-2 rounded hover:bg-blue-50" onClick={handleLinkClick}>Home</Link>
+              {token && <Link
+                to="/recommend"
+                className={`flex items-center gap-2 ${pathname === "/recommend" ? "text-blue-600 font-bold" : "text-gray-700"} hover:text-blue-500 transition`}
+              >
+                Recommendations
+              </Link>}
               {token &&
                 <Link to="/cart" className="relative text-blue-700 font-medium py-2 rounded hover:bg-blue-50 flex items-center" onClick={handleLinkClick}>
                   <IoCartOutline size={24} />
@@ -149,29 +162,29 @@ export default function UserHeader() {
 
       {/* --- MOBILE SEARCH OVERLAY --- */}
       {searchOpen && (
-  <div className="absolute left-0 top-0 w-full h-16 flex items-center bg-white z-20 px-4 lg:hidden">
-    <button
-      onClick={() => setSearchOpen(false)}
-      className="mr-2 shrink-0 p-2"
-      aria-label="Back"
-    >
-      <HiArrowLeft className="w-7 h-7 text-blue-700" />
-    </button>
-    <div className="flex-1 mt-8">
-      <BookSearchBar
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        autoFocus
-        onSearch={() => {
-          if (query.trim()) {
-            navigate(`/search?q=${encodeURIComponent(query)}`);
-            setSearchOpen(false);
-          }
-        }}
-      />
-    </div>
-  </div>
-)}
+        <div className="absolute left-0 top-0 w-full h-16 flex items-center bg-white z-20 px-4 lg:hidden">
+          <button
+            onClick={() => setSearchOpen(false)}
+            className="mr-2 shrink-0 p-2"
+            aria-label="Back"
+          >
+            <HiArrowLeft className="w-7 h-7 text-blue-700" />
+          </button>
+          <div className="flex-1 mt-8">
+            <BookSearchBar
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              autoFocus
+              onSearch={() => {
+                if (query.trim()) {
+                  navigate(`/search?q=${encodeURIComponent(query)}`);
+                  setSearchOpen(false);
+                }
+              }}
+            />
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

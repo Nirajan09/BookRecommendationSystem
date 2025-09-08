@@ -24,6 +24,7 @@ import PayWithEsewaPage from './components/payment-section/PayWithEsewaPage'
 import OrderConfirmation from "./components/order-processing/OrderConfirmation"
 import AdminOrdersPage from './components/adminorder-page/AdminOrdersPage'
 import EsewaSuccessPage from './components/payment-section/EsewaSuccessPage'
+import Recommend from './components/recommendation/Recommend'
 function App() {
 
   return (
@@ -52,6 +53,13 @@ function App() {
         <Route path="/search" element={
           <UserRoute>
             <SearchResultsPage />
+          </UserRoute>
+        }
+        />
+
+        <Route path="/recommend" element={
+          <UserRoute>
+            <Recommend />
           </UserRoute>
         }
         />
