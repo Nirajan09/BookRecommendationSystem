@@ -11,7 +11,7 @@ export default function GuestRoute({ children }) {
       if (user.is_staff) {
         navigate("/admin", { replace: true });
       } else {
-        navigate("/user-home", { replace: true });
+        navigate("/books", { replace: true });
       }
     }
   }, [token, user, navigate]);

@@ -202,8 +202,8 @@ export default function UserBookDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[90vh]">
         <div className="bg-red-100 text-red-800 rounded p-4">{error}</div>
-        <Link to="/user-home" className="mt-4 bg-gray-200 px-4 py-2 rounded">
-          Back to Home
+        <Link to="/books" className="mt-4 bg-gray-200 px-4 py-2 rounded">
+          Back to Explore Books
         </Link>
       </div>
     );
@@ -233,7 +233,7 @@ export default function UserBookDetail() {
             <img
               src={
                 book.cover_image
-              ? `http://127.0.0.1:8000${book.cover_image}`
+              ? `${book.cover_image}`
               : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
               }
               alt={book.title}
@@ -492,10 +492,10 @@ export default function UserBookDetail() {
           {/* Footer */}
           <div className="flex justify-center mt-6">
             <Link
-              to="/user-home"
+              to="/books"
               className="bg-gradient-to-r from-blue-200 to-purple-300 hover:from-blue-300 hover:to-purple-400 text-blue-900 font-semibold px-6 py-2 rounded-lg shadow"
             >
-              Back to Home
+              Back to Explore Books
             </Link>
           </div>
         </div>

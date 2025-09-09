@@ -173,7 +173,7 @@ export default function CartPage() {
               <img
                 src={
                   book_detail.cover_image
-              ? `http://127.0.0.1:8000${book_detail.cover_image}`
+              ? `${book_detail.cover_image}`
               : book_detail.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
                 }
                 alt={book_detail.title}

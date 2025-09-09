@@ -1,4 +1,3 @@
-// BookShelf.jsx
 import React, { useRef, useState, useEffect } from "react";
 import BookCard from "./BookCard";
 import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/solid";
@@ -8,25 +7,40 @@ export default function BookShelf({ title, books }) {
   const scrollRef = useRef(null);
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(false);
+
   useEffect(() => {
-    const checkScroll = () => {
-      if (!scrollRef.current) return;
-      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      setShowLeft(scrollLeft > 0);
-      setShowRight(scrollLeft + clientWidth < scrollWidth - 1);
-    };
-    checkScroll();
-    scrollRef.current?.addEventListener("scroll", checkScroll);
-    window.addEventListener("resize", checkScroll);
+    // Only show right arrow if there are more than 4 books
+    setShowRight(safeBooks.length > 4);
+    setShowLeft(false);
+  }, [safeBooks.length]);
+
+  const handleScroll = () => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setShowLeft(scrollLeft > 0);
+    setShowRight(scrollLeft + clientWidth < scrollWidth - 1 && safeBooks.length > 4);
+  };
+
+  useEffect(() => {
+    const scRef = scrollRef.current;
+    if (scRef) {
+      scRef.addEventListener("scroll", handleScroll);
+    }
+    window.addEventListener("resize", handleScroll);
     return () => {
-      scrollRef.current?.removeEventListener("scroll", checkScroll);
-      window.removeEventListener("resize", checkScroll);
+      if (scRef) {
+        scRef.removeEventListener("scroll", handleScroll);
+      }
+      window.removeEventListener("resize", handleScroll);
     };
+    // eslint-disable-next-line
   }, [safeBooks.length]);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = 320; // Should match your card width + margin
+      // Approximate card width (update as needed)
+      const cardWidth = scrollRef.current.firstChild?.offsetWidth || 270;
+      const scrollAmount = cardWidth * 2; // scroll 2 cards at a time for better UX
       scrollRef.current.scrollBy({
         left: direction === "right" ? scrollAmount : -scrollAmount,
         behavior: "smooth",
@@ -37,8 +51,8 @@ export default function BookShelf({ title, books }) {
   if (safeBooks.length === 0) return null;
 
   return (
-    <div className="mb-8 relative">
-      <h2 className="font-semibold text-3xl mb-2 mt-6 ">{title}</h2>
+    <section className="relative mb-8">
+      <h2 className="text-3xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600">{title}</h2>
       {/* Left Arrow */}
       {showLeft && (
         <button
@@ -49,14 +63,18 @@ export default function BookShelf({ title, books }) {
           <ChevronLeftIcon className="h-6 w-6 text-gray-700" />
         </button>
       )}
-      {/* Book Row */}
+      {/* Book Row - show max 4 at a time */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto hide-scrollbar space-x-6 py-2 pl-10 pb-8"
+        className="flex overflow-x-auto hide-scrollbar space-x-6 pb-2 px-2"
         style={{ scrollBehavior: "smooth" }}
       >
         {safeBooks.map((book) => (
-          <div key={book.id} className="flex-shrink-0 w-70 mr-0">
+          <div
+            key={book.id}
+            className="flex-shrink-0 w-[270px] md:w-[270px] lg:w-[270px]"
+            style={{ minWidth: 270, maxWidth: 270 }} // Fixed width per card
+          >
             <BookCard book={book} />
           </div>
         ))}
@@ -73,16 +91,10 @@ export default function BookShelf({ title, books }) {
       )}
       <style>
         {`/* Hide scrollbar for Chrome, Safari and Opera */
-              .hide-scrollbar::-webkit-scrollbar {
-                display: none;
-              }
-              /* Hide scrollbar for IE, Edge and Firefox */
-              .hide-scrollbar {
-                -ms-overflow-style: none;  /* IE and Edge */
-                scrollbar-width: none;     /* Firefox */
-              }
-              `}
+          .hide-scrollbar::-webkit-scrollbar { display: none; }
+          .hide-scrollbar { -ms-overflow-style: none;  scrollbar-width: none; }
+        `}
       </style>
-    </div>
+    </section>
   );
 }

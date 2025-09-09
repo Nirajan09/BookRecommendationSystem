@@ -35,7 +35,7 @@ export default function Login() {
       if (profile && profile.is_staff) {
         navigate('/admin');
       } else {
-        navigate('/user-home');
+        navigate('/books');
       }
     } catch {
       toast.error('Invalid credentials.');

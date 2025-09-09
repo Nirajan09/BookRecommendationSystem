@@ -45,7 +45,7 @@ export default function UserHeader() {
   return (
     <nav className="bg-white shadow-md h-16 flex items-center px-4 md:px-8 relative z-50 justify-between">
       {/* Logo */}
-      <Link to={token ? "/user-home" : "/"} className="text-2xl font-bold text-blue-700 tracking-wide select-none whitespace-nowrap" onClick={handleLinkClick}>BookStore</Link>
+      <Link to={token ? "/books" : "/"} className="text-2xl font-bold text-blue-700 tracking-wide select-none whitespace-nowrap" onClick={handleLinkClick}>BookStore</Link>
 
       {/* SearchBar (desktop only) */}
       {token && (
@@ -68,7 +68,7 @@ export default function UserHeader() {
 
       {/* Desktop Nav Links */}
       <div className="hidden lg:flex items-center gap-4 ml-6">
-        <Link to={token ? "/user-home" : "/"} className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Home</Link>
+        <Link to={token ? "/books" : "/"} className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Home</Link>
         {token && <Link
                 to="/recommend"
                 className={`flex items-center gap-2 ${pathname === "/recommend" ? "text-blue-600 font-bold" : "text-gray-700"} hover:text-blue-500 transition`}
@@ -121,7 +121,7 @@ export default function UserHeader() {
               <HiX className="h-7 w-7 text-blue-700" />
             </button>
             <div className="pt-16 px-6 flex flex-col gap-4">
-              <Link to={token ? "/user-home" : "/"} className="text-blue-700 font-medium py-2 rounded hover:bg-blue-50" onClick={handleLinkClick}>Home</Link>
+              <Link to={token ? "/books" : "/"} className="text-blue-700 font-medium py-2 rounded hover:bg-blue-50" onClick={handleLinkClick}>Home</Link>
               {token && <Link
                 to="/recommend"
                 className={`flex items-center gap-2 ${pathname === "/recommend" ? "text-blue-600 font-bold" : "text-gray-700"} hover:text-blue-500 transition`}

@@ -270,7 +270,7 @@ export default function CheckoutPage() {
               <div key={item.id} className="flex items-center">
                 <img
                   src={item.book_detail.cover_image
-                    ? `http://127.0.0.1:8000${item.book_detail.cover_image}`
+                    ? `${item.book_detail.cover_image}`
                     : item.book_detail.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"}
                   alt={item.book_detail.title}
                   className="w-16 h-20 object-cover rounded shadow mr-3"

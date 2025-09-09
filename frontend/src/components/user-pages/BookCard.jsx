@@ -9,6 +9,7 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 const BASE_URL = "http://localhost:8000";
 
 export default function BookCard({ book }) {
+  console.log(book,"Book")
   const { token, user: currUser } = useAuth();
   const navigate = useNavigate();
   const [showCartModal, setShowCartModal] = useState(false);
@@ -47,11 +48,11 @@ export default function BookCard({ book }) {
         to={`/books/${book.id}`}
         className="p-4 bg-white/90 backdrop-blur border border-blue-100 rounded-2xl shadow-md overflow-hidden group transition hover:-translate-y-1 hover:shadow-blue-100/60 hover:shadow-xl flex flex-col no-underline text-inherit"
       >
-        <div className="bg-gray-100 flex items-center justify-center h-56 w-full overflow-hidden">
+        <div className="flex items-center justify-center h-45 w-full overflow-hidden">
           <img
             src={
               book.cover_image
-                ? `http://127.0.0.1:8000${book.cover_image}`
+                ? `${book.cover_image}`
                 : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
             }
             alt={book.title}
@@ -80,7 +81,7 @@ export default function BookCard({ book }) {
             e.stopPropagation();
             openCartModal();
           }}
-          className="mt-3 w-full py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold shadow hover:shadow-md hover:-translate-y-0.5 transition"
+          className="w-full py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold shadow hover:shadow-md hover:-translate-y-0.5 transition"
           type="button"
           disabled={isOutOfStock}
         >

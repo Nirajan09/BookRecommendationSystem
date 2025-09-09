@@ -10,7 +10,6 @@ import AdminRoute from './utils/RouteProtection/AdminRoute'
 import AdminBooksGrid from "./components/adminbook-pages/AdminBooksGrid";
 import AdminAddBook from "./components/adminbook-pages/AdminAddBook";
 import AdminEditBook from "./components/adminbook-pages/AdminEditBook";
-import UserHome from './components/user-pages/UserHome'
 import UserDashboard from './components/user-dashboard/UserDashboard'
 import CartPage from './components/cart-page/CartPage'
 import Wishlist from './components/wishlist-page/Wishlist'
@@ -25,6 +24,7 @@ import EsewaSuccessPage from './components/payment-section/EsewaSuccessPage'
 import Recommend from './components/recommendation/Recommend'
 import UserBookDetail from './components/book-details/UserBookDetail'
 import BookDetail from "./components/adminbook-pages/BookDetail"
+import CombinedBooksView from './components/user-pages/CombinedBooksView'
 function App() {
 
   return (
@@ -43,10 +43,9 @@ function App() {
           </GuestRoute>
         } />
 
-        {/* User Dashboard: only logged-in users (non-admin) */}
-        <Route path="/user-home/*" element={
+        <Route path="/books" element={
           <UserRoute>
-            <UserHome />
+            <CombinedBooksView />
           </UserRoute>
         } />
 

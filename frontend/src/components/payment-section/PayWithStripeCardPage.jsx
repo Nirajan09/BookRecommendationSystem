@@ -14,13 +14,13 @@ function StripeForm({ orderPayload, totalCost }) {
   const elements = useElements();
   const { token: authToken } = useAuth();
   const navigate = useNavigate();
-const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) return;
 
-    setLoading(true); 
+    setLoading(true);
     try {
       // 1. Create PaymentIntent on backend
       const resp = await axios.post(

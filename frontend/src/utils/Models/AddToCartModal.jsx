@@ -25,7 +25,7 @@ export default function AddToCartModal({
             <img
               src={
                 book.cover_image
-                  ? `http://127.0.0.1:8000${book.cover_image}`
+                  ? `${book.cover_image}`
                   : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
               }
               alt={book.title}

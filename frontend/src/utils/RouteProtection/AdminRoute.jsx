@@ -6,6 +6,6 @@ export default function AdminRoute({ children }) {
   if (!token) return <Navigate to="/login" replace />;
   if (user === null) return <div>Loading...</div>; // Wait for user to load
 
-  if (!user.is_staff) return <Navigate to="/user-home" replace />;
+  if (!user.is_staff) return <Navigate to="/books" replace />;
   return children;
 }

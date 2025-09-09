@@ -128,7 +128,7 @@ export default function OrderConfirmation() {
                 <img
                   src={
                     item.cover_image
-                      ? `http://127.0.0.1:8000${item.cover_image}`
+                      ? `${item.cover_image}`
                       : item.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
                   }
                   alt={item.book_title || "Book Cover"}
