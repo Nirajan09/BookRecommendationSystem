@@ -30,14 +30,19 @@ class BookRatingViewSet(viewsets.ModelViewSet):
         book.average_rating = round(avg, 2)
         book.save(update_fields=['average_rating'])
 
+class BookListPagination(LimitOffsetPagination):
+    default_limit = 8
+    max_limit = 20
+
 
 class BookListView(generics.ListAPIView):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["title", "author", "isbn"]
     ordering_fields = ['created_at', 'title']
-    permission_classes = [permissions.IsAuthenticated]
+    pagination_class = BookListPagination
 
 class DatasetBooksPagination(LimitOffsetPagination):
     default_limit = 8

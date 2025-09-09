@@ -68,10 +68,10 @@ export default function UserHeader() {
 
       {/* Desktop Nav Links */}
       <div className="hidden lg:flex items-center gap-4 ml-6">
-        <Link to={token ? "/books" : "/"} className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Home</Link>
+        <Link to={token ? "/books" : "/"} className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Explore Books</Link>
         {token && <Link
                 to="/recommend"
-                className={`flex items-center gap-2 ${pathname === "/recommend" ? "text-blue-600 font-bold" : "text-gray-700"} hover:text-blue-500 transition`}
+                className={`flex items-center gap-2 text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50`}
               >
                 Recommendations
               </Link>}
@@ -121,10 +121,10 @@ export default function UserHeader() {
               <HiX className="h-7 w-7 text-blue-700" />
             </button>
             <div className="pt-16 px-6 flex flex-col gap-4">
-              <Link to={token ? "/books" : "/"} className="text-blue-700 font-medium py-2 rounded hover:bg-blue-50" onClick={handleLinkClick}>Home</Link>
+              <Link to={token ? "/books" : "/"} className="text-blue-700 font-medium py-2 rounded hover:bg-blue-50" onClick={handleLinkClick}>Explore books</Link>
               {token && <Link
                 to="/recommend"
-                className={`flex items-center gap-2 ${pathname === "/recommend" ? "text-blue-600 font-bold" : "text-gray-700"} hover:text-blue-500 transition`}
+                className={`flex items-center gap-2 text-blue-700 font-medium py-2 rounded hover:bg-blue-50`}
               >
                 Recommendations
               </Link>}

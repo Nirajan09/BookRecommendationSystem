@@ -66,7 +66,7 @@ export default function BookShelf({ title, books }) {
       {/* Book Row - show max 4 at a time */}
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto hide-scrollbar space-x-6 pb-2 px-2"
+        className="flex overflow-x-auto hide-scrollbar space-x-6 pb-2"
         style={{ scrollBehavior: "smooth" }}
       >
         {safeBooks.map((book) => (

@@ -46,7 +46,7 @@ export default function Recommend() {
 
     return (
         <div className="mt-10 flex flex-col items-center min-h-screen bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 px-4">
-            <h1 className="text-3xl font-extrabold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in">
+            <h1 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-600 animate-fade-in mb-8">
                 Discover Your Next Favorite Book!
             </h1>
             <form
@@ -81,9 +81,9 @@ export default function Recommend() {
                 </div>
                 <button
                     type="submit"
-                    className="ml-4 py-3 px-8 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-lg transition focus-visible:ring-2 ring-offset-2"
+                    className="ml-4 cursor-pointer px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white rounded-xl transition focus-visible:ring-2 ring-offset-2"
                 >
-                    Search
+                    Recommend
                 </button>
             </form>
 
