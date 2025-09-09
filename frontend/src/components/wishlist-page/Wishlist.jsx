@@ -7,29 +7,55 @@ import { MdFavorite } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import AddToCartModal from "../../utils/Models/AddToCartModal";
 
-
-
-// Remove confirmation modal
 function RemoveConfirmModal({ open, book, onConfirm, onCancel, removing }) {
   if (!open || !book) return null;
+
+  // Handler to close modal on backdrop click
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onCancel();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white/90 rounded-2xl p-6 max-w-md w-full shadow-xl border border-red-200">
-        <h3 className="text-xl font-semibold mb-4 text-red-600">Remove from Wishlist</h3>
-        <p className="mb-2 text-gray-600">
-          Are you sure you want to remove <b>{book.title}</b> by {book.author} from your wishlist?
+    <div
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      onClick={handleBackdropClick}  // Detect clicks on backdrop only
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="bg-white/90 rounded-3xl shadow-xl p-8 w-full max-w-lg border-2 border-blue-200">
+        <div className="mb-3 flex flex-col items-center">
+          {/* Book Image */}
+          {book.cover_image && (
+            <div className="w-24 h-32 mb-3 bg-blue-50 border border-blue-200 flex items-center justify-center rounded-xl overflow-hidden">
+              <img
+                src={book.image || book.cover_image}
+                alt={book.title}
+                className="object-contain max-h-full max-w-full"
+              />
+            </div>
+          )}
+          <h3 className="text-xl font-bold text-red-600 mb-2 text-center">
+            Remove from Wishlist
+          </h3>
+        </div>
+        <p className="text-center text-gray-600 mb-6">
+          Are you sure you want to remove{" "}
+          <span className="font-semibold text-gray-800">{book.title}</span> <span> by </span>
+          <span className="text-blue-600 font-semibold">{book.author}</span> from your wishlist?
         </p>
-        <div className="flex space-x-4 mt-4">
+        <div className="flex flex-col sm:flex-row gap-3 mt-2">
           <button
             onClick={onConfirm}
             disabled={removing}
-            className="flex-1 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700 disabled:bg-red-300 transition"
+            className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-red-500 to-pink-500 text-white font-bold shadow hover:from-red-600 hover:to-pink-600 transition disabled:bg-pink-300 disabled:opacity-60"
           >
             {removing ? "Removing..." : "Yes, Remove"}
           </button>
           <button
             onClick={onCancel}
-            className="flex-1 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium transition"
+            className="flex-1 py-2.5 rounded-lg bg-gray-300 text-gray-800 font-bold hover:bg-gray-400 transition"
           >
             Cancel
           </button>
@@ -38,6 +64,7 @@ function RemoveConfirmModal({ open, book, onConfirm, onCancel, removing }) {
     </div>
   );
 }
+
 
 const BASE_URL = "http://localhost:8000";
 
@@ -149,11 +176,19 @@ const Wishlist = () => {
   }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 rounded-xl shadow-lg">
+    <div className="mt-5 max-w-3xl mx-auto p-6 bg-white/90 rounded-3xl shadow-xl border-2 border-blue-200">
       <h1 className="text-3xl font-bold mb-6 text-blue-700 flex items-center gap-2">
         <MdFavorite className="text-blue-600" /> My Wishlist
       </h1>
-      <div className="flex flex-col gap-5">
+      <div
+        className={`flex flex-col gap-5 ${wishlist.length > 3 ? "max-h-[450px] overflow-y-auto pr-2" : ""
+          }`}
+        style={
+          wishlist.length > 3
+            ? { scrollbarWidth: "thin", scrollbarColor: "#b3a5f7 #e0e7ff" }
+            : {}
+        }
+      >
         {wishlist.map((item) => {
           const book = item.book_detail || {};
           return (
@@ -163,9 +198,9 @@ const Wishlist = () => {
             >
               <img
                 src={
-                  book.cover_image?.startsWith("http")
-                    ? book.cover_image
-                    : `${BASE_URL}${book.cover_image}`
+                  book.cover_image
+                    ? `${book.cover_image}`
+                    : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
                 }
                 alt={book.title}
                 className="w-20 h-28 object-contain border border-gray-200 rounded bg-blue-50/80"
