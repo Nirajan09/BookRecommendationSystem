@@ -1,11 +1,13 @@
 from rest_framework import serializers
 from .models import Book, CartItem, WishlistItem, BookRating
-import datetime, re
+import datetime
+import re
+
 
 class BookMiniSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        fields = ['id', 'title', 'author', 'cover_image', 'year_of_publication']  # Added year_of_publication here
+        fields = ['id', 'title', 'author', 'cover_image', 'year_of_publication', 'source']  # Added source field
 
 
 class BookRatingSerializer(serializers.ModelSerializer):
@@ -38,11 +40,10 @@ class BookRatingSerializer(serializers.ModelSerializer):
         return attrs
 
 
-from rest_framework import serializers
-
 class BookSerializer(serializers.ModelSerializer):
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
     cover_image_url = serializers.SerializerMethodField()
+    source = serializers.CharField(read_only=True)  # expose source field as read-only
 
     class Meta:
         model = Book
@@ -59,8 +60,9 @@ class BookSerializer(serializers.ModelSerializer):
             'dataset_image_url',
             'quantity',
             'year_of_publication',
-            'reviews',            # explicitly added
-            'cover_image_url',    # explicitly added
+            'reviews',
+            'cover_image_url',
+            'source',  # added source to fields
         ]
 
     def get_cover_image_url(self, obj):
@@ -75,7 +77,7 @@ class BookSerializer(serializers.ModelSerializer):
         if url and request:
             return request.build_absolute_uri(url)
         return url
-    
+
     def validate_title(self, value):
         if not value or len(value.strip()) < 2:
             raise serializers.ValidationError("Title must be at least 2 characters.")
@@ -117,6 +119,7 @@ class BookSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Year cannot be after {current_year}.")
         return value
 
+
 class CartItemSerializer(serializers.ModelSerializer):
     book = serializers.PrimaryKeyRelatedField(queryset=Book.objects.all(), write_only=True)
     book_detail = BookSerializer(source='book', read_only=True)
@@ -125,6 +128,7 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = ['id', 'user', 'book', 'book_detail', 'quantity', 'added_at']
         read_only_fields = ['id', 'user', 'added_at', 'book_detail']
+
 
 class WishlistItemSerializer(serializers.ModelSerializer):
     book_detail = BookSerializer(source='book', read_only=True)

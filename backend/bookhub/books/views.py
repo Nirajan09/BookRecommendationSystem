@@ -6,13 +6,17 @@ from rest_framework.exceptions import ValidationError
 from django.db.models import Avg
 from .models import Book, BookRating, CartItem, WishlistItem
 from .serializers import BookSerializer, BookRatingSerializer, CartItemSerializer, WishlistItemSerializer
-
+from rest_framework.pagination import LimitOffsetPagination
 
 class AdminBookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAdminUser]
+    def get_queryset(self):
+        return Book.objects.filter(source='admin').order_by('-created_at')
 
+    def perform_create(self, serializer):
+        serializer.save(source='admin')
 
 class BookRatingViewSet(viewsets.ModelViewSet):
     queryset = BookRating.objects.all()
@@ -35,38 +39,42 @@ class BookListView(generics.ListAPIView):
     ordering_fields = ['created_at', 'title']
     permission_classes = [permissions.IsAuthenticated]
 
+class DatasetBooksPagination(LimitOffsetPagination):
+    default_limit = 8
+    max_limit = 20  # maximum to prevent overload
 
-class NewReleasesView(APIView):
+
+class AdminBooksPagination(LimitOffsetPagination):
+    default_limit = 8
+    max_limit = 20
+
+
+class DatasetBooksDataViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    API endpoint for dataset books.
+    Initial load 8 books, load more 4 books on demand (pagination).
+    Shuffles books randomly on each request.
+    """
+    serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = DatasetBooksPagination
 
-    def get(self, request):
-        books = Book.objects.order_by('-created_at')[:12]
-        return Response(BookSerializer(books, many=True).data)
+    def get_queryset(self):
+        return Book.objects.filter(source='dataset').order_by('?')
 
 
-class BestSellersView(APIView):
+class AdminBooksDataViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for admin-added books.
+    Initial 8 books, support paginated loading as user reaches end.
+    Shuffles books randomly on each request.
+    """
+    serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = AdminBooksPagination
 
-    def get(self, request):
-        books = Book.objects.order_by('-sold_count')[:12] if hasattr(Book, 'sold_count') else Book.objects.all()[:12]
-        return Response(BookSerializer(books, many=True).data)
-
-
-class TopRatedView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        books = Book.objects.order_by('-average_rating')[:12] if hasattr(Book, 'average_rating') else Book.objects.all()[:12]
-        return Response(BookSerializer(books, many=True).data)
-
-
-class PersonalizedPicksView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request):
-        books = Book.objects.all().order_by('?')[:12]
-        return Response(BookSerializer(books, many=True).data)
-
+    def get_queryset(self):
+        return Book.objects.filter(source='admin').order_by('?')
 
 class CartItemViewSet(viewsets.ModelViewSet):
     serializer_class = CartItemSerializer
@@ -134,6 +142,12 @@ class BookViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.AllowAny]
+
+    def perform_create(self, serializer):
+        if self.request.user.is_staff:
+            serializer.save(source='admin')
+        else:
+            serializer.save(source='dataset')
 
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):

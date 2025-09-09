@@ -8,7 +8,7 @@ python manage.py load_books
 
 # Books app
 python manage.py startapp books
-python manage.py makemigrations userprofile
+python manage.py makemigrations books
 python manage.py migrate
 
 

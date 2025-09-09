@@ -3,7 +3,13 @@ from django.db import models
 from django.core.exceptions import ValidationError
 import datetime, re
 
+BOOK_SOURCE_CHOICES = [
+    ('admin', 'Admin Added'),
+    ('dataset', 'Dataset Imported'),
+]
+
 class Book(models.Model):
+    source = models.CharField(max_length=10, choices=BOOK_SOURCE_CHOICES, default='dataset')
     title = models.CharField(max_length=255)
     author = models.CharField(max_length=255)
     isbn = models.CharField(max_length=13, unique=True)
