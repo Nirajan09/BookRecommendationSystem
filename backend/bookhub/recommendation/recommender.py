@@ -1,42 +1,76 @@
-import pickle
-from books.models import Book
-from django.http import JsonResponse
-# Load trained model once at startup
-with open("recommendation/item_cf_model.pkl", "rb") as f:
-    model_data = pickle.load(f)
+import pandas as pd
+import numpy as np
+from books.models import BookRating, Book
 
-train_matrix = model_data["train_matrix"]
-similarity_df = model_data["similarity_df"]
+def build_train_matrix():
+    # Fetch all ratings
+    ratings = BookRating.objects.all().values('user_id', 'book__title', 'rating')
+    df = pd.DataFrame(ratings)
+    if df.empty:
+        return pd.DataFrame(), pd.DataFrame()
+    
+    df.rename(columns={'user_id':'User-ID', 'book__title':'Book-Title', 'rating':'Book-Rating'}, inplace=True)
+    train_matrix = df.pivot_table(index='Book-Title', columns='User-ID', values='Book-Rating')
+    
+    # Compute item-item cosine similarity manually
+    similarity_df = pd.DataFrame(index=train_matrix.index, columns=train_matrix.index, dtype=float)
+    
+    for book1 in train_matrix.index:
+        vec1 = train_matrix.loc[book1].values
+        norm1 = np.linalg.norm(vec1)
+        for book2 in train_matrix.index:
+            vec2 = train_matrix.loc[book2].values
+            norm2 = np.linalg.norm(vec2)
+            if norm1 == 0 or norm2 == 0:
+                similarity = 0
+            else:
+                similarity = np.dot(vec1, vec2) / (norm1 * norm2)
+            similarity_df.at[book1, book2] = similarity
+    
+    return train_matrix, similarity_df
 
-def recommend_books(request):
-    book_title = request.GET.get("book", "")
-    recommendations = get_recommendations(book_title, top_n=8)
-    if not recommendations:
-        return JsonResponse({
-            "book": book_title,
-            "recommendations": [],
-            "error": "No matching books found for this title."
-        })
-    return JsonResponse({"book": book_title, "recommendations": recommendations})
+def predict_rating(user_id, book_title, train_matrix, similarity_df, k=5):
+    user_id = str(user_id)
+    if book_title not in similarity_df.index or user_id not in train_matrix.columns:
+        return 0
+    
+    sims = similarity_df[book_title]
+    user_ratings = train_matrix[user_id]
+    rated_books = user_ratings[user_ratings > 0].index
+    
+    # Top k most similar rated books
+    top_k_books = sims[rated_books].sort_values(ascending=False)[:k]
+    
+    numerator = sum(train_matrix.loc[b, user_id] * top_k_books[b] for b in top_k_books.index)
+    denominator = sum(abs(top_k_books))
+    
+    return numerator / denominator if denominator != 0 else 0
 
-def get_recommendations(book_title, top_n=8):
-    if book_title not in similarity_df.columns:
+def get_personalized_recommendations(user_id, top_n=8):
+    train_matrix, similarity_df = build_train_matrix()
+    if train_matrix.empty:
         return []
 
-    # Get similar book titles as before
-    similar_books = (
-        similarity_df[book_title]
-        .sort_values(ascending=False)[1:top_n + 1]  # top_n titles
-        .index.tolist()
+    predictions = []
+    user_id = str(user_id)
+
+    # Books this user already rated
+    already_rated = set()
+    if user_id in train_matrix.columns:
+        already_rated = set(train_matrix[user_id].dropna().index)
+
+    for book_title in train_matrix.index:
+        if book_title in already_rated:
+            continue  # skip rated books
+        est_rating = predict_rating(user_id, book_title, train_matrix, similarity_df)
+        predictions.append((book_title, est_rating))
+
+    predictions.sort(key=lambda x: x[1], reverse=True)
+    top_books = [b[0] for b in predictions[:top_n]]
+
+    books = Book.objects.filter(title__in=top_books).exclude(title__in=already_rated).values(
+        "id","isbn","title","author","year_of_publication",
+        "cover_image","dataset_image_url","average_rating","price","quantity"
     )
+    return list(books)
 
-    # Query all books matching those titles
-    books = Book.objects.filter(title__in=similar_books).values(
-        "id","isbn", "title", "author", "year_of_publication",
-        "cover_image", "dataset_image_url", "average_rating", "price", "quantity"
-    )
-
-    # Convert queryset to list and slice only top_n results (to guarantee max number)
-    books_list = list(books)[:top_n]
-
-    return books_list

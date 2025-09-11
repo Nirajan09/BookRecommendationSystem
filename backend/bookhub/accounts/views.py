@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from .serializers import RegisterSerializer
+from .serializers import LoginSerializer
 from rest_framework.permissions import IsAuthenticated
 
 class RegisterView(generics.CreateAPIView):
@@ -13,8 +14,12 @@ class RegisterView(generics.CreateAPIView):
 
 class LoginView(APIView):
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  # <-- This enforces validation
+
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+
         user = authenticate(username=username, password=password)
         if user:
             token, created = Token.objects.get_or_create(user=user)

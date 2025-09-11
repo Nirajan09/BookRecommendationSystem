@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { HiMenu, HiX, HiOutlineSearch, HiArrowLeft } from "react-icons/hi";
 import { IoCartOutline } from "react-icons/io5";
@@ -10,9 +10,8 @@ import axios from "axios";
 const BASE_URL = "http://localhost:8000";
 
 export default function UserHeader() {
-  const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false); // <-- new
+  const [searchOpen, setSearchOpen] = useState(false);
   const { token } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const [query, setQuery] = useState("");

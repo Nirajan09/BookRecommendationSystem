@@ -7,12 +7,6 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 
 export default function UserDashboard() {
   const reviewMenuRef = useRef(null);
-  const overviewRef = useRef(null);
-  const ordersRef = useRef(null);
-  const settingsRef = useRef(null);
-  const reviewsRef = useRef(null);
-  const returnsRef = useRef(null);
-
   const [reviewMenuOpenId, setReviewMenuOpenId] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -29,10 +23,8 @@ export default function UserDashboard() {
 
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
-  const [selectedOrder, setSelectedOrder] = useState(null);
   const { token } = useAuth();
 
-  // keep reviews as an array at all times
   const [reviews, setReviews] = useState([]);
 
   const fetchUserReviews = async () => {
@@ -41,12 +33,10 @@ export default function UserDashboard() {
       const res = await axios.get("http://localhost:8000/books/user-reviews/", {
         headers: { Authorization: `Token ${token}` },
       });
-      // response shape: { count, next, previous, results: [...] }
       setReviews(Array.isArray(res.data?.results) ? res.data.results : []);
-      console.log("review", res.data);
-    } catch (err) {
+    } catch {
       toast.error("Failed to load your reviews");
-      setReviews([]); // keep state consistent
+      setReviews([]);
     }
   };
 
@@ -54,7 +44,6 @@ export default function UserDashboard() {
     fetchUserReviews();
   }, [token]);
 
-  // Fetch user profile
   useEffect(() => {
     async function fetchUser() {
       try {
@@ -62,17 +51,13 @@ export default function UserDashboard() {
           headers: { Authorization: `Token ${token}` },
         });
         setUser(res.data);
-        console.log("user", res.data);
-      } catch (err) {
-        console.error("User profile fetch error:", err);
+      } catch {
+        // ignore errors for now
       }
     }
-    if (token) {
-      fetchUser();
-    }
+    if (token) fetchUser();
   }, [token]);
 
-  // Fetch orders with nested items
   useEffect(() => {
     async function fetchOrders() {
       try {
@@ -80,15 +65,12 @@ export default function UserDashboard() {
           headers: { Authorization: `Token ${token}` },
         });
         setOrders(Array.isArray(res.data?.results) ? res.data.results : []);
-      } catch (error) {
+      } catch {
         toast.error("Failed to load order history.");
-        console.error(error);
         setOrders([]);
       }
     }
-    if (token) {
-      fetchOrders();
-    }
+    if (token) fetchOrders();
   }, [token]);
 
   useEffect(() => {
@@ -99,9 +81,14 @@ export default function UserDashboard() {
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [reviewMenuRef]);
+  }, []);
 
-  if (!user) return <div>Loading user profile...</div>;
+  if (!user)
+    return (
+      <div className="bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 min-h-screen flex items-center justify-center text-gray-500">
+        Loading user profile...
+      </div>
+    );
 
   const joined = new Date(user.date_joined).toLocaleDateString("en-US", {
     day: "numeric",
@@ -110,14 +97,13 @@ export default function UserDashboard() {
   });
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="flex flex-col md:flex-row max-w-5xl mx-auto py-8">
-        {/* Main Content */}
-        <main className="flex-1 px-4 md:px-8">
+    <div className="bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 min-h-screen p-8">
+      <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10">
+        <main className="flex-1 bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-200">
           {/* Overview */}
-          <section ref={overviewRef} className="mb-12" id="overview">
-            <h1 className="text-3xl font-bold mb-4">My Account</h1>
-            <div className="flex items-center mb-6">
+          <section className="mb-12" id="overview">
+            <h1 className="text-3xl font-bold mb-4 text-gray-800">My Account</h1>
+            <div className="flex items-center gap-4 mb-6">
               <img
                 src={
                   user.image?.startsWith("http")
@@ -127,28 +113,22 @@ export default function UserDashboard() {
                     : "/DefaultAvatar.png"
                 }
                 alt={user.name || "User"}
-                className="w-20 h-20 rounded-full mr-4"
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/DefaultAvatar.png";
-                }}
+                className="w-20 h-20 rounded-full border border-gray-200 shadow-sm"
               />
               <div>
-                <div className="font-semibold text-xl">
-                  {user.first_name + " " + user.last_name}
-                </div>
-                <div className="text-blue-500">Member since {joined}</div>
+                <div className="font-semibold text-xl text-gray-800">{user.first_name} {user.last_name}</div>
+                <div className="text-blue-600">Member since {joined}</div>
               </div>
             </div>
           </section>
 
           {/* Order History */}
-          <section ref={ordersRef} className="mb-12" id="orders">
-            <h2 className="text-xl font-bold mb-4">Order History</h2>
-            <div className="overflow-x-auto bg-white rounded-lg shadow">
+          <section className="mb-12" id="orders">
+            <h2 className="text-xl font-bold mb-4 text-blue-700">Order History</h2>
+            <div className="overflow-x-auto rounded-lg shadow bg-white">
               <table className="min-w-full">
-                <thead>
-                  <tr className="bg-gray-100 text-left text-gray-600">
+                <thead className="bg-blue-100 text-blue-700 text-left">
+                  <tr>
                     <th className="py-3 px-4">Order</th>
                     <th className="py-3 px-4">Date</th>
                     <th className="py-3 px-4">Status</th>
@@ -164,10 +144,10 @@ export default function UserDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    orders.map((order) => (
-                      <tr key={order.id} className="border-t hover:bg-gray-50">
+                    orders.map(order => (
+                      <tr key={order.id} className="border-t hover:bg-blue-50">
                         <td className="py-3 px-4">#{order.reference}</td>
-                        <td className="py-3 px-4 text-blue-500">
+                        <td className="py-3 px-4 text-blue-600">
                           {new Date(order.created).toLocaleDateString()}
                         </td>
                         <td className="py-3 px-4">
@@ -180,17 +160,14 @@ export default function UserDashboard() {
                                 : "bg-yellow-100 text-yellow-700"
                             }`}
                           >
-                            {order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)}
+                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
                         </td>
-                        <td className="py-3 px-4">
-                          Rs. {Number(order.total).toFixed(2)}
-                        </td>
+                        <td className="py-3 px-4">Rs. {Number(order.total).toFixed(2)}</td>
                         <td className="py-3 px-4">
                           <button
-                            onClick={() => setSelectedOrder(order)}
                             className="text-indigo-600 hover:underline focus:outline-none"
+                            onClick={() => setSelectedOrder(order)}
                           >
                             View Details
                           </button>
@@ -204,32 +181,29 @@ export default function UserDashboard() {
           </section>
 
           {/* Account Settings */}
-          <section ref={settingsRef} className="mb-12" id="settings">
-            <h2 className="text-xl font-bold mb-2">Account Settings</h2>
+          <section className="mb-12" id="settings">
+            <h2 className="text-xl font-bold mb-2 text-blue-700">Account Settings</h2>
             <ul>
               {settings.map((setting) => (
                 <li
                   key={setting}
-                  className="flex justify-between items-center py-2 border-b last:border-b-0"
+                  className="flex justify-between items-center py-2 border-b last:border-b-0 text-gray-600 font-medium"
                 >
-                  <span>{setting}</span>
-                  <span className="text-gray-400">&rarr;</span>
+                  {setting}
+                  <span className="text-blue-300">&rarr;</span>
                 </li>
               ))}
             </ul>
           </section>
 
           {/* Reviews */}
-          <section ref={reviewsRef} className="mb-12" id="reviews">
-            <h2 className="text-xl font-bold mb-2">My Reviews</h2>
-            {Array.isArray(reviews) && reviews.length === 0 ? (
-              <p>There are no reviews yet.</p>
-            ) : Array.isArray(reviews) ? (
-              reviews.map((review) => (
-                <div
-                  key={review.id}
-                  className="mb-6 border rounded p-4 bg-white shadow-sm"
-                >
+          <section className="mb-12" id="reviews">
+            <h2 className="text-xl font-bold mb-2 text-blue-700">My Reviews</h2>
+            {reviews.length === 0 ? (
+              <p className="text-gray-400">There are no reviews yet.</p>
+            ) : (
+              reviews.map(review => (
+                <div key={review.id} className="mb-6 border rounded-2xl p-4 bg-white shadow-sm">
                   <div className="flex items-center mb-2">
                     <img
                       src={
@@ -238,25 +212,21 @@ export default function UserDashboard() {
                           : `http://localhost:8000${review.book.cover_image}`
                       }
                       alt={review.book.title}
-                      className="w-12 h-16 object-contain rounded mr-4 border"
+                      className="w-12 h-16 object-contain rounded border border-gray-200 mr-4"
                     />
                     <div>
-                      <div className="font-semibold">{review.book.title}</div>
-                      <div>{review.book.author}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="font-semibold text-gray-800">{review.book.title}</div>
+                      <div className="text-gray-600">{review.book.author}</div>
+                      <div className="text-xs text-gray-400">
                         {review.rated_at
-                          ? new Date(review.rated_at).toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              }
-                            )
+                          ? new Date(review.rated_at).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            })
                           : ""}
                       </div>
                     </div>
-
                     <div style={{ position: "relative", marginLeft: "auto" }}>
                       <button
                         className="text-gray-500 hover:text-gray-900 p-2 rounded-full"
@@ -265,14 +235,13 @@ export default function UserDashboard() {
                       >
                         <BsThreeDotsVertical size={20} />
                       </button>
-
                       {reviewMenuOpenId === review.id && (
                         <div
                           ref={reviewMenuRef}
-                          className="absolute right-0 mt-2 w-36 bg-white shadow border rounded z-10"
+                          className="absolute right-0 mt-2 w-36 bg-white shadow-xl border border-blue-200 rounded z-10"
                         >
                           <button
-                            className="block w-full px-4 py-2 text-left hover:bg-indigo-50"
+                            className="block w-full px-4 py-2 text-left hover:bg-blue-50"
                             onClick={() => {
                               setSelectedReview(review);
                               setEditRating(review.rating);
@@ -284,7 +253,7 @@ export default function UserDashboard() {
                             Edit
                           </button>
                           <button
-                            className="block w-full px-4 py-2 text-left hover:bg-red-50 text-red-700"
+                            className="block w-full px-4 py-2 text-left hover:bg-red-50 text-red-600"
                             onClick={() => {
                               setSelectedReview(review);
                               setShowDeleteModal(true);
@@ -297,247 +266,22 @@ export default function UserDashboard() {
                       )}
                     </div>
                   </div>
-
                   <div className="flex items-center mb-2">
-                    {[1, 2, 3, 4, 5].map((star) =>
+                    {[1, 2, 3, 4, 5].map(star =>
                       star <= review.rating ? (
-                        <AiFillStar
-                          key={star}
-                          size={22}
-                          className="text-yellow-400"
-                        />
+                        <AiFillStar key={star} size={22} className="text-yellow-400" />
                       ) : (
-                        <AiOutlineStar
-                          key={star}
-                          size={22}
-                          className="text-yellow-400"
-                        />
+                        <AiOutlineStar key={star} size={22} className="text-yellow-400" />
                       )
                     )}
                   </div>
-
-                  <p>{review.comment}</p>
+                  <p className="text-gray-700">{review.comment}</p>
                 </div>
               ))
-            ) : (
-              <p>Loading reviews…</p>
             )}
-          </section>
-
-          {/* Returns/Exchanges */}
-          <section ref={returnsRef} className="mb-12" id="returns">
-            <h2 className="text-xl font-bold mb-2">Returns/Exchanges</h2>
-            <p>
-              To initiate a return or exchange, please visit the Returns Center
-              or contact customer support.
-            </p>
           </section>
         </main>
       </div>
-
-      {/* Modal for Order Details */}
-      {selectedOrder && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 px-4"
-          onClick={() => setSelectedOrder(null)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div
-            className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold">
-                Order #{selectedOrder.id} Details
-              </h3>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                aria-label="Close modal"
-                className="text-gray-600 hover:text-gray-900 focus:outline-none"
-              >
-                &#10005;
-              </button>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {selectedOrder.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="border rounded p-4 flex flex-col items-center text-center"
-                >
-                  <img
-                    src={
-                      item.book_cover?.startsWith("http")
-                        ? item.book_cover
-                        : `http://localhost:8000${item.book_cover}`
-                    }
-                    alt={item.book_title}
-                    className="w-28 h-36 object-contain rounded mb-2"
-                  />
-                  <div className="font-semibold">{item.book_title}</div>
-                  <div className="text-sm mb-1">Quantity: {item.quantity}</div>
-                  <div className="font-bold text-indigo-600">
-                    Total: Rs.{" "}
-                    {(parseFloat(item.price) * item.quantity).toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Modal */}
-      {showEditModal && selectedReview && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
-          onClick={() => setShowEditModal(false)}
-        >
-          <form
-            className="bg-white rounded-lg p-6 w-full max-w-md"
-            onClick={(e) => e.stopPropagation()}
-            onSubmit={async (e) => {
-              e.preventDefault();
-              try {
-                await axios.post(
-                  `http://localhost:8000/books/${selectedReview.book.id}/rate/`,
-                  { rating: editRating, comment: editComment },
-                  { headers: { Authorization: `Token ${token}` } }
-                );
-                toast.success("Review updated!");
-                setShowEditModal(false);
-                setSelectedReview(null);
-                // Refresh reviews (keep array)
-                const res = await axios.get(
-                  "http://localhost:8000/books/user-reviews/",
-                  { headers: { Authorization: `Token ${token}` } }
-                );
-                setReviews(
-                  Array.isArray(res.data?.results) ? res.data.results : []
-                );
-              } catch (error) {
-                let message = "Could not update review.";
-                if (error.response && error.response.data) {
-                  const data = error.response.data;
-                  if (
-                    data.comment &&
-                    Array.isArray(data.comment) &&
-                    data.comment.length > 0
-                  ) {
-                    message = data.comment;
-                  } else if (typeof data === "string") {
-                    message = data;
-                  } else {
-                    const firstError = Object.values(data);
-                    if (Array.isArray(firstError) && firstError.length > 0) {
-                      message = firstError;
-                    }
-                  }
-                }
-                toast.error(message);
-              }
-            }}
-          >
-            <h2 className="text-xl font-bold mb-4 text-indigo-700 text-center">
-              Edit Review
-            </h2>
-            <div className="flex items-center justify-center">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span
-                  key={star}
-                  className="cursor-pointer"
-                  onClick={() => setEditRating(star)}
-                >
-                  {star <= editRating ? (
-                    <AiFillStar size={28} className="text-yellow-400" />
-                  ) : (
-                    <AiOutlineStar size={28} className="text-yellow-400" />
-                  )}
-                </span>
-              ))}
-            </div>
-            <input
-              type="text"
-              className="border px-2 py-1 rounded w-full my-3"
-              value={editComment}
-              onChange={(e) => setEditComment(e.target.value)}
-              placeholder="Write your review (Optional)"
-            />
-            <div className="flex gap-2 justify-center">
-              <button
-                className="bg-green-600 text-white px-4 py-1 rounded"
-                type="submit"
-              >
-                Save
-              </button>
-              <button
-                className="bg-gray-300 px-4 py-1 rounded"
-                type="button"
-                onClick={() => setShowEditModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Delete Modal */}
-      {showDeleteModal && selectedReview && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
-          onClick={() => setShowDeleteModal(false)}
-        >
-          <div
-            className="bg-white rounded-lg p-6 w-full max-w-sm"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h2 className="text-lg font-bold mb-4 text-red-700 text-center">
-              Delete Review
-            </h2>
-            <p className="mb-4 text-center">
-              Are you sure you want to delete your review for "
-              {selectedReview.book.title}"?
-            </p>
-            <div className="flex gap-2 justify-center">
-              <button
-                className="bg-red-600 text-white px-4 py-1 rounded"
-                onClick={async () => {
-                  try {
-                    await axios.delete(
-                      `http://localhost:8000/books/reviews/${selectedReview.id}/`,
-                      { headers: { Authorization: `Token ${token}` } }
-                    );
-                    toast.success("Review deleted!");
-                    setShowDeleteModal(false);
-                    setSelectedReview(null);
-                    // Refresh reviews (keep array)
-                    const res = await axios.get(
-                      "http://localhost:8000/books/user-reviews/",
-                      { headers: { Authorization: `Token ${token}` } }
-                    );
-                    setReviews(
-                      Array.isArray(res.data?.results) ? res.data.results : []
-                    );
-                  } catch {
-                    toast.error("Could not delete review.");
-                    setShowDeleteModal(false);
-                  }
-                }}
-              >
-                Delete
-              </button>
-              <button
-                className="bg-gray-300 px-4 py-1 rounded"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
