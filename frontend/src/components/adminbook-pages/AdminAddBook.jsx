@@ -41,13 +41,14 @@ export default function AdminAddBook() {
   };
 
   return (
-    <div className="flex flex-col items-center px-2 py-8 bg-gray-100 min-h-screen">
+    <div className="flex flex-col items-center px-2 py-8 h-[87vh] 
+      bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60">
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm flex flex-col"
+        className="bg-white/90 shadow-xl rounded-2xl border border-gray-200 p-8 w-full max-w-sm flex flex-col"
         encType="multipart/form-data"
       >
-        <h2 className="text-xl font-bold text-indigo-700 mb-4">Add New Book</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">Add New Book</h2>
 
         {/* Title */}
         <input
@@ -57,9 +58,9 @@ export default function AdminAddBook() {
             maxLength: { value: 200, message: "Title must be under 200 characters" }
           })}
           placeholder="Title"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-blue-50/80 text-gray-800"
         />
-        {errors.title && <span className="text-red-500 text-xs mb-1">{errors.title.message}</span>}
+        {errors.title && <span className="text-red-600 text-xs mb-1">{errors.title.message}</span>}
 
         {/* Author */}
         <input
@@ -70,9 +71,9 @@ export default function AdminAddBook() {
             pattern: { value: /^[a-zA-Z\s.'-]+$/, message: "Author name contains invalid characters" }
           })}
           placeholder="Author"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-blue-50/80 text-gray-800"
         />
-        {errors.author && <span className="text-red-500 text-xs mb-1">{errors.author.message}</span>}
+        {errors.author && <span className="text-red-600 text-xs mb-1">{errors.author.message}</span>}
 
         {/* Year of Publication */}
         <input
@@ -84,9 +85,9 @@ export default function AdminAddBook() {
           })}
           placeholder="Year of Publication"
           type="number"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-blue-50/80 text-gray-800"
         />
-        {errors.year_of_publication && <span className="text-red-500 text-xs mb-1">{errors.year_of_publication.message}</span>}
+        {errors.year_of_publication && <span className="text-red-600 text-xs mb-1">{errors.year_of_publication.message}</span>}
 
         {/* ISBN */}
         <input
@@ -95,9 +96,9 @@ export default function AdminAddBook() {
             pattern: { value: /^\d{13}$/, message: "ISBN must be exactly 13 digits" }
           })}
           placeholder="ISBN"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-blue-50/80 text-gray-800"
         />
-        {errors.isbn && <span className="text-red-500 text-xs mb-1">{errors.isbn.message}</span>}
+        {errors.isbn && <span className="text-red-600 text-xs mb-1">{errors.isbn.message}</span>}
 
         {/* Price */}
         <input
@@ -107,9 +108,9 @@ export default function AdminAddBook() {
             min: { value: 0, message: "Price cannot be negative" }
           })}
           placeholder="Price"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-blue-50/80 text-gray-800"
         />
-        {errors.price && <span className="text-red-500 text-xs mb-1">{errors.price.message}</span>}
+        {errors.price && <span className="text-red-600 text-xs mb-1">{errors.price.message}</span>}
 
         {/* Quantity */}
         <input
@@ -119,9 +120,9 @@ export default function AdminAddBook() {
             valueAsNumber: true
           })}
           placeholder="Quantity"
-          className="w-full px-3 py-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-blue-50"
+          className="w-full px-3 py-2 border border-gray-200 rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-600 bg-blue-50/80 text-gray-800"
         />
-        {errors.quantity && <span className="text-red-500 text-xs mb-1">{errors.quantity.message}</span>}
+        {errors.quantity && <span className="text-red-600 text-xs mb-1">{errors.quantity.message}</span>}
 
         {/* Cover Image */}
         <label className="mb-2 text-sm text-gray-600">Cover Image:</label>
@@ -129,15 +130,15 @@ export default function AdminAddBook() {
           {...register("cover_image", { required: "Cover image is required" })}
           type="file"
           accept="image/*"
-          className="mb-3"
+          className="mb-3 text-gray-600"
         />
-        {errors.cover_image && <span className="text-red-500 text-xs mb-1">{errors.cover_image.message}</span>}
+        {errors.cover_image && <span className="text-red-600 text-xs mb-1">{errors.cover_image.message}</span>}
 
         {/* Submit Button */}
         <button
           disabled={isSubmitting}
           type="submit"
-          className="w-full py-2 mt-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition"
+          className="w-full py-2 mt-2 bg-gradient-to-r from-indigo-500 to-blue-600 text-white rounded font-semibold shadow-sm transition-all duration-150 hover:brightness-110 disabled:opacity-60"
         >
           {isSubmitting ? "Saving..." : "Add Book"}
         </button>
@@ -146,7 +147,7 @@ export default function AdminAddBook() {
         <button
           type="button"
           onClick={() => navigate("/admin/books")}
-          className="w-full mt-2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-medium transition"
+          className="w-full mt-2 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded font-medium transition-all duration-150"
         >
           Back to List
         </button>
