@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 
@@ -84,10 +83,7 @@ export default function AdminDashboard() {
       </section>
       
       {/* Admin Navigation */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <NavCard to="/admin/books" label="Book Management" />
-        <NavCard to="/admin/orders" label="Order Management" />
-      </section>
+      
     </div>
   );
 }
@@ -101,13 +97,4 @@ function KpiCard({ label, value }) {
   );
 }
 
-function NavCard({ to, label }) {
-  return (
-    <Link
-      to={to}
-      className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium p-4 rounded shadow text-center flex items-center justify-center"
-    >
-      {label}
-    </Link>
-  );
-}
+
