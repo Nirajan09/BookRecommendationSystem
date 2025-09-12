@@ -209,9 +209,21 @@ export default function CartPage() {
                 >
                   -
                 </button>
-                <span className="w-10 text-center font-bold bg-gradient-to-tr from-blue-100 to-purple-100 rounded-lg py-1 text-lg shadow">
-                  {quantity}
-                </span>
+                <input
+  type="text"
+  inputMode="numeric"
+  pattern="[0-9]*"
+  value={quantity}
+  onChange={e => {
+    // Only allow digits, clamp to valid range, empty disables update
+    const digits = e.target.value.replace(/\D/g, "");
+    let num = digits === "" ? "" : Math.max(1, Math.min(Number(digits), book_detail?.quantity ?? 1));
+    updateQuantity({ id, book_detail, quantity }, num === "" ? 1 : num);
+  }}
+  className="w-14 text-center font-bold bg-gradient-to-tr from-blue-100 to-purple-100 rounded-lg py-1 text-lg shadow outline-none"
+  aria-label={`Set quantity for ${book_detail?.title || "book"}`}
+/>
+
                 <button
                   disabled={quantity >= (book_detail?.quantity ?? 1)}
                   onClick={() => updateQuantity({ id, book_detail, quantity }, quantity + 1)}
