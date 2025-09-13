@@ -34,7 +34,8 @@ INSTALLED_APPS = [
     'payment',
     'stripePayment', 
     'django_filters',
-    "recommendation"
+    "recommendation",
+    "adminDashboard"
 ]
 
 MIDDLEWARE = [

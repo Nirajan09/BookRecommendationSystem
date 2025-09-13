@@ -135,7 +135,7 @@ export default function OrderConfirmation() {
                   className="w-20 h-24 rounded-lg shadow object-cover"
                 />
                 <div>
-                  <p className="font-semibold text-lg text-gray-700">{item.book_title}</p>
+                  <p className="max-w-45 font-semibold text-lg text-gray-700 truncate">{item.book_title}</p>
                   <p className="text-gray-500 mt-1">Qty: {item.quantity}</p>
                 </div>
               </div>

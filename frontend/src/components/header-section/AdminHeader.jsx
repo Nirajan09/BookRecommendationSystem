@@ -51,6 +51,9 @@ const AdminHeader = () => {
 
         {/* Desktop Nav */}
         <div className="hidden sm:flex items-center gap-6">
+          <Link to="/admin" className="flex items-center gap-2 text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">
+            Dashboard
+          </Link>
           <Link to="/admin/books" className="flex items-center gap-2 text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">
             Book Management
           </Link>
@@ -90,6 +93,9 @@ const AdminHeader = () => {
                 <HiX className="w-7 h-7" />
               </button>
               <nav className="flex flex-col gap-4 px-6 pt-4">
+                <Link to="/admin" className="flex items-center gap-2 text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50" onClick={() => setMenuOpen(false)}>
+                  Dashboard
+                </Link>
                 <Link to="/admin/books" className="flex items-center gap-2 text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50" onClick={() => setMenuOpen(false)}>
                   Book Management
                 </Link>

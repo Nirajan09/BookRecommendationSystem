@@ -34,6 +34,7 @@ urlpatterns = [
     path('',include('payment.urls')),
     path('',include('stripePayment.urls')),
     path('',include('recommendation.urls')),
+    path('',include('adminDashboard.urls')),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

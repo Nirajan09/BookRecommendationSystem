@@ -68,21 +68,32 @@ export default function AddToCartModal({
         {/* Quantity Input Row */}
         <div className="my-4 flex items-center justify-center gap-6">
           <button
-            onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
+            onClick={() => onQuantityChange(Math.max(1, Number(quantity) - 1))}
             className="bg-gray-200 disabled:opacity-50 w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition"
             disabled={quantity <= 1}
             aria-label="Decrease quantity"
             type="button"
           >-</button>
-          <span className="font-extrabold text-xl bg-gradient-to-r from-blue-100 to-indigo-100 px-4 py-1 rounded-md">{quantity}</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={quantity}
+            onChange={e => {
+              const val = e.target.value.replace(/\D/g, '');
+              let num = val === "" ? "" : Math.max(1, Math.min(Number(val), book.quantity));
+              onQuantityChange(num);
+            }}
+            className="w-16 text-center text-xl font-extrabold bg-gradient-to-r from-blue-100 to-indigo-100 rounded px-2 py-1 outline-none"
+            aria-label="Quantity input"
+          />
           <button
-            onClick={() => onQuantityChange(quantity < book.quantity ? quantity + 1 : quantity)}
+            onClick={() => onQuantityChange(quantity < book.quantity ? Number(quantity) + 1 : Number(quantity))}
             disabled={quantity >= book.quantity}
-            className={`w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition ${
-              quantity >= book.quantity
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition ${quantity >= book.quantity
                 ? 'bg-gray-300 text-gray-400 cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
-            }`}
+              }`}
             aria-label="Increase quantity"
             type="button"
           >+</button>
@@ -95,11 +106,10 @@ export default function AddToCartModal({
         <button
           onClick={onAddToCart}
           disabled={adding}
-          className={`w-full py-3 mt-3 rounded-lg text-lg font-bold shadow transition ${
-            adding
+          className={`w-full py-3 mt-3 rounded-lg text-lg font-bold shadow transition ${adding
               ? "bg-blue-300 text-white cursor-not-allowed"
               : "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white"
-          }`}
+            }`}
         >
           {adding ? 'Adding...' : 'Add to Cart'}
         </button>

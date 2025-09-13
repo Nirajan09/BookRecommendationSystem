@@ -25,5 +25,6 @@ staticfiles/
 local_settings.py
 .env
 
-/data/*.csv
-/data/*.pkl
+/media/
+media/
+bookhub/books/data/

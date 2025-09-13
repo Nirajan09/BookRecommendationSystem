@@ -7,16 +7,39 @@ from django.db.models import Avg
 from .models import Book, BookRating, CartItem, WishlistItem
 from .serializers import BookSerializer, BookRatingSerializer, CartItemSerializer, WishlistItemSerializer
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import status
 
 class AdminBookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAdminUser]
+
     def get_queryset(self):
         return Book.objects.filter(source='admin').order_by('-created_at')
 
     def perform_create(self, serializer):
         serializer.save(source='admin')
+
+    @action(detail=True, methods=['patch'], url_path='update-stock')
+    def update_stock(self, request, pk=None):
+        book = self.get_object()
+        quantity = request.data.get('quantity')
+
+        # Validation
+        if quantity is None:
+            return Response({"error": "Quantity is required."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            quantity = int(quantity)
+        except ValueError:
+            return Response({"error": "Quantity must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+        if quantity < 0:
+            return Response({"error": "Quantity cannot be negative."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update stock
+        book.quantity = quantity
+        book.save(update_fields=['quantity'])
+
+        return Response({"message": "Stock updated successfully."}, status=status.HTTP_200_OK)
 
 class BookRatingViewSet(viewsets.ModelViewSet):
     queryset = BookRating.objects.all()

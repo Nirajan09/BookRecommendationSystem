@@ -13,6 +13,7 @@ export default function UserDashboard() {
   const [selectedReview, setSelectedReview] = useState(null);
   const [editComment, setEditComment] = useState("");
   const [editRating, setEditRating] = useState(0);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
   const settings = [
     "Change Password",
@@ -96,6 +97,26 @@ export default function UserDashboard() {
     year: "numeric",
   });
 
+  // Cancel order API call
+  const cancelOrder = async (orderId) => {
+    try {
+      await axios.post(
+        `http://localhost:8000/orders/${orderId}/cancel/`,
+        {},
+        { headers: { Authorization: `Token ${token}` } }
+      );
+      toast.success("Order cancelled successfully.");
+      // Refresh orders and close modal
+      const res = await axios.get("http://localhost:8000/orders/", {
+        headers: { Authorization: `Token ${token}` },
+      });
+      setOrders(Array.isArray(res.data?.results) ? res.data.results : []);
+      setSelectedOrder(null);
+    } catch (error) {
+      toast.error("Failed to cancel order.");
+    }
+  };
+
   return (
     <div className="bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 min-h-screen p-8">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10">
@@ -116,7 +137,9 @@ export default function UserDashboard() {
                 className="w-20 h-20 rounded-full border border-gray-200 shadow-sm"
               />
               <div>
-                <div className="font-semibold text-xl text-gray-800">{user.first_name} {user.last_name}</div>
+                <div className="font-semibold text-xl text-gray-800">
+                  {user.first_name} {user.last_name}
+                </div>
                 <div className="text-blue-600">Member since {joined}</div>
               </div>
             </div>
@@ -144,7 +167,7 @@ export default function UserDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    orders.map(order => (
+                    orders.map((order) => (
                       <tr key={order.id} className="border-t hover:bg-blue-50">
                         <td className="py-3 px-4">#{order.reference}</td>
                         <td className="py-3 px-4 text-blue-600">
@@ -202,7 +225,7 @@ export default function UserDashboard() {
             {reviews.length === 0 ? (
               <p className="text-gray-400">There are no reviews yet.</p>
             ) : (
-              reviews.map(review => (
+              reviews.map((review) => (
                 <div key={review.id} className="mb-6 border rounded-2xl p-4 bg-white shadow-sm">
                   <div className="flex items-center mb-2">
                     <img
@@ -267,7 +290,7 @@ export default function UserDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center mb-2">
-                    {[1, 2, 3, 4, 5].map(star =>
+                    {[1, 2, 3, 4, 5].map((star) =>
                       star <= review.rating ? (
                         <AiFillStar key={star} size={22} className="text-yellow-400" />
                       ) : (
@@ -281,6 +304,90 @@ export default function UserDashboard() {
             )}
           </section>
         </main>
+      </div>
+
+      {/* Order Details Modal */}
+      {selectedOrder && (
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          onCancel={cancelOrder}
+        />
+      )}
+    </div>
+  );
+}
+
+function OrderDetailsModal({ order, onClose, onCancel }) {
+  const items = order.items || [];
+  console.log(items)
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 bg-opacity-40 flex items-center justify-center z-50"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white p-6 rounded-xl max-w-lg w-full shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-2xl font-bold mb-4">Order #{order.reference}</h2>
+        <p className="mb-2">
+          <strong>Status:</strong>{" "}
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+            order.status.toLowerCase() === "shipped"
+              ? "bg-blue-100 text-blue-700"
+              : order.status.toLowerCase() === "delivered"
+              ? "bg-green-100 text-green-700"
+              : "bg-yellow-100 text-yellow-700"
+          }`}>
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </span>
+        </p>
+        <p className="mb-4">
+          <strong>Total:</strong> <span className="text-red-600">Rs. {Number(order.total).toFixed(2)}</span>
+        </p>
+        <div className="max-h-64 overflow-y-auto mb-4 border rounded p-3 bg-gray-50">
+          {items.length === 0 ? (
+            <p className="text-gray-500">No items in this order.</p>
+          ) : (
+            items.map((item) => (
+              <div key={item.id || item.book_id} className="flex gap-4 mb-3">
+                <img
+                  src={
+                    item.cover_image
+                  ? `${item.cover_image}`
+                  : item.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
+                  }
+                  alt={item.book_title}
+                  className="w-14 h-20 object-contain rounded shadow"
+                />
+                <div>
+                  <p className="font-semibold">{item.book_title}</p>
+                  <p className="text-sm text-gray-700">Qty: {item.quantity}</p>
+                  <p className="text-sm text-indigo-700 font-semibold">
+                    Rs. {Number(item.price).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {order.status.toLowerCase() === "pending" && (
+          <button
+            onClick={() => onCancel(order.id)}
+            className="w-full py-3 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition"
+          >
+            Cancel Order
+          </button>
+        )}
+
+        <button
+          onClick={onClose}
+          className="mt-4 w-full py-3 bg-gray-300 rounded-lg font-semibold hover:bg-gray-400 transition"
+        >
+          Close
+        </button>
       </div>
     </div>
   );
