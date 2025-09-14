@@ -68,32 +68,21 @@ export default function AddToCartModal({
         {/* Quantity Input Row */}
         <div className="my-4 flex items-center justify-center gap-6">
           <button
-            onClick={() => onQuantityChange(Math.max(1, Number(quantity) - 1))}
+            onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
             className="bg-gray-200 disabled:opacity-50 w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition"
             disabled={quantity <= 1}
             aria-label="Decrease quantity"
             type="button"
           >-</button>
-          <input
-            type="text"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            value={quantity}
-            onChange={e => {
-              const val = e.target.value.replace(/\D/g, '');
-              let num = val === "" ? "" : Math.max(1, Math.min(Number(val), book.quantity));
-              onQuantityChange(num);
-            }}
-            className="w-16 text-center text-xl font-extrabold bg-gradient-to-r from-blue-100 to-indigo-100 rounded px-2 py-1 outline-none"
-            aria-label="Quantity input"
-          />
+          <span className="font-extrabold text-xl bg-gradient-to-r from-blue-100 to-indigo-100 px-4 py-1 rounded-md">{quantity}</span>
           <button
-            onClick={() => onQuantityChange(quantity < book.quantity ? Number(quantity) + 1 : Number(quantity))}
+            onClick={() => onQuantityChange(quantity < book.quantity ? quantity + 1 : quantity)}
             disabled={quantity >= book.quantity}
-            className={`w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition ${quantity >= book.quantity
+            className={`w-9 h-9 rounded-full flex items-center justify-center text-lg font-bold transition ${
+              quantity >= book.quantity
                 ? 'bg-gray-300 text-gray-400 cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700'
-              }`}
+            }`}
             aria-label="Increase quantity"
             type="button"
           >+</button>
