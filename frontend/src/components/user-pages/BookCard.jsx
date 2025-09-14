@@ -9,7 +9,7 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 const BASE_URL = "http://localhost:8000";
 
 export default function BookCard({ book }) {
-  console.log(book,"Book")
+  console.log(book,"Book card")
   const { token, user: currUser } = useAuth();
   const navigate = useNavigate();
   const [showCartModal, setShowCartModal] = useState(false);

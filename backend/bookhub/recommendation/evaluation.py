@@ -1,7 +1,7 @@
 # recommender/evaluation.py
 import pandas as pd
 from books.models import BookRating
-from .recommender import build_train_matrix, get_personalized_recommendations
+from .recommender import get_personalized_recommendations
 
 def evaluate_recommender(k=5, test_ratio=0.2):
     """
@@ -19,7 +19,7 @@ def evaluate_recommender(k=5, test_ratio=0.2):
     train = df.drop(test.index)
 
     # Build train matrix from training data
-    train_matrix, similarity_df = build_train_matrix()
+    # train_matrix, similarity_df = build_train_matrix()
 
     precision_list, recall_list, f1_list = [], [], []
 

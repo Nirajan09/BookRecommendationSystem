@@ -5,6 +5,7 @@ import BookCard from "../user-pages/BookCard";
 
 export default function Recommend() {
   const { user } = useAuth();
+  console.log(user,"user")
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -31,7 +32,7 @@ export default function Recommend() {
 
       if (!res.ok) throw new Error(`Server error: ${res.status}`);
       const data = await res.json();
-
+      console.log(data,"Recommendation")
       if (data.error) {
         setError(data.error);
         setBooks([]);
