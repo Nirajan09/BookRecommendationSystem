@@ -41,67 +41,104 @@ def build_sparse_matrix():
     return sparse_matrix, user_ids, book_isbns
 
 # -------------------------------
-# Item-based CF prediction
+# User-based collaborative filtering
 # -------------------------------
-def predict_item_rating(user_idx, book_idx, sparse_matrix, book_map, top_k=5):
-    # Get books rated by this user
-    user_ratings = sparse_matrix[user_idx].toarray().flatten()
-    rated_indices = np.where(user_ratings > 0)[0]
+def get_user_based_recommendations(user_id, top_n=8):
+    sparse_matrix, user_map, book_map = build_sparse_matrix()
+    if sparse_matrix is None or user_id not in user_map:
+        return get_top_books(top_n)
 
-    if len(rated_indices) == 0:
-        return 0  # user has not rated anything
+    user_idx = user_map[user_id]
+    user_vector = sparse_matrix[user_idx].toarray()
+    similarity_scores = cosine_similarity(user_vector, sparse_matrix)[0]
 
-    # Get similarity scores for target book with already rated books
-    book_isbn = [isbn for isbn, idx in book_map.items() if idx == book_idx][0]
-    sims = similarity_df[book_isbn].loc[
-        [isbn for isbn, idx in book_map.items() if idx in rated_indices]
-    ].sort_values(ascending=False)[:top_k]
+    similar_users = [(idx, score) for idx, score in enumerate(similarity_scores) if idx != user_idx and score > 0]
+    similar_users.sort(key=lambda x: x[1], reverse=True)
 
-    numerator = sum(user_ratings[book_map[b]] * sims[b] for b in sims.index)
-    denominator = sum(abs(sims))
-    return numerator / denominator if denominator != 0 else 0
+    book_scores = {}
+    rated_books = set(np.where(user_vector[0] > 0)[0])
+
+    for sim_user_idx, sim_score in similar_users[:10]:
+        sim_ratings = sparse_matrix[sim_user_idx].toarray()[0]
+        for book_idx, rating in enumerate(sim_ratings):
+            if rating == 0 or book_idx in rated_books:
+                continue
+            book_scores.setdefault(book_idx, []).append((rating, sim_score))
+
+    predictions = []
+    for book_idx, values in book_scores.items():
+        numerator = sum(r * s for r, s in values)
+        denominator = sum(abs(s) for _, s in values)
+        if denominator > 0:
+            predictions.append((book_idx, numerator / denominator))
+
+    predictions.sort(key=lambda x: x[1], reverse=True)
+    top_book_indices = [idx for idx, _ in predictions[:top_n]]
+
+    reverse_book_map = {idx: isbn for isbn, idx in book_map.items()}
+    top_books_isbn = [reverse_book_map[idx] for idx in top_book_indices]
+
+    return fetch_books_by_isbn(top_books_isbn)
 
 # -------------------------------
-# Get top N personalized recommendations (item-based)
+# Item-based collaborative filtering
 # -------------------------------
 def get_item_based_recommendations(user_id, top_n=8):
     sparse_matrix, user_map, book_map = build_sparse_matrix()
     if sparse_matrix is None or user_id not in user_map:
-        # Cold start fallback
-        top_books = Book.objects.order_by('-average_rating')[:top_n]
-        return list(top_books.values(
-            "id", "isbn", "title", "author", "year_of_publication",
-            "cover_image", "dataset_image_url", "average_rating",
-            "price", "quantity"
-        ))
+        return get_top_books(top_n)
 
     user_idx = user_map[user_id]
-    user_ratings = sparse_matrix[user_idx].toarray().flatten()
-    already_rated = {idx for idx, r in enumerate(user_ratings) if r > 0}
+    user_ratings = sparse_matrix[user_idx].toarray()[0]
+    rated_books = [isbn for isbn, idx in book_map.items() if user_ratings[idx] > 0]
 
     predictions = []
     for isbn, idx in book_map.items():
-        if idx in already_rated:
+        if user_ratings[idx] > 0 or isbn not in similarity_df.index:
             continue
-        est_rating = predict_item_rating(user_idx, idx, sparse_matrix, book_map)
-        predictions.append((isbn, est_rating))
+
+        sims = similarity_df[isbn].loc[rated_books]
+        scores = [user_ratings[book_map[rated]] * sims[rated] for rated in sims.index if rated in book_map]
+        denominator = sum(abs(sims[rated]) for rated in sims.index if rated in book_map)
+
+        if denominator > 0:
+            predicted = sum(scores) / denominator
+            predictions.append((isbn, predicted))
 
     predictions.sort(key=lambda x: x[1], reverse=True)
-    top_books_isbn = [b[0] for b in predictions[:top_n]]
+    top_books_isbn = [isbn for isbn, _ in predictions[:top_n]]
 
-    # Preserve order in DB query
-    ordering = Case(*[When(isbn=isbn, then=pos) for pos, isbn in enumerate(top_books_isbn)],
-                    output_field=IntegerField())
-    books_qs = Book.objects.filter(isbn__in=top_books_isbn).annotate(_order=ordering).order_by('_order')
+    return fetch_books_by_isbn(top_books_isbn)
 
-    return list(books_qs.values(
+# -------------------------------
+# Unified entry point
+# -------------------------------
+def get_personalized_recommendations(user_id, top_n=8, strategy="user"):
+    if strategy == "item":
+        return get_item_based_recommendations(user_id, top_n)
+    else:
+        return get_user_based_recommendations(user_id, top_n)
+
+# -------------------------------
+# Cold start fallback
+# -------------------------------
+def get_top_books(top_n):
+    top_books = Book.objects.order_by('-average_rating')[:top_n]
+    return list(top_books.values(
         "id", "isbn", "title", "author", "year_of_publication",
         "cover_image", "dataset_image_url", "average_rating",
         "price", "quantity"
     ))
 
 # -------------------------------
-# Alias for compatibility with views
+# Utility: Fetch books by ISBN with preserved order
 # -------------------------------
-def get_personalized_recommendations(user_id, top_n=8):
-    return get_item_based_recommendations(user_id, top_n)
+def fetch_books_by_isbn(isbn_list):
+    ordering = Case(*[When(isbn=isbn, then=pos) for pos, isbn in enumerate(isbn_list)],
+                    output_field=IntegerField())
+    books_qs = Book.objects.filter(isbn__in=isbn_list).annotate(_order=ordering).order_by('_order')
+    return list(books_qs.values(
+        "id", "isbn", "title", "author", "year_of_publication",
+        "cover_image", "dataset_image_url", "average_rating",
+        "price", "quantity"
+    ))

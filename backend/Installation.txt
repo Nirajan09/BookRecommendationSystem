@@ -4,6 +4,8 @@ python -m venv .venv
 
 pip install django djangorestframework djangorestframework-simplejwt django-cors-headers python-dotenv requests pandas django-filter Pillow stripe
 
+pip install scipy
+
 python manage.py load_books
 
 # Books app

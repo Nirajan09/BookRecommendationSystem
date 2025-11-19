@@ -28,3 +28,5 @@ local_settings.py
 /media/
 media/
 bookhub/books/data/
+
+bookhub\recommendation\book_recommendation_system_isbn.pkl

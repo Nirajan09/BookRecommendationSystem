@@ -24,3 +24,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+backend\bookhub\recommendation\book_recommendation_system_isbn.pkl
