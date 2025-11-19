@@ -15,7 +15,7 @@ class RegisterView(generics.CreateAPIView):
 class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)  # <-- This enforces validation
+        serializer.is_valid(raise_exception=True) 
 
         username = serializer.validated_data['username']
         password = serializer.validated_data['password']
