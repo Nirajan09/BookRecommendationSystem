@@ -85,6 +85,7 @@ export default function UserHeader() {
         {token && <Link to="/dashboard" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Dashboard</Link>}
         {!token && (
           <>
+          <Link to="/" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Home</Link>
             <Link to="/register" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Register</Link>
             <Link to="/login" className="text-blue-700 font-medium px-3 py-1 rounded hover:bg-blue-50">Login</Link>
           </>
