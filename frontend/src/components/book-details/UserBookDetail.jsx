@@ -8,7 +8,7 @@ import { IoCartOutline } from "react-icons/io5";
 import AddToCartModal from "../../utils/Models/AddToCartModal";
 import StarRating from "../user-pages/StarRating";  // Adjust as needed
 
-const BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function UserBookDetail() {
   const { id } = useParams();
@@ -38,7 +38,7 @@ export default function UserBookDetail() {
   useEffect(() => {
     if (!token) return;
     axios
-      .get(`${BASE_URL}/books/${id}/`, { headers: { Authorization: `Token ${token}` } })
+      .get(`${backendUrl}/books/${id}/`, { headers: { Authorization: `Token ${token}` } })
       .then((res) => {
         setBook(res.data);
         const selfReview = Array.isArray(res.data.reviews)
@@ -60,7 +60,7 @@ export default function UserBookDetail() {
         );
       });
     axios
-      .get(`${BASE_URL}/books/wishlist/`, { headers: { Authorization: `Token ${token}` } })
+      .get(`${backendUrl}/books/wishlist/`, { headers: { Authorization: `Token ${token}` } })
       .then((res) => {
         const items =
           Array.isArray(res.data) ? res.data : Array.isArray(res.data.results) ? res.data.results : [];
@@ -102,7 +102,7 @@ export default function UserBookDetail() {
     setAddingCart(true);
     try {
       await axios.post(
-        `${BASE_URL}/books/cart/`,
+        `${backendUrl}/books/cart/`,
         { book: book.id, quantity },
         { headers: { Authorization: `Token ${token}` } }
       );
@@ -120,7 +120,7 @@ export default function UserBookDetail() {
     setAddingWishlist(true);
     try {
       if (isInWishlist) {
-        const wlRes = await axios.get(`${BASE_URL}/books/wishlist/`, { headers: { Authorization: `Token ${token}` } });
+        const wlRes = await axios.get(`${backendUrl}/books/wishlist/`, { headers: { Authorization: `Token ${token}` } });
         const items = Array.isArray(wlRes.data)
           ? wlRes.data
           : Array.isArray(wlRes.data.results)
@@ -132,13 +132,13 @@ export default function UserBookDetail() {
             : item.book?.id === book.id
         );
         if (wishlistItem) {
-          await axios.delete(`${BASE_URL}/books/wishlist/${wishlistItem.id}/`, { headers: { Authorization: `Token ${token}` } });
+          await axios.delete(`${backendUrl}/books/wishlist/${wishlistItem.id}/`, { headers: { Authorization: `Token ${token}` } });
         }
         toast.success("Removed from wishlist!");
         setIsInWishlist(false);
       } else {
         await axios.post(
-          `${BASE_URL}/books/wishlist/`,
+          `${backendUrl}/books/wishlist/`,
           { book: book.id },
           { headers: { Authorization: `Token ${token}` } }
         );
@@ -156,13 +156,13 @@ export default function UserBookDetail() {
     e.preventDefault();
     try {
       await axios.post(
-        `${BASE_URL}/books/${book.id}/rate/`,
+        `${backendUrl}/books/${book.id}/rate/`,
         { rating: Number(ratingValue), comment: reviewText },
         { headers: { Authorization: `Token ${token}` } }
       );
       toast.success("Review submitted!");
       // Reload
-      const res = await axios.get(`${BASE_URL}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
+      const res = await axios.get(`${backendUrl}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
       setBook(res.data);
       const selfReview = Array.isArray(res.data.reviews)
         ? res.data.reviews.find((rv) =>
@@ -182,11 +182,11 @@ export default function UserBookDetail() {
     if (!userReview?.id) return;
     try {
       await axios.delete(
-        `${BASE_URL}/books/reviews/${userReview.id}/`,
+        `${backendUrl}/books/reviews/${userReview.id}/`,
         { headers: { Authorization: `Token ${token}` } }
       );
       toast.success("Review deleted!");
-      const updated = await axios.get(`${BASE_URL}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
+      const updated = await axios.get(`${backendUrl}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
       setBook(updated.data);
       setUserReview(null);
       setReviewText("");

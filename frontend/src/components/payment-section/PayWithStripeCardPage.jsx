@@ -6,8 +6,8 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-const stripePromise = loadStripe("pk_test_51Ru39zDDPpxrz2C9CfNxjLpKgpTt3YYL6BuHXm5BBcXEHZRoXJeIsWzL1LBxhW1JaFAf90ubPlv6Svaq7HuSmgTz00upC1kfIJ");
-const API_BASE_URL = "http://localhost:8000";
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 function StripeForm({ orderPayload, totalCost }) {
   const stripe = useStripe();
@@ -24,7 +24,7 @@ function StripeForm({ orderPayload, totalCost }) {
     try {
       // 1. Create PaymentIntent on backend
       const resp = await axios.post(
-        `${API_BASE_URL}/create-stripe-payment-intent/`,
+        `${backendUrl}/create-stripe-payment-intent/`,
         { amount: totalCost },
         { headers: { Authorization: `Token ${authToken}` } }
       );

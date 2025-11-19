@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { toast } from "react-toastify";
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function AdminBookDetail() {
   const { id } = useParams();
   const { token } = useAuth();
@@ -15,7 +15,7 @@ export default function AdminBookDetail() {
 
   const fetchBook = () => {
     axios
-      .get(`http://localhost:8000/books/admin/books/${id}/`, {
+      .get(`${backendUrl}/books/admin/books/${id}/`, {
         headers: { Authorization: `Token ${token}` }
       })
       .then((res) => setBook(res.data))
@@ -39,7 +39,7 @@ export default function AdminBookDetail() {
   const handleDeleteConfirmed = async () => {
     if (!selectedReviewId) return;
     try {
-      await axios.delete(`http://localhost:8000/books/reviews/${selectedReviewId}/`, {
+      await axios.delete(`${backendUrl}/books/reviews/${selectedReviewId}/`, {
         headers: { Authorization: `Token ${token}` }
       });
       toast.success("Review deleted");
@@ -65,7 +65,7 @@ export default function AdminBookDetail() {
           <img
             src={
               book.cover_image
-                ? (book.cover_image.startsWith("http") ? book.cover_image : `http://localhost:8000${book.cover_image}`)
+                ? (book.cover_image.startsWith("http") ? book.cover_image : `${backendUrl}${book.cover_image}`)
                 : "https://via.placeholder.com/150x220?text=No+Cover"
             }
             alt={book.title}

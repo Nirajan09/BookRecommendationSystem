@@ -3,7 +3,7 @@ import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { toast } from "react-toastify";
 import AvatarSkeleton from "../../Skeleton/AvatarSkeleton";
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function UserProfileSnapshot() {
   const { token, logout } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -48,7 +48,7 @@ export default function UserProfileSnapshot() {
   // Fetch profile on mount
   useEffect(() => {
     if (!token) return;
-    axios.get("http://localhost:8000/userprofile/profile/", {
+    axios.get(`${backendUrl}/userprofile/profile/`, {
       headers: { Authorization: `Token ${token}` }
     }).then(res => {
       setProfile(res.data);
@@ -80,7 +80,7 @@ export default function UserProfileSnapshot() {
 
     try {
       const res = await axios.patch(
-        "http://localhost:8000/userprofile/profile/",
+        `${backendUrl}/userprofile/profile/`,
         data,
         { headers: { Authorization: `Token ${token}`, "Content-Type": "multipart/form-data" } }
       );
@@ -112,7 +112,7 @@ export default function UserProfileSnapshot() {
       <img
         ref={avatarRef}
         src={profile.profile?.avatar
-          ? (profile.profile.avatar.startsWith("http") ? profile.profile.avatar : `http://localhost:8000${profile.profile.avatar}`)
+          ? (profile.profile.avatar.startsWith("http") ? profile.profile.avatar : `${backendUrl}${profile.profile.avatar}`)
           : "/DefaultAvatar.png"}
         alt="Avatar"
         onClick={() => setShowMenu(v => !v)}

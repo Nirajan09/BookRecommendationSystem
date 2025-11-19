@@ -5,7 +5,7 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function AdminEditBook() {
   const { token } = useAuth();
   const { id } = useParams();
@@ -19,7 +19,7 @@ export default function AdminEditBook() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/books/admin/books/${id}/`, { headers: { Authorization: `Token ${token}` } })
+      .get(`${backendUrl}/books/admin/books/${id}/`, { headers: { Authorization: `Token ${token}` } })
       .then((res) => {
         const book = res.data;
         setValue("title", book.title);
@@ -43,7 +43,7 @@ export default function AdminEditBook() {
     if (data.cover_image?.[0]) formData.append("cover_image", data.cover_image[0]);
 
     try {
-      await axios.patch(`http://localhost:8000/books/admin/books/${id}/`, formData, {
+      await axios.patch(`${backendUrl}/books/admin/books/${id}/`, formData, {
         headers: { Authorization: `Token ${token}`, "Content-Type": "multipart/form-data" }
       });
       toast.success("Book updated successfully!");

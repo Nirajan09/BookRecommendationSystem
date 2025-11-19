@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { FaCreditCard, FaMoneyBillWave, FaWallet } from "react-icons/fa";
 
-const API_BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const SHIPPING_OPTIONS = [
   { id: "standard", label: "Standard Delivery", cost: 50, eta: "3-5 business days" },
@@ -101,7 +101,7 @@ export default function CheckoutPage() {
     setLoading(true);
 
     if (paymentMethod === "cash_on_delivery") {
-      axios.post(`${API_BASE_URL}/orders/`, orderPayload, {
+      axios.post(`${backendUrl}/orders/`, orderPayload, {
         headers: { Authorization: `Token ${authToken}` },
       })
         .then(res => {
@@ -304,7 +304,7 @@ export default function CheckoutPage() {
           {/* Button */}
           <button
             onClick={handleSubmit(onSubmit)}
-            className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:opacity-90 transition"
+            className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:opacity-90 transition cursor-pointer"
             disabled={loading}
           >
             {loading ? "Processing..." : "Place Order"}

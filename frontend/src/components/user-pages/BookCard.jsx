@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 
-const BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function BookCard({ book }) {
   console.log(book,"Book card")
@@ -28,7 +28,7 @@ export default function BookCard({ book }) {
     setAddingCart(true);
     try {
       await axios.post(
-        `${BASE_URL}/books/cart/`,
+        `${backendUrl}/books/cart/`,
         { book: book.id, quantity },
         { headers: { Authorization: `Token ${token}` } }
       );

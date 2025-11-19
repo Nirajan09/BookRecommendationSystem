@@ -5,6 +5,7 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function AdminAddBook() {
   const { token } = useAuth();
@@ -29,7 +30,7 @@ export default function AdminAddBook() {
         formData.append("cover_image", data.cover_image[0]);
       }
 
-      await axios.post("http://localhost:8000/books/admin/books/", formData, {
+      await axios.post(`${backendUrl}/books/admin/books/`, formData, {
         headers: { Authorization: `Token ${token}` }
       });
       toast.success("Book added successfully!");

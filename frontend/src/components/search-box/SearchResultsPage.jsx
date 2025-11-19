@@ -3,8 +3,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookCard from "../user-pages/BookCard";
-
-const BASE_URL = "http://localhost:8000/books";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function SearchResultsPage() {
   const { token } = useAuth();
@@ -30,7 +29,7 @@ export default function SearchResultsPage() {
     const limit = 8;
 
     axios
-      .get(`${BASE_URL}/all/`, {
+      .get(`${backendUrl}/books/all/`, {
         params: {
           search: searchTermParam,
           limit: limit,

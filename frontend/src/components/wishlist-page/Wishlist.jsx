@@ -6,7 +6,7 @@ import { IoCartOutline } from "react-icons/io5";
 import { MdFavorite } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import AddToCartModal from "../../utils/Models/AddToCartModal";
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 function RemoveConfirmModal({ open, book, onConfirm, onCancel, removing }) {
   if (!open || !book) return null;
 
@@ -66,7 +66,6 @@ function RemoveConfirmModal({ open, book, onConfirm, onCancel, removing }) {
 }
 
 
-const BASE_URL = "http://localhost:8000";
 
 const Wishlist = () => {
   const { token } = useAuth();
@@ -89,7 +88,7 @@ const Wishlist = () => {
     const fetchWishlist = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${BASE_URL}/books/wishlist/`, {
+        const res = await axios.get(`${backendUrl}/books/wishlist/`, {
           headers: { Authorization: `Token ${token}` },
         });
         setWishlist(res.data.results);

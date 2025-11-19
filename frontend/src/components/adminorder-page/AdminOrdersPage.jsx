@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const API_BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -52,7 +52,7 @@ export default function AdminOrdersPage() {
     };
 
     axios
-      .get(`${API_BASE_URL}/orders/`, {
+      .get(`${backendUrl}/orders/`, {
         headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         params,
       })
@@ -76,7 +76,7 @@ export default function AdminOrdersPage() {
 
     axios
       .patch(
-        `${API_BASE_URL}/orders/${orderId}/`,
+        `${backendUrl}/orders/${orderId}/`,
         { status: newStatus },
         { headers: { Authorization: `Token ${localStorage.getItem("token")}` } }
       )

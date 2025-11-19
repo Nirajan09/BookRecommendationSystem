@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { AiOutlineDelete } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
 
-const BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function CartPage() {
   const { token } = useAuth();
@@ -24,7 +24,7 @@ export default function CartPage() {
   const fetchCartItems = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BASE_URL}/books/cart/`, {
+      const res = await axios.get(`${backendUrl}/books/cart/`, {
         headers: { Authorization: `Token ${token}` },
       });
       setCartItems(res.data.results);
@@ -66,7 +66,7 @@ export default function CartPage() {
 
     try {
       await axios.patch(
-        `${BASE_URL}/books/cart/${cartItem.id}/`,
+        `${backendUrl}/books/cart/${cartItem.id}/`,
         { quantity: newQuantity },
         { headers: { Authorization: `Token ${token}` } }
       );
@@ -82,7 +82,7 @@ export default function CartPage() {
     if (deletingItemId) return;
     setDeletingItemId(itemPendingDelete);
     try {
-      await axios.delete(`${BASE_URL}/books/cart/${itemPendingDelete}/`, {
+      await axios.delete(`${backendUrl}/books/cart/${itemPendingDelete}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       toast.success("Item removed from cart.");
@@ -124,7 +124,7 @@ export default function CartPage() {
         </div>
         <h2 className="text-3xl font-extrabold text-gray-800 mb-2">Your cart is empty</h2>
         <p className="text-gray-500 mb-6 max-w-md">
-          Looks like you haven’t added any books yet. Start browsing our collection now!
+          Looks like you haven't added any books yet. Start browsing our collection now!
         </p>
         <button
           onClick={() => navigate("/books")}

@@ -4,7 +4,7 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookCard from "./BookCard";
 import BookShelf from "./BookShelf";
 
-const BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 function AdminBookCarousel() {
   const { token } = useAuth();
@@ -19,7 +19,7 @@ function AdminBookCarousel() {
   const fetchBooks = async (offsetParam) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BASE_URL}/books/admin-booksdata/`, {
+      const res = await axios.get(`${backendUrl}/books/admin-booksdata/`, {
         params: { limit, offset: offsetParam },
         headers: { Authorization: `Token ${token}` },
       });

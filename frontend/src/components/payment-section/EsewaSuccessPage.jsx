@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 
-const API_BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function EsewaSuccessPage() {
   const location = useLocation();
@@ -36,7 +36,7 @@ export default function EsewaSuccessPage() {
     // 3. Verify payment in backend (pass eSewa params)
     axios
       .post(
-        `${API_BASE_URL}/orders/esewa-success/`,
+        `${backendUrl}/orders/esewa-success/`,
         {
           ...orderPayload,
           oid,

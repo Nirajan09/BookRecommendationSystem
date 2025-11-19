@@ -7,7 +7,8 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookSearchBar from "../search-box/BookSearchBar";
 import UserProfileSnapshot from "../profile-section/UserProfileSnapshot";
 import axios from "axios";
-const BASE_URL = "http://localhost:8000";
+
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function UserHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -27,7 +28,7 @@ export default function UserHeader() {
 
   useEffect(() => {
     if (!token) { setCartCount(0); return; }
-    axios.get(`${BASE_URL}/books/cart/`, {
+    axios.get(`${backendUrl}/books/cart/`, {
       headers: { Authorization: `Token ${token}` },
     }).then((res) => {
       const totalItems = res.data.reduce(

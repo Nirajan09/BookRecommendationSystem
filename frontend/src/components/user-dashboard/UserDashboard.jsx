@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 import { BsThreeDotsVertical } from "react-icons/bs";
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function UserDashboard() {
   const reviewMenuRef = useRef(null);
   const [reviewMenuOpenId, setReviewMenuOpenId] = useState(null);
@@ -31,7 +31,7 @@ export default function UserDashboard() {
   const fetchUserReviews = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("http://localhost:8000/books/user-reviews/", {
+      const res = await axios.get(`${backendUrl}/books/user-reviews/`, {
         headers: { Authorization: `Token ${token}` },
       });
       setReviews(Array.isArray(res.data?.results) ? res.data.results : []);
@@ -48,7 +48,7 @@ export default function UserDashboard() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await axios.get("http://localhost:8000/userprofile/profile/", {
+        const res = await axios.get(`${backendUrl}/userprofile/profile/`, {
           headers: { Authorization: `Token ${token}` },
         });
         setUser(res.data);
@@ -62,7 +62,7 @@ export default function UserDashboard() {
   useEffect(() => {
     async function fetchOrders() {
       try {
-        const res = await axios.get("http://localhost:8000/orders/", {
+        const res = await axios.get(`${backendUrl}/orders/`, {
           headers: { Authorization: `Token ${token}` },
         });
         setOrders(Array.isArray(res.data?.results) ? res.data.results : []);
@@ -101,13 +101,13 @@ export default function UserDashboard() {
   const cancelOrder = async (orderId) => {
     try {
       await axios.post(
-        `http://localhost:8000/orders/${orderId}/cancel/`,
+        `${backendUrl}/orders/${orderId}/cancel/`,
         {},
         { headers: { Authorization: `Token ${token}` } }
       );
       toast.success("Order cancelled successfully.");
       // Refresh orders and close modal
-      const res = await axios.get("http://localhost:8000/orders/", {
+      const res = await axios.get(`${backendUrl}/orders/`, {
         headers: { Authorization: `Token ${token}` },
       });
       setOrders(Array.isArray(res.data?.results) ? res.data.results : []);
@@ -130,7 +130,7 @@ export default function UserDashboard() {
                   user.image?.startsWith("http")
                     ? user.image
                     : user.profile?.avatar
-                    ? `http://localhost:8000${user.profile.avatar}`
+                    ? `${backendUrl}${user.profile.avatar}`
                     : "/DefaultAvatar.png"
                 }
                 alt={user.name || "User"}
@@ -232,7 +232,7 @@ export default function UserDashboard() {
                       src={
                         review.book.cover_image?.startsWith("http")
                           ? review.book.cover_image
-                          : `http://localhost:8000${review.book.cover_image}`
+                          : `${backendUrl}${review.book.cover_image}`
                       }
                       alt={review.book.title}
                       className="w-12 h-16 object-contain rounded border border-gray-200 mr-4"

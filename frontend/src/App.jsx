@@ -25,12 +25,13 @@ import Recommend from './components/recommendation/Recommend'
 import UserBookDetail from './components/book-details/UserBookDetail'
 import BookDetail from "./components/adminbook-pages/BookDetail"
 import CombinedBooksView from './components/user-pages/CombinedBooksView'
+import HeroSection from './components/user-pages/HeroSection'
 function App() {
 
   return (
     <>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<HeroSection />} />
 
         <Route path="/login" element={
           <GuestRoute>

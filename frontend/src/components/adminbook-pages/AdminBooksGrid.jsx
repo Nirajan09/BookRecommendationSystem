@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { toast } from "react-toastify";
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function AdminBooksGrid() {
   const [books, setBooks] = useState([]);
   const { token } = useAuth();
@@ -14,7 +14,7 @@ export default function AdminBooksGrid() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/books/admin/books/", {
+      .get(`${backendUrl}/books/admin/books/`, {
         headers: { Authorization: `Token ${token}` }
       })
       .then(res => setBooks(res.data.results))
@@ -33,7 +33,7 @@ export default function AdminBooksGrid() {
   const handleDeleteConfirmed = async () => {
     if (!selectedBook) return;
     try {
-      await axios.delete(`http://localhost:8000/books/admin/books/${selectedBook.id}/`, {
+      await axios.delete(`${backendUrl}/books/admin/books/${selectedBook.id}/`, {
         headers: { Authorization: `Token ${token}` }
       });
       setBooks(books.filter(book => book.id !== selectedBook.id));
@@ -84,7 +84,7 @@ export default function AdminBooksGrid() {
             >
               {book.cover_image ? (
                 <img
-                  src={book.cover_image.startsWith("http") ? book.cover_image : `http://localhost:8000${book.cover_image}`}
+                  src={book.cover_image.startsWith("http") ? book.cover_image : `${backendUrl}${book.cover_image}`}
                   alt={book.title}
                   className="w-full h-60 object-contain rounded-lg mb-4"
                 />

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import axios from "axios";
 
-const API_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const ITEMS_PER_BATCH = 4;
 
 export default function AdminDashboard() {
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
   // Fetch dashboard stats from backend API
   const fetchStats = async () => {
     try {
-      const res = await axios.get(`${API_URL}/dashboard-stats/`, {
+      const res = await axios.get(`${backendUrl}/dashboard-stats/`, {
         headers: { Authorization: `Token ${localStorage.getItem("token")}` },
       });
       setStats(res.data);

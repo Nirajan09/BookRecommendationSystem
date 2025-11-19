@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8000";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function OrderConfirmation() {
   const { orderId } = useParams();
@@ -20,7 +20,7 @@ export default function OrderConfirmation() {
     }
 
     axios
-      .get(`${API_BASE_URL}/orders/${orderId}/`, {
+      .get(`${backendUrl}/orders/${orderId}/`, {
         headers: { Authorization: `Token ${localStorage.getItem("token")}` },
       })
       .then((response) => {
