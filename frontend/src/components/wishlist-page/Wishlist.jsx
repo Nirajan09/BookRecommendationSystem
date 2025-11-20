@@ -103,7 +103,7 @@ const Wishlist = () => {
   const actuallyRemove = async () => {
     setRemovingId(removeItemId);
     try {
-      await axios.delete(`${BASE_URL}/books/wishlist/${removeItemId}/`, {
+      await axios.delete(`${backendUrl}/books/wishlist/${removeItemId}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       setWishlist((prev) => prev.filter((item) => item.id !== removeItemId));
@@ -135,7 +135,7 @@ const Wishlist = () => {
     setAdding(true);
     try {
       await axios.post(
-        `${BASE_URL}/books/cart/`,
+        `${backendUrl}/books/cart/`,
         { book: modalBook.id, quantity: addQuantity },
         { headers: { Authorization: `Token ${token}` } }
       );

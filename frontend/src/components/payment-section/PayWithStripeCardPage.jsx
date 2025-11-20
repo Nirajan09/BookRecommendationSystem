@@ -47,7 +47,7 @@ function StripeForm({ orderPayload, totalCost }) {
         };
 
         // 4. Create order in backend
-        const orderRes = await axios.post(`${API_BASE_URL}/orders/`, completedPayload, {
+        const orderRes = await axios.post(`${backendUrl}/orders/`, completedPayload, {
           headers: { Authorization: `Token ${authToken}` },
         });
 

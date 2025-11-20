@@ -57,7 +57,7 @@ function DatasetBookGrid() {
   const fetchBooks = async (offsetParam, limitParam) => {
     setLoading(true);
     try {
-      const res = await axios.get(`${BASE_URL}/books/dataset-booksdata/`, {
+      const res = await axios.get(`${backendUrl}/books/dataset-booksdata/`, {
         params: { limit: limitParam, offset: offsetParam },
         headers: { Authorization: `Token ${token}` },
       });
