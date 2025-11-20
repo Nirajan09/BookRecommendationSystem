@@ -6,6 +6,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 import dj_database_url
+
 # Load environment variables
 load_dotenv()
 
@@ -17,7 +18,25 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # DEBUG
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
+# -----------------------------
+# ALLOWED HOSTS for Render
+# -----------------------------
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "bookrecommendationsystem-d42r.onrender.com",
+]
+
+# -----------------------------
+# CORS SETTINGS
+# -----------------------------
+CORS_ALLOW_ALL_ORIGINS = False  
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  
+    "https://localhost:3000",
+    "https://book-recommendation-system-topaz.vercel.app/",  
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -58,8 +77,6 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "False") == "True"
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
@@ -94,7 +111,6 @@ WSGI_APPLICATION = "bookhub.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
 }
-
 
 # Validators
 AUTH_PASSWORD_VALIDATORS = [
