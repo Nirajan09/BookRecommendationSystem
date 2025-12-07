@@ -33,9 +33,9 @@ ALLOWED_HOSTS = [
 CORS_ALLOW_ALL_ORIGINS = False  
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  
-    "https://localhost:3000",
-    "https://book-recommendation-system-topaz.vercel.app/",  
+    "http://localhost:5173",  
+    "https://localhost:5173",
+    "https://book-recommendation-system-topaz.vercel.app",  
 ]
 
 INSTALLED_APPS = [

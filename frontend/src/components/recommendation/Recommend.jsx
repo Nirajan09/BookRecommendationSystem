@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookCard from "../user-pages/BookCard";
-import { useNavigate } from "react-router-dom"; // for "Explore Books" navigation
+import { useNavigate } from "react-router-dom"; 
 
 export default function Recommend() {
   const { user } = useAuth();
@@ -33,19 +33,14 @@ export default function Recommend() {
       const data = await res.json();
       console.log(data, "Recommendation");
 
-      // Cold-start message
-      if (data.error) {
-        setError(
-          "You need to rate some books first to get personalized recommendations."
-        );
-        setBooks([]);
-      } else if (!data.recommendations || data.recommendations.length === 0) {
+      if (!data.recommendations || data.recommendations.length === 0) {
         setError(
           "No recommendations found. Please rate some books to see recommendations."
         );
         setBooks([]);
       } else {
         setBooks(data.recommendations);
+        setError("");
       }
     } catch (err) {
       console.error(err);
@@ -56,7 +51,7 @@ export default function Recommend() {
   };
 
   const handleExploreBooks = () => {
-    navigate("/explore"); // redirect to a page where user can rate/discover books
+    navigate("/books"); // redirect to book discovery/rating page
   };
 
   return (

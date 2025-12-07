@@ -41,8 +41,7 @@ export default function Login() {
 
   if (loading || isSubmitting) {
     return (
-      <div className="min-h-[90vh] flex items-center justify-center text-2xl font-bold text-blue-500">
-        Loading...
+      <div className="min-h-[90vh] loader">
       </div>
     );
   }

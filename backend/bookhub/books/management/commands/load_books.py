@@ -1,16 +1,13 @@
 import os
 import pandas as pd
 import random
-import requests
-from io import BytesIO
 from decimal import Decimal
 from django.core.management.base import BaseCommand
-from django.core.files import File
 from django.conf import settings
 from books.models import Book
 
 class Command(BaseCommand):
-    help = "Load books from clean_books.csv with original column names, random prices, and images"
+    help = "Load books from clean_books.csv starting after last Book ID"
 
     def handle(self, *args, **kwargs):
         file_path = os.path.join(settings.BASE_DIR, "books", "data", "clean_books.csv")
@@ -21,11 +18,22 @@ class Command(BaseCommand):
         df = pd.read_csv(file_path)
         imported, skipped = 0, 0
 
+        # Get the last Book ID
+        last_book = Book.objects.order_by("-id").first()
+        next_id = last_book.id + 1 if last_book else 1
+
+        # Optional: skip rows already imported by checking ISBNs
+        existing_isbns = set(Book.objects.values_list("isbn", flat=True))
+
         for _, row in df.iterrows():
             try:
                 isbn = str(row.get("ISBN", "")).zfill(13)
                 if len(isbn) != 13 or not isbn.isdigit():
                     skipped += 1
+                    continue
+
+                # Skip if ISBN already exists
+                if isbn in existing_isbns:
                     continue
 
                 title = str(row.get("Book-Title", "")).strip()
@@ -38,25 +46,24 @@ class Command(BaseCommand):
                     year = None
 
                 # Random price between 500 and 1600 NPR
-                price_npr = random.randint(500, 1600)
-                price = Decimal(price_npr)
+                price = Decimal(random.randint(500, 1600))
 
                 cover_image_url = row.get("Image-URL-L", None)
 
-                obj, created = Book.objects.update_or_create(
+                # Create new book
+                Book.objects.create(
+                    id=next_id,
                     isbn=isbn,
-                    defaults={
-                        "title": title,
-                        "author": author,
-                        "year_of_publication": year,
-                        "price": price,
-                        "quantity": 100,
-                        "dataset_image_url": cover_image_url if pd.notna(cover_image_url) else None,
-                    },
+                    title=title,
+                    author=author,
+                    year_of_publication=year,
+                    price=price,
+                    quantity=100,
+                    dataset_image_url=cover_image_url if pd.notna(cover_image_url) else None,
                 )
 
-                if created:
-                    imported += 1
+                imported += 1
+                next_id += 1  # increment ID for the next book
 
             except Exception as e:
                 skipped += 1
