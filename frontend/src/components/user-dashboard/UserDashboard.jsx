@@ -34,7 +34,15 @@ export default function UserDashboard() {
       const res = await axios.get(`${backendUrl}/books/user-reviews/`, {
         headers: { Authorization: `Token ${token}` },
       });
-      setReviews(Array.isArray(res.data?.results) ? res.data.results : []);
+
+      // Log the actual response
+      console.log("API response:", res.data);
+
+      const reviewsArray = Array.isArray(res.data?.results) ? res.data.results : [];
+      setReviews(reviewsArray);
+
+      // Log the array after you get it
+      console.log("Reviews array to set:", reviewsArray);
     } catch {
       toast.error("Failed to load your reviews");
       setReviews([]);
@@ -118,7 +126,7 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 min-h-screen p-8">
+    <div className="bg-gradient-to-tr from-blue-50/70 via-white to-purple-50/60 p-8">
       <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-10">
         <main className="flex-1 bg-white/90 p-8 rounded-2xl shadow-xl border border-blue-200">
           {/* Overview */}
@@ -130,8 +138,8 @@ export default function UserDashboard() {
                   user.image?.startsWith("http")
                     ? user.image
                     : user.profile?.avatar
-                    ? `${backendUrl}${user.profile.avatar}`
-                    : "/DefaultAvatar.png"
+                      ? `${backendUrl}${user.profile.avatar}`
+                      : "/DefaultAvatar.png"
                 }
                 alt={user.name || "User"}
                 className="w-20 h-20 rounded-full border border-gray-200 shadow-sm"
@@ -175,13 +183,12 @@ export default function UserDashboard() {
                         </td>
                         <td className="py-3 px-4">
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              order.status.toLowerCase() === "shipped"
-                                ? "bg-blue-100 text-blue-700"
-                                : order.status.toLowerCase() === "delivered"
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${order.status.toLowerCase() === "shipped"
+                              ? "bg-blue-100 text-blue-700"
+                              : order.status.toLowerCase() === "delivered"
                                 ? "bg-green-100 text-green-700"
                                 : "bg-yellow-100 text-yellow-700"
-                            }`}
+                              }`}
                           >
                             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                           </span>
@@ -204,7 +211,7 @@ export default function UserDashboard() {
           </section>
 
           {/* Account Settings */}
-          <section className="mb-12" id="settings">
+          {/* <section className="mb-12" id="settings">
             <h2 className="text-xl font-bold mb-2 text-blue-700">Account Settings</h2>
             <ul>
               {settings.map((setting) => (
@@ -217,7 +224,7 @@ export default function UserDashboard() {
                 </li>
               ))}
             </ul>
-          </section>
+          </section> */}
 
           {/* Reviews */}
           <section className="mb-12" id="reviews">
@@ -230,9 +237,13 @@ export default function UserDashboard() {
                   <div className="flex items-center mb-2">
                     <img
                       src={
-                        review.book.cover_image?.startsWith("http")
-                          ? review.book.cover_image
-                          : `${backendUrl}${review.book.cover_image}`
+                        review.book.source === "dataset"
+                          ? review.book.dataset_image_url
+                          : review.book.cover_image
+                            ? review.book.cover_image.startsWith("http")
+                              ? review.book.cover_image
+                              : `${backendUrl}${review.book.cover_image}`
+                            : "/DefaultBookCover.png"
                       }
                       alt={review.book.title}
                       className="w-12 h-16 object-contain rounded border border-gray-200 mr-4"
@@ -243,10 +254,10 @@ export default function UserDashboard() {
                       <div className="text-xs text-gray-400">
                         {review.rated_at
                           ? new Date(review.rated_at).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                            })
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                          })
                           : ""}
                       </div>
                     </div>
@@ -333,13 +344,12 @@ function OrderDetailsModal({ order, onClose, onCancel }) {
         <h2 className="text-2xl font-bold mb-4">Order #{order.reference}</h2>
         <p className="mb-2">
           <strong>Status:</strong>{" "}
-          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-            order.status.toLowerCase() === "shipped"
-              ? "bg-blue-100 text-blue-700"
-              : order.status.toLowerCase() === "delivered"
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold ${order.status.toLowerCase() === "shipped"
+            ? "bg-blue-100 text-blue-700"
+            : order.status.toLowerCase() === "delivered"
               ? "bg-green-100 text-green-700"
               : "bg-yellow-100 text-yellow-700"
-          }`}>
+            }`}>
             {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
           </span>
         </p>
@@ -355,8 +365,8 @@ function OrderDetailsModal({ order, onClose, onCancel }) {
                 <img
                   src={
                     item.cover_image
-                  ? `${item.cover_image}`
-                  : item.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
+                      ? `${item.cover_image}`
+                      : item.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
                   }
                   alt={item.book_title}
                   className="w-14 h-20 object-contain rounded shadow"

@@ -84,6 +84,7 @@ export default function UserProfileSnapshot() {
         data,
         { headers: { Authorization: `Token ${token}`, "Content-Type": "multipart/form-data" } }
       );
+      console.log("Backend Response:", res.data);
       toast.success("Profile updated!");
       setProfile(res.data);
       setShowModal(false);

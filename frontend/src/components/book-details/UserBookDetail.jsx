@@ -153,30 +153,47 @@ export default function UserBookDetail() {
   };
 
   const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(
-        `${backendUrl}/books/${book.id}/rate/`,
-        { rating: Number(ratingValue), comment: reviewText },
-        { headers: { Authorization: `Token ${token}` } }
-      );
-      toast.success("Review submitted!");
-      // Reload
-      const res = await axios.get(`${backendUrl}/books/${book.id}/`, { headers: { Authorization: `Token ${token}` } });
-      setBook(res.data);
-      const selfReview = Array.isArray(res.data.reviews)
-        ? res.data.reviews.find((rv) =>
+  e.preventDefault();
+  try {
+    await axios.post(
+      `${backendUrl}/books/${book.id}/rate/`,
+      { rating: Number(ratingValue), comment: reviewText },
+      { headers: { Authorization: `Token ${token}` } }
+    );
+    toast.success("Review submitted!");
+    // Reload book data
+    const res = await axios.get(`${backendUrl}/books/${book.id}/`, {
+      headers: { Authorization: `Token ${token}` }
+    });
+    setBook(res.data);
+    const selfReview = Array.isArray(res.data.reviews)
+      ? res.data.reviews.find((rv) =>
           typeof rv.user === "string"
             ? rv.user === currUser?.username
             : rv.user?.username === currUser?.username
         )
-        : null;
-      setUserReview(selfReview || null);
-      setShowReviewModal(false);
-    } catch {
+      : null;
+    setUserReview(selfReview || null);
+    setShowReviewModal(false);
+  } catch (err) {
+    // Check for validation errors from backend
+    if (err.response?.data) {
+      const errors = err.response.data;
+      // errors can be {rating: ["..."], comment: ["..."]}
+      const messages = [];
+      Object.entries(errors).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          value.forEach((msg) => messages.push(`${key}: ${msg}`));
+        } else {
+          messages.push(`${key}: ${value}`);
+        }
+      });
+      toast.error(messages.join("\n"));
+    } else {
       toast.error("Could not submit review.");
     }
-  };
+  }
+};
 
   const handleDeleteReview = async () => {
     if (!userReview?.id) return;
@@ -233,8 +250,8 @@ export default function UserBookDetail() {
             <img
               src={
                 book.cover_image
-              ? `${book.cover_image}`
-              : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
+                  ? `${book.cover_image}`
+                  : book.dataset_image_url || "https://via.placeholder.com/150x220?text=No+Cover"
               }
               alt={book.title}
               className="object-contain rounded-xl border border-gray-200 bg-gray-100 w-56 h-80 shadow"

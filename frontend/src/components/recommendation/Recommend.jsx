@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookCard from "../user-pages/BookCard";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
 
 export default function Recommend() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const fetchRecommendations = async () => {
@@ -31,16 +32,13 @@ export default function Recommend() {
       );
 
       const data = await res.json();
-      console.log(data, "Recommendation");
 
       if (!data.recommendations || data.recommendations.length === 0) {
-        setError(
-          "No recommendations found. Please rate some books to see recommendations."
-        );
+        setMessage(data.message || "No recommendations found.");
         setBooks([]);
       } else {
         setBooks(data.recommendations);
-        setError("");
+        if (data.message) setMessage(data.message);
       }
     } catch (err) {
       console.error(err);
@@ -83,10 +81,17 @@ export default function Recommend() {
           </button>
         </div>
       ) : books.length ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full max-w-7xl">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
+        <div className="w-full max-w-7xl">
+          {message && (
+            <p className="mb-6 text-center text-blue-600 font-semibold">
+              {message}
+            </p>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {books.map((book) => (
+              <BookCard key={book.id} book={book} />
+            ))}
+          </div>
         </div>
       ) : (
         <div className="mt-20 flex flex-col items-center opacity-80 text-center max-w-md">

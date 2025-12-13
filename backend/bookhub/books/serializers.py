@@ -5,19 +5,33 @@ import re
 
 
 class BookMiniSerializer(serializers.ModelSerializer):
+    dataset_image_url = serializers.SerializerMethodField()  # unified image for frontend
+
     class Meta:
         model = Book
-        fields = ['id', 'title', 'author', 'cover_image', 'year_of_publication', 'source']  # Added source field
+        fields = ['id', 'title', 'author', 'year_of_publication', 'source', 'dataset_image_url','cover_image']
+
+    def get_dataset_image_url(self, obj):
+        request = self.context.get('request')
+        url = None
+        if obj.source == "dataset" and obj.dataset_image_url:
+            url = obj.dataset_image_url
+        elif obj.cover_image and hasattr(obj.cover_image, 'url'):
+            url = obj.cover_image.url
+        if url and request:
+            return request.build_absolute_uri(url)
+        return url
 
 
 class BookRatingSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     book = BookMiniSerializer(read_only=True)
+    source = serializers.CharField(read_only=True)
 
     class Meta:
         model = BookRating
-        fields = ['id', 'user', 'book', 'rating', 'comment', 'rated_at']
-        read_only_fields = ['id', 'user', 'book', 'rated_at']
+        fields = ['id', 'user', 'book', 'rating', 'comment', 'rated_at', 'source']
+        read_only_fields = ['id', 'user', 'book', 'rated_at', 'source']
 
     def validate_rating(self, value):
         if not (1 <= value <= 5):
@@ -43,7 +57,8 @@ class BookRatingSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     reviews = BookRatingSerializer(source='ratings', many=True, read_only=True)
     cover_image_url = serializers.SerializerMethodField()
-    source = serializers.CharField(read_only=True)  # expose source field as read-only
+    dataset_image_url = serializers.SerializerMethodField()
+    source = serializers.CharField(read_only=True)
 
     class Meta:
         model = Book
@@ -62,18 +77,26 @@ class BookSerializer(serializers.ModelSerializer):
             'year_of_publication',
             'reviews',
             'cover_image_url',
-            'source',  # added source to fields
+            'dataset_image_url',
+            'source',
         ]
 
     def get_cover_image_url(self, obj):
         request = self.context.get('request')
-        if obj.dataset_image_url:
+        if obj.cover_image and hasattr(obj.cover_image, 'url'):
+            url = obj.cover_image.url
+            if request:
+                return request.build_absolute_uri(url)
+            return url
+        return None
+
+    def get_dataset_image_url(self, obj):
+        request = self.context.get('request')
+        url = None
+        if obj.source == "dataset" and obj.dataset_image_url:
             url = obj.dataset_image_url
         elif obj.cover_image and hasattr(obj.cover_image, 'url'):
             url = obj.cover_image.url
-        else:
-            url = None
-
         if url and request:
             return request.build_absolute_uri(url)
         return url
