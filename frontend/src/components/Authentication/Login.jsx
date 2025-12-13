@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { loginSchema } from "../../utils/ValidationSchema/ValidationSchema";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { useState } from "react";
+import Loader from "../../shared/Loader";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function Login() {
   const { login } = useAuth();
@@ -41,8 +42,7 @@ export default function Login() {
 
   if (loading || isSubmitting) {
     return (
-      <div className="min-h-[90vh] loader">
-      </div>
+      <Loader size={100} /> 
     );
   }
 

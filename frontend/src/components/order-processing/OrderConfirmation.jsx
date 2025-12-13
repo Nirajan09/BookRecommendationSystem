@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import Loader from "../../shared/Loader";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -34,7 +35,7 @@ export default function OrderConfirmation() {
   }, [orderId]);
 
   if (loading) {
-    return <div className="p-6 text-center text-gray-600">Loading order details...</div>;
+    <Loader/>
   }
 
   if (error) {

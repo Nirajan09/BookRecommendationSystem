@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AiOutlineDelete } from "react-icons/ai";
 import { IoCartOutline } from "react-icons/io5";
+import Loader from "../../shared/Loader";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -113,7 +114,7 @@ export default function CartPage() {
 
   if (loading)
     return (
-      <div className="p-10 text-center text-lg text-gray-500">Loading your cart...</div>
+      <Loader/>
     );
 
   if (cartItems.length === 0)

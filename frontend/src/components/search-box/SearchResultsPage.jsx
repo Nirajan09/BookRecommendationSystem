@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookCard from "../user-pages/BookCard";
+import Loader from "../../shared/Loader";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function SearchResultsPage() {
@@ -80,7 +81,7 @@ export default function SearchResultsPage() {
         ))}
       </div>
 
-      {loading && <div className="text-gray-500 mb-4">Loading…</div>}
+      {loading && <Loader/>}
 
       {!loading && hasMore && (
         <button

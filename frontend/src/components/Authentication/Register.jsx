@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Link, useNavigate } from "react-router-dom";
 import { registerSchema } from "../../utils/ValidationSchema/ValidationSchema";
 import { useState } from "react";
+import Loader from "../../shared/Loader";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 export default function Register() {
   const navigate = useNavigate();
@@ -37,9 +38,7 @@ export default function Register() {
 
   if (loading || isSubmitting) {
     return (
-      <div className="min-h-[90vh] flex items-center justify-center text-2xl font-bold text-blue-500">
-        Loading...
-      </div>
+      <Loader/>
     );
   }
 

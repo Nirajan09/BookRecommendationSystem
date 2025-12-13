@@ -6,8 +6,8 @@ import { toast } from "react-toastify";
 import { MdFavorite, MdFavoriteBorder, MdAutorenew } from "react-icons/md";
 import { IoCartOutline } from "react-icons/io5";
 import AddToCartModal from "../../utils/Models/AddToCartModal";
-import StarRating from "../user-pages/StarRating";  // Adjust as needed
-
+import StarRating from "../user-pages/StarRating";  
+import Loader from "../../shared/Loader";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function UserBookDetail() {
@@ -227,9 +227,7 @@ export default function UserBookDetail() {
 
   if (!book)
     return (
-      <div className="flex items-center justify-center min-h-[90vh]">
-        <span>Loading...</span>
-      </div>
+      <Loader/>
     );
 
   // Gather passive user reviews
@@ -408,7 +406,7 @@ export default function UserBookDetail() {
             {/* Add New Review Form (if not reviewed) */}
             {!userReview && (
               <form
-                className="p-4 border rounded-2xl mt-3 flex flex-col gap-2 shadow bg-blue-50/60"
+                className="p-4 border-2 border-blue-200 rounded-2xl mt-3 flex flex-col gap-2 shadow bg-blue-50/60"
                 onSubmit={handleReviewSubmit}
               >
                 <div className="font-semibold text-blue-600 mb-1">Leave a review:</div>
@@ -439,13 +437,13 @@ export default function UserBookDetail() {
                 <div className="flex gap-2 mt-2">
                   <input
                     type="text"
-                    className="flex-1 border px-2 py-2 rounded"
+                    className="flex-1 border-2 border-blue-200 focus:border-blue-200  px-2 py-2 rounded"
                     placeholder="Write your review (optional)"
                     value={reviewText}
                     onChange={e => setReviewText(e.target.value)}
                   />
                   <button
-                    className="bg-green-600 text-white px-5 py-2 rounded"
+                    className="cursor-pointer bg-green-600 hover:bg-green-700 duration-500 text-white px-5 py-2 rounded"
                     type="submit"
                     disabled={!ratingValue}
                   >

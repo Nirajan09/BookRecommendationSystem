@@ -6,6 +6,7 @@ import { IoCartOutline } from "react-icons/io5";
 import { MdFavorite } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import AddToCartModal from "../../utils/Models/AddToCartModal";
+import Loader from "../../shared/Loader";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 function RemoveConfirmModal({ open, book, onConfirm, onCancel, removing }) {
   if (!open || !book) return null;
@@ -162,7 +163,7 @@ const Wishlist = () => {
   };
 
   if (loading) {
-    return <div className="p-6 text-center text-gray-500">Loading wishlist...</div>;
+    return <Loader/>;
   }
 
   if (!wishlist.length) {

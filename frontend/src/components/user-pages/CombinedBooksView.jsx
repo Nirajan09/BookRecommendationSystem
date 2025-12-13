@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import BookCard from "./BookCard";
 import BookShelf from "./BookShelf";
+import Loader from "../../shared/Loader";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -110,9 +111,7 @@ function DatasetBookGrid() {
         </section>
       )}
       {loading && books.length === 0 && (
-        <div className="flex justify-center items-center py-20">
-          <span className="text-lg text-blue-500 font-semibold">Loading books...</span>
-        </div>
+        <Loader/>
       )}
     </>
   );
