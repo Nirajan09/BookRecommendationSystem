@@ -23,7 +23,7 @@ def recommend_books(request):
         message = "You have not rated any books yet. Showing popular books instead."
     elif len(recommendations) < top_n:
         # User has some ratings, but not enough recommendations
-        message = "Not enough personalized books rated. Showing popular books instead."
+        message = "You haven't rated enough books yet to generate personalized recommendations. Here are some popular books to get you started."
         needed = top_n - len(recommendations)
         fallback = get_fallback_books(top_n=needed)
         existing_isbns = {b["isbn"] for b in recommendations}

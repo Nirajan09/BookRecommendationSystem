@@ -14,10 +14,26 @@ class OrderPagination(PageNumberPagination):
 
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
-    serializer_class = OrderSerializer                     # MUST have this to avoid AssertionError
+    serializer_class = OrderSerializer                     
     permission_classes = [permissions.IsAuthenticated]
-    filterset_fields = ['status','payment_method']  # 👈 this enables /orders/?status=cancelled
+    filterset_fields = ['status','payment_method'] 
     filter_backends = [DjangoFilterBackend]
+
+    @action(detail=True, methods=['post'])
+    def cancel(self, request, pk=None):
+        try:
+            order = self.get_object()
+            if order.status.lower() != "pending":
+                return Response(
+                    {"error": "Only pending orders can be cancelled."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            order.status = "cancelled"
+            order.save()
+            return Response({"success": "Order cancelled successfully."})
+        except Order.DoesNotExist:
+            return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
+        
     def get_queryset(self):
         """Only return orders belonging to the logged-in user unless staff."""
         user = self.request.user
