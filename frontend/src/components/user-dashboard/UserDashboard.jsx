@@ -227,13 +227,13 @@ export default function UserDashboard() {
           </section> */}
 
           {/* Reviews */}
-          <section className="mb-12" id="reviews">
+          <section className="mb-12 " id="reviews">
             <h2 className="text-xl font-bold mb-2 text-blue-700">My Reviews</h2>
             {reviews.length === 0 ? (
               <p className="text-gray-400">There are no reviews yet.</p>
             ) : (
               reviews.map((review) => (
-                <div key={review.id} className="mb-6 border rounded-2xl p-4 bg-white shadow-sm">
+                <div key={review.id} className="mb-6  rounded-2xl p-4 bg-white shadow-sm border border-blue-200">
                   <div className="flex items-center mb-2">
                     <img
                       src={
@@ -316,6 +316,104 @@ export default function UserDashboard() {
           </section>
         </main>
       </div>
+
+      {showEditModal && selectedReview && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowEditModal(false)}>
+          <div className="bg-white p-6 rounded-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-xl font-bold mb-4">Edit Review</h2>
+
+            {/* Rating */}
+            <div className="flex mb-3">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button key={star} onClick={() => setEditRating(star)}>
+                  {star <= editRating ? (
+                    <AiFillStar size={24} className="text-yellow-400" />
+                  ) : (
+                    <AiOutlineStar size={24} className="text-yellow-400" />
+                  )}
+                </button>
+              ))}
+            </div>
+
+            {/* Comment */}
+            <textarea
+              value={editComment}
+              onChange={(e) => setEditComment(e.target.value)}
+              className="w-full border rounded p-2 mb-4"
+              rows={4}
+            />
+
+            <div className="flex gap-3">
+              <button
+                className="flex-1 bg-blue-600 text-white py-2 rounded"
+                onClick={async () => {
+                  try {
+                    await axios.put(
+                      `${backendUrl}/books/reviews/${selectedReview.id}/`,
+                      { rating: editRating, comment: editComment },
+                      { headers: { Authorization: `Token ${token}` } }
+                    );
+                    toast.success("Review updated");
+                    setShowEditModal(false);
+                    fetchUserReviews();
+                  } catch {
+                    toast.error("Failed to update review");
+                  }
+                }}
+              >
+                Save
+              </button>
+
+              <button
+                className="flex-1 bg-gray-300 py-2 rounded"
+                onClick={() => setShowEditModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && selectedReview && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50" onClick={() => setShowEditModal(false)}>
+          <div className="bg-white p-6 rounded-xl w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
+            <h2 className="text-lg font-bold mb-4">Delete Review</h2>
+            <p className="mb-6 text-gray-600">
+              Are you sure you want to delete this review?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                className="flex-1 bg-red-600 text-white py-2 rounded"
+                onClick={async () => {
+                  try {
+                    await axios.delete(
+                      `${backendUrl}/books/reviews/${selectedReview.id}/`,
+                      { headers: { Authorization: `Token ${token}` } }
+                    );
+                    toast.success("Review deleted");
+                    setShowDeleteModal(false);
+                    fetchUserReviews();
+                  } catch {
+                    toast.error("Failed to delete review");
+                  }
+                }}
+              >
+                Delete
+              </button>
+
+              <button
+                className="flex-1 bg-gray-300 py-2 rounded"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Order Details Modal */}
       {selectedOrder && (
@@ -402,3 +500,5 @@ function OrderDetailsModal({ order, onClose, onCancel }) {
     </div>
   );
 }
+
+
