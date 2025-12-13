@@ -9,33 +9,6 @@ from .serializers import BookSerializer, BookRatingSerializer, CartItemSerialize
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import status
 
-# def recommend_books(request):
-#     user_id = request.GET.get('user_id')
-#     df = load_user_book_data()  # however you're loading it
-#     sparse_matrix = build_sparse_matrix(df)
-#     # proceed with recommendation logic
-
-def recommend_books_view(request):
-    user_id = request.GET.get("user_id")
-    strategy = request.GET.get("strategy", "user")  # default to user-based
-
-    if not user_id:
-        return JsonResponse({"error": "user_id is required"}, status=400)
-
-    try:
-        user_id = int(user_id)
-    except ValueError:
-        return JsonResponse({"error": "Invalid user_id"}, status=400)
-
-    recommendations = get_personalized_recommendations(user_id, top_n=8, strategy=strategy)
-    if not recommendations:
-        return JsonResponse({"error": "No recommendations available"}, status=400)
-
-    return JsonResponse({
-        "user_id": user_id,
-        "strategy": strategy,
-        "recommendations": recommendations
-    })
 
 class AdminBookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()

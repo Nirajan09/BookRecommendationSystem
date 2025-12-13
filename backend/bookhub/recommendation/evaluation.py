@@ -1,7 +1,7 @@
 # recommender/evaluation.py
 import pandas as pd
 from books.models import BookRating
-from .recommender import get_personalized_recommendations
+from .recommender import get_hybrid_recommendations 
 
 def evaluate_recommender(k=5, test_ratio=0.2):
     """
@@ -32,7 +32,7 @@ def evaluate_recommender(k=5, test_ratio=0.2):
             continue  # skip users with no relevant books
 
         # Get top-K recommendations for this user
-        recs = get_personalized_recommendations(user_id, top_n=k)
+        recs = get_hybrid_recommendations(user_id, top_n=k)
         recommended_books = [r["title"] for r in recs]
 
         # True positives: intersection of recommended & relevant
