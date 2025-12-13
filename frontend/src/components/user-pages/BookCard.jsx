@@ -9,7 +9,6 @@ import { useAuth } from "../../utils/AuthContext/AuthContext";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export default function BookCard({ book }) {
-  console.log(book,"Book card")
   const { token, user: currUser } = useAuth();
   const navigate = useNavigate();
   const [showCartModal, setShowCartModal] = useState(false);
@@ -37,7 +36,7 @@ export default function BookCard({ book }) {
       navigate("/cart");
     } catch (err) {
       toast.error("Could not add to cart.");
-      console.log(err)
+      console.error(err)
     } finally {
       setAddingCart(false);
     }

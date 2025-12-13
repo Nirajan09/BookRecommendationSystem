@@ -181,14 +181,8 @@ class BookViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def rate(self, request, pk=None):
         book = self.get_object()
-        data = {
-            "rating": request.data.get("rating"),
-            "comment": request.data.get("comment", ""),
-        }
-
-        serializer = BookRatingSerializer(data=data)
+        serializer = BookRatingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         rating_value = serializer.validated_data["rating"]
         comment = serializer.validated_data.get("comment", "")
 

@@ -40,7 +40,6 @@ export default function SearchResultsPage() {
       .then((res) => {
         // API returns paginated result with results array
         const newBooks = res.data.results || [];
-        console.log(newBooks,"SearchBooks")
         setResults((prev) => (append ? [...prev, ...newBooks] : newBooks));
         setOffset(offsetParam + newBooks.length);
         setHasMore(res.data.next !== null);

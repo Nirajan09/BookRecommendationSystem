@@ -16,7 +16,6 @@ export default function PayWithEsewaPage() {
       const paymentUrl = `https://rc.esewa.com.np/epay/main?amt=${totalCost}&txAmt=0&psc=0&pdc=0&tAmt=${totalCost}&pid=TEMP123&scd=EPAYTEST&su=${encodeURIComponent(
         successUrl
       )}&fu=${encodeURIComponent(failUrl)}`;
-      console.log(paymentUrl)
       window.location.href = paymentUrl;
     }
   }, [orderPayload, totalCost]);

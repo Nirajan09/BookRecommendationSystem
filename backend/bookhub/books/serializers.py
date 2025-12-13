@@ -59,7 +59,7 @@ class BookSerializer(serializers.ModelSerializer):
     cover_image_url = serializers.SerializerMethodField()
     dataset_image_url = serializers.SerializerMethodField()
     source = serializers.CharField(read_only=True)
-
+    average_rating = serializers.FloatField(read_only=True)
     class Meta:
         model = Book
         fields = [

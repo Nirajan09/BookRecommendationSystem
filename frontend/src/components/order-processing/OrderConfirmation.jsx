@@ -62,7 +62,6 @@ export default function OrderConfirmation() {
     stripe: "Credit/Debit Card (Stripe)",
     esewa: "E-Sewa",
   };
-  console.log("Order",order)
   return (
     <div
       className="max-w-4xl mx-auto p-8 bg-white rounded-3xl shadow-xl mt-12"

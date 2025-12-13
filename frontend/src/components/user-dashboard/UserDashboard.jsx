@@ -35,14 +35,10 @@ export default function UserDashboard() {
         headers: { Authorization: `Token ${token}` },
       });
 
-      // Log the actual response
-      console.log("API response:", res.data);
 
       const reviewsArray = Array.isArray(res.data?.results) ? res.data.results : [];
       setReviews(reviewsArray);
 
-      // Log the array after you get it
-      console.log("Reviews array to set:", reviewsArray);
     } catch {
       toast.error("Failed to load your reviews");
       setReviews([]);
@@ -429,7 +425,6 @@ export default function UserDashboard() {
 
 function OrderDetailsModal({ order, onClose, onCancel }) {
   const items = order.items || [];
-  console.log(items)
   return (
     <div
       className="fixed inset-0 bg-black/40 bg-opacity-40 flex items-center justify-center z-50"

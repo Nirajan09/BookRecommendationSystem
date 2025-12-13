@@ -39,7 +39,6 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { token: authToken } = useAuth();
   const cartItems = location.state?.items || [];
-  console.log(cartItems)
   const [province, setProvince] = useState(PROVINCES[0]);
   const [city, setCity] = useState(CITIES_BY_PROVINCE[PROVINCES[0]][0]);
   const [shippingMethod, setShippingMethod] = useState("standard");

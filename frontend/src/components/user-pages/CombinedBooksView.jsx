@@ -23,7 +23,6 @@ function AdminBookCarousel() {
         params: { limit, offset: offsetParam },
         headers: { Authorization: `Token ${token}` },
       });
-      console.log("Admin books response:", res.data);
       setBooks(prev => [...prev, ...res.data.results]);
       setHasMore(res.data.length === limit);
       setHasMore(res.data.next !== null);

@@ -65,12 +65,4 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(f"✅ User mapping saved to {MAPPING_FILE}"))
 
-        # ---- Update all book average ratings once ----
-        for book in Book.objects.all():
-            avg_rating = (
-                BookRating.objects.filter(book=book).aggregate(avg=Avg("rating"))["avg"] or 0
-            )
-            book.average_rating = round(avg_rating, 2)
-            book.save(update_fields=["average_rating"])
-
         self.stdout.write(self.style.SUCCESS("✅ Book average ratings updated successfully."))
