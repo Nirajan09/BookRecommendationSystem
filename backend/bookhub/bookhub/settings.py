@@ -32,11 +32,11 @@ ALLOWED_HOSTS = [
 # -----------------------------
 CORS_ALLOW_ALL_ORIGINS = False  
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  
-    "https://localhost:5173",
-    "https://book-recommendation-system-topaz.vercel.app",  
-]
+CORS_ALLOW_CREDENTIALS = True 
+
+# Read allowed origins from environment variable, split by comma
+cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
