@@ -1,61 +1,52 @@
+1. Welcome to Forever
 
-Title: Clean Code: A Handbook of Agile Software Craftsmanship
+Title: Welcome to Forever
+Author: Nathan Tavares
+Genre: Science Fiction, Romance
+ISBN: 9781803360409
+Description: A near-future sci-fi romance where memory editing technology allows people to rewrite their pasts — and explores identity, love, and what it means to be human. The emotional connection drives the story between Fox and Gabe as they confront loss and belonging. 
+Wikipedia
 
-Author: Robert C. Martin
+2. The Ministry of Time
 
-ISBN: 9780132350884
+Title: The Ministry of Time
+Author: Kaliane Bradley
+Genre: Science Fiction, Romance
+ISBN: 9781668045145
+Description: A 2024 sci-fi romance about time travel and politics, following a government worker safeguarding a time-traveller as their relationship evolves across unexpected timelines. 
+Wikipedia
 
-Price: $30–$50 USD (varies by store and condition)
+3. A Klaus Encounter (New Sci-Fi Romance)
 
-Quantity: Commonly available
+Title: A Klaus Encounter
+Author: Honey Phillips
+Genre: Science Fiction Romance
+Publish Date: Dec 4, 2025
+Description: A heart-warming alien romance featuring a grieving woman, an alien warrior, and the unexpected family bonds they form while trying to rescue a lost child. 
+romance.io
 
+4. Xara and the Xenobeast (Sci-Fi Romance Adventure)
 
-Cover Image:
+Title: Xara and the Xenobeast
+Author: Honey Phillips
+Genre: Science Fiction, Romance
+Publish Date: Jul 3, 2025
+Description: After a human woman is abducted to a hostile world filled with strange creatures, her survival depends on unlikely alliances — and a growing emotional bond with one of her captors. 
+romance.io
 
-2. Automate the Boring Stuff with Python
-Title: Automate the Boring Stuff with Python: Practical Programming for Total Beginners
+5. Iron and Dust: A Dystopian Cyborg Romance
 
-Author: Al Sweigart
+Title: Iron and Dust: A Dystopian Cyborg Romance
+Author: Sal Riff
+Genre: Science Fiction Romance, Dystopian
+Description: In a dying world filled with danger, a tough scavenger meets a bio-engineered super-soldier with a hidden soul — and they must learn to trust each other to survive. 
+Veronica Scott Author
 
-ISBN: 9781593275990
+6. (Bonus Recommendation) Weeping Nightshade
 
-Price: $20–$30 USD on most platforms
-
-Quantity: Commonly available
-
-Description:
-Introduces Python programming through real-world automation projects. Step-by-step instructions teach how to automate tasks like updating spreadsheets, handling files, and interacting with websites—no prior programming experience required.
-
-Cover Image:
-
-3. Python Crash Course
-Title: Python Crash Course: A Hands-On, Project-Based Introduction to Programming
-
-Author: Eric Matthes
-
-ISBN: 9781718502703 (3rd Edition)
-
-Price: $21–$40 USD, depending on retailer and edition
-
-Quantity: Commonly available
-
-Description:
-One of the best-selling programming books, it covers Python fundamentals plus practical projects like games, data visualization, and simple web apps. Ideal for beginners and those who want a practical, project-based approach.
-
-Cover Image:
-
-4. The Pragmatic Programmer
-Title: The Pragmatic Programmer: From Journeyman to Master (20th Anniversary Edition: Your Journey to Mastery)
-
-Authors: Andrew Hunt, David Thomas
-
-ISBN: 9780135957059 (20th Anniversary Edition)
-
-Price: $27–$36 USD (varies)
-
-Quantity: Widely available
-
-Description:
-Essential reading for developers, this book combines practical tips for software development with insights into problem-solving, career growth, and code craftsmanship. Known for popularizing best practices such as DRY and robust debugging techniques.
-
-Cover Image:
+Title: Weeping Nightshade
+Author: Micki Mirello
+Genre: Science Fiction Romance
+Publish Date: Jun 25, 2025
+Description: Five women crash-land on a hostile planet full of mysteries — and romance ignites among danger, humor, and unexpected connections. 
+romance.io
