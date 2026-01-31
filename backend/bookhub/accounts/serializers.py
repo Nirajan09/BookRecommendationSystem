@@ -1,7 +1,5 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
-from rest_framework.response import Response
-from rest_framework import status
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -10,14 +8,13 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id','username', 'password', 'email')
 
-        def create(self, request, *args, **kwargs):
-            serializer = self.get_serializer(data=request.data)
-            if not serializer.is_valid():
-                print("Serializer errors:", serializer.errors)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email'),
+            password=validated_data['password']
+        )
+        return user
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
