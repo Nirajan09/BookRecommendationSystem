@@ -24,7 +24,7 @@ DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "bookrecommendationsystem-d42r.onrender.com",
+    "https://bookrecommendationsystem-z65y.onrender.com",
 ]
 
 # -----------------------------
@@ -65,10 +65,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
 
-    # CORS
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
 
     "django.middleware.csrf.CsrfViewMiddleware",
