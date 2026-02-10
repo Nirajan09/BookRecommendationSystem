@@ -8,7 +8,9 @@ import { loginSchema } from "../../utils/ValidationSchema/ValidationSchema";
 import { useAuth } from "../../utils/AuthContext/AuthContext";
 import { useState } from "react";
 import Loader from "../../shared/Loader";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -24,93 +26,81 @@ export default function Login() {
 
   const onSubmit = async (data) => {
     setLoading(true);
+
     try {
-      const res = await axios.post(`${backendUrl}/accounts/login/`, data);
-      toast.success("Login successful!", {
-        position: "top-right",
-        autoClose: 2000,
-        closeButton: false,
-      });
+      const res = await axios.post(
+        `${backendUrl}/accounts/login/`,
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      toast.success("Login successful!", { autoClose: 2000 });
+
       const profile = await login(res.data.token);
-      navigate(profile && profile.is_staff ? "/admin" : "/books");
-    } catch {
-      toast.error("Invalid credentials.");
+      navigate(profile?.is_staff ? "/admin" : "/books");
+
+    } catch (error) {
+      if (error.response && error.response.data) {
+        const errData = error.response.data;
+
+        Object.values(errData).forEach((messages) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((msg) => toast.error(msg));
+          } else {
+            toast.error(messages);
+          }
+        });
+      } else {
+        toast.error("Invalid credentials.");
+      }
     } finally {
       setLoading(false);
     }
   };
 
   if (loading || isSubmitting) {
-    return (
-      <Loader size={100} /> 
-    );
+    return <Loader />;
   }
 
   return (
-    <section className="min-h-[90vh] flex items-center justify-center px-4 py-8 sm:py-12 bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="w-full max-w-md bg-white border border-blue-200 rounded-2xl shadow-lg p-8 sm:p-10 flex flex-col items-center animate-fade-in">
-        <h2 className="mb-6 text-blue-700 font-bold tracking-wide text-2xl sm:text-3xl text-center">
+    <section className="min-h-[90vh] flex items-center justify-center px-4 py-8 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="w-full max-w-md bg-white border rounded-2xl shadow-lg p-8">
+        <h2 className="mb-6 text-blue-700 font-bold text-2xl text-center">
           Welcome Back
         </h2>
 
-        <form
-          className="w-full flex flex-col"
-          onSubmit={handleSubmit(onSubmit)}
-          noValidate
-        >
-          {/* Username */}
+        <form className="w-full flex flex-col" onSubmit={handleSubmit(onSubmit)} noValidate>
+
           <input
             {...register("username")}
             placeholder="Username"
-            autoComplete="username"
-            className="w-full px-4 py-3 mb-2 border border-blue-200 rounded-lg bg-blue-50 text-base focus:border-blue-700 focus:bg-blue-100 transition"
+            className="w-full px-4 py-3 mb-2 border rounded-lg"
           />
-          {errors.username && (
-            <p className="text-red-500 text-sm mb-3 animate-fade-in">
-              {errors.username.message}
-            </p>
-          )}
+          {errors.username && <p className="text-red-500 text-sm">{errors.username.message}</p>}
 
-          {/* Password */}
           <input
             {...register("password")}
             type="password"
             placeholder="Password"
-            autoComplete="current-password"
-            className="w-full px-4 py-3 mb-2 border border-blue-200 rounded-lg bg-blue-50 text-base focus:border-blue-700 focus:bg-blue-100 transition"
+            className="w-full px-4 py-3 mb-2 border rounded-lg"
           />
-          {errors.password && (
-            <p className="text-red-500 text-sm mb-3 animate-fade-in">
-              {errors.password.message}
-            </p>
-          )}
+          {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
 
-          {/* Submit */}
           <button
             type="submit"
-            disabled={isSubmitting || loading}
-            className="w-full mt-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold hover:opacity-90 transition transform hover:-translate-y-0.5 focus:ring-2 focus:ring-blue-300"
+            disabled={loading}
+            className="w-full mt-6 py-3 rounded-xl bg-blue-600 text-white font-semibold"
           >
             Login
           </button>
 
-          {/* Links */}
-          <p className="mt-6 text-center text-gray-600 text-sm">
+          <p className="mt-4 text-center text-sm">
             Don't have an account?{" "}
-            <Link
-              to="/register"
-              className="text-blue-600 underline hover:text-blue-800"
-            >
-              Register
-            </Link>
-          </p>
-          <p className="mt-2 text-center">
-            <Link
-              to="/"
-              className="text-gray-400 text-xs hover:text-gray-600 hover:underline"
-            >
-              Back to Home
-            </Link>
+            <Link to="/register" className="text-blue-600 underline">Register</Link>
           </p>
         </form>
       </div>
