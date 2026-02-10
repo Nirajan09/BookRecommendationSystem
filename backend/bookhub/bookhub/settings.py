@@ -12,32 +12,25 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET KEY
-SECRET_KEY = os.getenv("SECRET_KEY")
+# =====================
+# CORE SETTINGS
+# =====================
+SECRET_KEY = os.getenv("SECRET_KEY", "unsafe-secret-key")
 
-# DEBUG
-DEBUG = os.getenv("DEBUG", "True").lower() == "true"
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-# -----------------------------
-# ALLOWED HOSTS for Render
-# -----------------------------
+# =====================
+# ALLOWED HOSTS
+# =====================
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "https://bookrecommendationsystem-z65y.onrender.com",
+    "bookrecommendationsystem-z65y.onrender.com",
 ]
 
-# -----------------------------
+# =====================
 # CORS SETTINGS
-# -----------------------------
-CORS_ALLOW_ALL_ORIGINS = False  
-
-CORS_ALLOW_CREDENTIALS = True 
-
-# Read allowed origins from environment variable, split by comma
-cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "")
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
-
+# =====================
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -45,8 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    
-    # Third party
+
+    # Third-party
     "rest_framework",
     "rest_framework.authtoken",
     "corsheaders",
@@ -65,9 +58,11 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
 
+    # CORS MUST be high
+    "corsheaders.middleware.CorsMiddleware",
+
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
 
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -76,17 +71,39 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "https://book-recommendation-system-umber.vercel.app",
+]
+
+# =====================
+# DJANGO REST FRAMEWORK
+# =====================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.TokenAuthentication",
     ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",
+    ],
+    "DEFAULT_PARSER_CLASSES": [
+        "rest_framework.parsers.JSONParser",
+    ],
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+    ],
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 15,
     "DEFAULT_FILTER_BACKENDS": [
-        "django_filters.rest_framework.DjangoFilterBackend"
+        "django_filters.rest_framework.DjangoFilterBackend",
     ],
 }
 
+# =====================
+# URLS & TEMPLATES
+# =====================
 ROOT_URLCONF = "bookhub.urls"
 
 TEMPLATES = [
@@ -106,12 +123,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "bookhub.wsgi.application"
 
-# Database
+# =====================
+# DATABASE
+# =====================
 if DEBUG:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 else:
@@ -123,7 +142,9 @@ else:
         )
     }
 
-# Validators
+# =====================
+# PASSWORD VALIDATION
+# =====================
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -131,24 +152,30 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+# =====================
+# LOCALIZATION
+# =====================
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Static & Media
-STATIC_URL = "static/"
+# =====================
+# STATIC & MEDIA
+# =====================
+STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ---------- ESEWA ----------
+# =====================
+# PAYMENT KEYS
+# =====================
 ESEWA_MERCHANT_ID = os.getenv("ESEWA_MERCHANT_ID")
 ESEWA_MERCHANT_CODE = os.getenv("ESEWA_MERCHANT_CODE")
 ESEWA_VERIFY_URL = os.getenv("ESEWA_VERIFY_URL")
 ESEWA_PAYMENT_URL = os.getenv("ESEWA_PAYMENT_URL")
 
-# ---------- STRIPE ----------
 STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY")
